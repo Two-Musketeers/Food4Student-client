@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screens.sign_in
+package com.ilikeincest.food4student.screens.sign_up
 
 import com.ilikeincest.food4student.model.service.AccountService
 import com.ilikeincest.food4student.screens.ScreenViewModel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(
+class SignUpViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ScreenViewModel() {
     // Backing properties to avoid state updates from other classes
@@ -19,6 +19,9 @@ class SignInViewModel @Inject constructor(
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password.asStateFlow()
 
+    private val _confirmPassword = MutableStateFlow("")
+    val confirmPassword: StateFlow<String> = _confirmPassword.asStateFlow()
+
     fun updateEmail(newEmail: String) {
         _email.value = newEmail
     }
@@ -27,14 +30,26 @@ class SignInViewModel @Inject constructor(
         _password.value = newPassword
     }
 
-    fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
-        launchCatching {
-            accountService.signInWithEmail(_email.value, _password.value)
-            openAndPopUp("AppScreen", "SignInScreen")
-        }
+    fun updateConfirmPassword(newConfirmPassword: String) {
+        _confirmPassword.value = newConfirmPassword
     }
 
     fun onSignUpClick(openAndPopUp: (String, String) -> Unit) {
-        openAndPopUp("SignUpScreen", "SignInScreen")
+        launchCatching {
+            if (!_email.value.isValidEmail()) {
+                throw IllegalArgumentException("Invalid email format")
+            }
+
+            if (!_password.value.isValidPassword()) {
+                throw IllegalArgumentException("Invalid password format")
+            }
+
+            if (_password.value != _confirmPassword.value) {
+                throw IllegalArgumentException("Passwords do not match")
+            }
+
+            accountService.linkAccountWithEmail(_email.value, _password.value)
+            openAndPopUp("AppScreen", "SignInScreen")
+        }
     }
 }
