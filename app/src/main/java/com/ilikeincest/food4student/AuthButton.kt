@@ -69,7 +69,10 @@ fun AuthenticationButton(
                 }
             }
         },
-        modifier = modifier.fillMaxWidth()
+        colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp, 0.dp)
     ) {
         Icon(
             // TODO: extract icon

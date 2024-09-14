@@ -11,6 +11,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.ilikeincest.food4student.screens.sign_in.SignInScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,27 +23,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Food4StudentTheme {
+                val navController = rememberNavController()
+                val appState = AppState(navController)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TestLogInWithGoogle(
-                        modifier = Modifier.padding(innerPadding)
+                    SignInScreen(
+                        openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun TestLogInWithGoogle(
-    modifier: Modifier = Modifier,
-    gameViewModel: AppViewModel = viewModel()
-) {
-    Column(modifier = modifier) {
-        AuthenticationButton(
-            "Login bitch",
-            onGetCredentialResponse = { credential ->
-                gameViewModel.onSignInWithGoogle(credential)
-            }
-        )
     }
 }
