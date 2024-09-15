@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ilikeincest.food4student.screens.app.AppScreen
+import com.ilikeincest.food4student.screens.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screens.sign_in.SignInScreen
 import com.ilikeincest.food4student.screens.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screens.splash.SplashScreen
@@ -44,8 +44,8 @@ fun rememberAppState(navController: NavHostController = rememberNavController())
     }
 
 fun NavGraphBuilder.notesGraph(appState: AppState) {
-    composable("AppScreen") {
-        AppScreen(navController = appState.navController)
+    composable("AccountCenterScreen") {
+        AccountCenterScreen(navController = appState.navController)
     }
     composable("SignInScreen") {
         SignInScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })

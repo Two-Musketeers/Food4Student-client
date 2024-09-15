@@ -11,7 +11,7 @@ class SplashViewModel @Inject constructor(
 ) : ScreenViewModel() {
 
     fun onAppStart(openAndPopUp: (String, String) -> Unit) {
-        if (accountService.hasUser()) openAndPopUp("AppScreen", "SplashScreen")
+        if (accountService.hasUser()) openAndPopUp("AccountCenterScreen", "SplashScreen")
         else openAndPopUp("SignInScreen", "SplashScreen")
     }
 

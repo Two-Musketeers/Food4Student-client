@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screens.app
+package com.ilikeincest.food4student.screens.account_center
 
 import android.content.Context
 import android.content.Intent
