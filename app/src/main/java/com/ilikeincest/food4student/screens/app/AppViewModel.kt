@@ -1,5 +1,10 @@
 package com.ilikeincest.food4student.screens.app
 
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.NavController
+import com.ilikeincest.food4student.MainActivity
 import com.ilikeincest.food4student.model.User
 import com.ilikeincest.food4student.model.service.AccountService
 import com.ilikeincest.food4student.screens.ScreenViewModel
@@ -30,21 +35,29 @@ class AccountCenterViewModel @Inject constructor(
         }
     }
 
-    fun onSignInClick(openScreen: (String) -> Unit) = openScreen("SignInScreen")
+    fun onSignInClick(navController: NavController) {
+        navController.navigate("SignInScreen")
+    }
 
-    fun onSignUpClick(openScreen: (String) -> Unit) = openScreen("SignUpScreen")
+    fun onSignUpClick(navController: NavController) {
+        navController.navigate("SignUpScreen")
+    }
 
-    fun onSignOutClick(restartApp: (String) -> Unit) {
+    fun onSignOutClick(navController: NavController, context: Context) {
         launchCatching {
             accountService.signOut()
-            restartApp("SplashScreen")
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(context, intent, null)
         }
     }
 
-    fun onDeleteAccountClick(restartApp: (String) -> Unit) {
+    fun onDeleteAccountClick(navController: NavController, context: Context) {
         launchCatching {
             accountService.deleteAccount()
-            restartApp("SplashScreen")
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(context, intent, null)
         }
     }
 }

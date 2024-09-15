@@ -19,25 +19,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.model.User
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 import java.util.Locale
 
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScreen(
-    restartApp: (String) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: AccountCenterViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState(initial = User())
     val provider = user.provider.replaceFirstChar { it.titlecase(Locale.getDefault()) }
+    val context = LocalContext.current
 
     Scaffold {
         Column(
@@ -48,31 +52,38 @@ fun AppScreen(
         ) {
             TopAppBar(title = { Text(stringResource(R.string.account_center)) })
 
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            )
 
             DisplayNameCard(user.displayName) { viewModel.onUpdateDisplayNameClick(it) }
 
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            )
 
             Card(modifier = Modifier.card()) {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                ) {
                     if (!user.isAnonymous) {
                         Text(
-                            text = String.format(stringResource(R.string.profile_email), user.email),
+                            text = String.format(
+                                stringResource(R.string.profile_email),
+                                user.email
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
                         )
                     }
 
-                    // ⚠️This is for demonstration purposes only, it's not a common
-                    // practice to show the unique ID or account provider of an account⚠️
                     Text(
                         text = String.format(stringResource(R.string.profile_uid), user.id),
                         modifier = Modifier
@@ -89,32 +100,32 @@ fun AppScreen(
                 }
             }
 
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            )
 
             if (user.isAnonymous) {
-                AccountCenterCard(stringResource(R.string.sign_in), Icons.Filled.Face, Modifier.card()) {
-                    viewModel.onSignInClick(restartApp)
+                AccountCenterCard(
+                    stringResource(R.string.sign_in),
+                    Icons.Filled.Face,
+                    Modifier.card()
+                ) {
+                    viewModel.onSignInClick(navController)
                 }
 
-                AccountCenterCard(stringResource(R.string.sign_up), Icons.Filled.AccountCircle, Modifier.card()) {
-                    viewModel.onSignUpClick(restartApp)
+                AccountCenterCard(
+                    stringResource(R.string.sign_up),
+                    Icons.Filled.AccountCircle,
+                    Modifier.card()
+                ) {
+                    viewModel.onSignUpClick(navController)
                 }
             } else {
-                ExitAppCard { viewModel.onSignOutClick(restartApp) }
-                RemoveAccountCard { viewModel.onDeleteAccountClick(restartApp) }
+                ExitAppCard(navController, context) { navController, context -> viewModel.onSignOutClick(navController, context) }
+                RemoveAccountCard(navController, context) { navController, context -> viewModel.onDeleteAccountClick(navController, context) }
             }
         }
-    }
-}
-
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AccountCenterPreview() {
-    Food4StudentTheme {
-        AppScreen({ })
     }
 }
