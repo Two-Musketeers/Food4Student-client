@@ -1,5 +1,8 @@
 package com.ilikeincest.food4student.screens.sign_up
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import com.ilikeincest.food4student.model.service.AccountService
 import com.ilikeincest.food4student.screens.ScreenViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,22 +37,30 @@ class SignUpViewModel @Inject constructor(
         _confirmPassword.value = newConfirmPassword
     }
 
-    fun onSignUpClick(openAndPopUp: (String, String) -> Unit) {
+    fun onSignUpClick(openAndPopUp: (String, String) -> Unit, context: Context) {
         launchCatching {
-            if (!_email.value.isValidEmail()) {
-                throw IllegalArgumentException("Invalid email format")
-            }
+            try {
+                if (!_email.value.isValidEmail()) {
+                    throw IllegalArgumentException("Invalid email format")
+                }
 
-            if (!_password.value.isValidPassword()) {
-                throw IllegalArgumentException("Invalid password format")
-            }
+                if (!_password.value.isValidPassword()) {
+                    throw IllegalArgumentException("Invalid password format")
+                }
 
-            if (_password.value != _confirmPassword.value) {
-                throw IllegalArgumentException("Passwords do not match")
-            }
+                if (_password.value != _confirmPassword.value) {
+                    throw IllegalArgumentException("Passwords do not match")
+                }
 
-            accountService.linkAccountWithEmail(_email.value, _password.value)
-            openAndPopUp("AccountCenterScreen", "SignInScreen")
+                accountService.createAccountWithEmail(_email.value, _password.value)
+                openAndPopUp("AccountCenterScreen", "SignUpScreen")
+            } catch (e: IllegalArgumentException) {
+                Log.e("SignUpError", e.message.orEmpty())
+                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                Log.e("SignUpError", e.message.orEmpty())
+                Toast.makeText(context, "An unexpected error occurred", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }
