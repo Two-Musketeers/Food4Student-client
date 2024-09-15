@@ -30,7 +30,7 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
         launchCatching {
             accountService.signInWithEmail(_email.value, _password.value)
-            openAndPopUp("AppScreen", "SignInScreen")
+            openAndPopUp("AccountCenterScreen", "SignInScreen")
         }
     }
 

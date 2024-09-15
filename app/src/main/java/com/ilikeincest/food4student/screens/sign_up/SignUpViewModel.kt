@@ -49,7 +49,7 @@ class SignUpViewModel @Inject constructor(
             }
 
             accountService.linkAccountWithEmail(_email.value, _password.value)
-            openAndPopUp("AppScreen", "SignInScreen")
+            openAndPopUp("AccountCenterScreen", "SignInScreen")
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screens.app
+package com.ilikeincest.food4student.screens.account_center
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card

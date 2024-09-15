@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screens.app
+package com.ilikeincest.food4student.screens.account_center
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
@@ -21,20 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.model.User
-import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 import java.util.Locale
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScreen(
+fun AccountCenterScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: AccountCenterViewModel = hiltViewModel()
