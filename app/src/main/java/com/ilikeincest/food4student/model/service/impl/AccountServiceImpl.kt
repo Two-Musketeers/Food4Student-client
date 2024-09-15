@@ -1,10 +1,8 @@
 package com.ilikeincest.food4student.model.service.impl
 
 import com.google.firebase.Firebase
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
@@ -56,11 +54,6 @@ class AccountServiceImpl @Inject constructor() : AccountService {
     override suspend fun linkAccountWithGoogle(idToken: String) {
         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
         Firebase.auth.currentUser!!.linkWithCredential(firebaseCredential).await()
-    }
-
-    override suspend fun linkAccountWithEmail(email: String, password: String) {
-        val credential = EmailAuthProvider.getCredential(email, password)
-        Firebase.auth.currentUser!!.linkWithCredential(credential).await()
     }
 
     override suspend fun signInWithGoogle(idToken: String) {

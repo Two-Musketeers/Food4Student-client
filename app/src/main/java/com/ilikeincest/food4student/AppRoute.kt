@@ -19,7 +19,7 @@ import com.ilikeincest.food4student.screens.splash.SplashScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 
 @Composable
-fun Food4StudentsApp() {
+fun AppRoute() {
     Food4StudentTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
