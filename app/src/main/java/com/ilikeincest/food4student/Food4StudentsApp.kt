@@ -45,7 +45,7 @@ fun rememberAppState(navController: NavHostController = rememberNavController())
 
 fun NavGraphBuilder.notesGraph(appState: AppState) {
     composable("AppScreen") {
-        AppScreen(restartApp = { route -> appState.clearAndNavigate(route) })
+        AppScreen(navController = appState.navController)
     }
     composable("SignInScreen") {
         SignInScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })

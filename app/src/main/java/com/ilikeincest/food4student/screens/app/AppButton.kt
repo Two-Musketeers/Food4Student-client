@@ -1,10 +1,12 @@
 package com.ilikeincest.food4student.screens.app
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
 
 @Composable
@@ -98,12 +101,13 @@ fun Modifier.card(): Modifier {
 }
 
 @Composable
-fun ExitAppCard(onSignOutClick: () -> Unit) {
+fun ExitAppCard(navController: NavController, context: Context, onSignOutClick: (NavController, Context) -> Unit) {
     var showExitAppDialog by remember { mutableStateOf(false) }
-//
-//    AccountCenterCard(stringResource(R.string.sign_out), Icons.Filled.ExitToApp, Modifier.card()) {
-//        showExitAppDialog = true
-//    }
+
+    AccountCenterCard(stringResource(R.string.sign_out),
+        Icons.AutoMirrored.Filled.ExitToApp, Modifier.card()) {
+        showExitAppDialog = true
+    }
 
     if (showExitAppDialog) {
         AlertDialog(
@@ -116,7 +120,7 @@ fun ExitAppCard(onSignOutClick: () -> Unit) {
             },
             confirmButton = {
                 Button(onClick = {
-                    onSignOutClick()
+                    onSignOutClick(navController, context)
                     showExitAppDialog = false
                 }) {
                     Text(text = stringResource(R.string.sign_out))
@@ -128,7 +132,7 @@ fun ExitAppCard(onSignOutClick: () -> Unit) {
 }
 
 @Composable
-fun RemoveAccountCard(onRemoveAccountClick: () -> Unit) {
+fun RemoveAccountCard(navController: NavController, context: Context, onDeleteAccountClick: (NavController, Context) -> Unit) {
     var showRemoveAccDialog by remember { mutableStateOf(false) }
 
     AccountCenterCard(stringResource(R.string.delete_account), Icons.Filled.Delete, Modifier.card()) {
@@ -146,7 +150,7 @@ fun RemoveAccountCard(onRemoveAccountClick: () -> Unit) {
             },
             confirmButton = {
                 Button(onClick = {
-                    onRemoveAccountClick()
+                    onDeleteAccountClick(navController, context)
                     showRemoveAccDialog = false
                 }) {
                     Text(text = stringResource(R.string.delete_account))
