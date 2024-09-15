@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
@@ -64,6 +66,11 @@ fun AuthenticationButton(
                     )
 
                     onGetCredentialResponse(result.credential)
+
+                    // Restart the app
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(context, intent, null)
                 } catch (e: GetCredentialException) {
                     Log.d(ACCOUNT_ERROR_TAG, e.message.orEmpty())
                 }
@@ -75,7 +82,6 @@ fun AuthenticationButton(
             .padding(16.dp, 0.dp)
     ) {
         Icon(
-            // TODO: extract icon
             painter = painterResource(id = R.drawable.google_g),
             modifier = Modifier
                 .padding(end = 16.dp)
