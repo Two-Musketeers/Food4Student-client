@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.ilikeincest.food4student.model.OrderItem
+import com.ilikeincest.food4student.util.formatPrice
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -90,8 +91,10 @@ fun OrderCard(
             }
         }
         Spacer(Modifier.height(8.dp))
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(orderItems) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            var totalPrice = 0
+            for (it in orderItems) {
+                totalPrice += it.price
                 OrderItemCard(
                     // TODO: add item image link to model
                     image = rememberAsyncImagePainter("https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
@@ -100,6 +103,14 @@ fun OrderCard(
                     price = it.price,
                     quantity = it.quantity
                 )
+            }
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Tổng cộng:", style = typography.titleMedium)
+                Text(formatPrice(totalPrice), style = typography.titleLarge)
             }
         }
     }
