@@ -4,7 +4,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
@@ -88,7 +87,7 @@ class AccountServiceImpl @Inject constructor() : AccountService {
             id = this.uid,
             email = this.email ?: "",
             provider = this.providerId,
-            displayName = this.displayName ?: "",
+            fullName = this.displayName ?: "",
             isAnonymous = this.isAnonymous
         )
     }
