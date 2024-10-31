@@ -1,6 +1,7 @@
 package com.ilikeincest.food4student.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -15,19 +16,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 
-
+/**
+ * A password field with show/hide button
+ *
+ * @param label Label of field
+ * @param password Actual password inside field
+ * @param onPasswordChange Callback invoked on password change
+ * @param imeAction Specifies which button to use for keyboard's enter key
+ * @param keyboardAction KeyboardAction invoked when user press enter key
+ */
 @Composable
 fun PasswordField(
     label: String,
     password: String,
-    onPasswordChanged: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardAction: KeyboardActions = KeyboardActions.Default,
 ) {
     var isPasswordVisible by remember { mutableStateOf(false) }
 
@@ -39,7 +50,7 @@ fun PasswordField(
         else "Show password"
 
     TextField(
-        value = password, onValueChange = onPasswordChanged,
+        value = password, onValueChange = onPasswordChange,
         singleLine = true,
         label = { Text(label) },
         trailingIcon = {
@@ -56,8 +67,11 @@ fun PasswordField(
         if (isPasswordVisible) VisualTransformation.None
         else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password
+            keyboardType = KeyboardType.Password,
+            autoCorrectEnabled = false,
+            imeAction = imeAction
         ),
+        keyboardActions = keyboardAction,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -66,6 +80,6 @@ fun PasswordField(
 @Composable
 private fun PasswordFieldPrev() {
     Food4StudentTheme {
-        PasswordField("password label", "") { }
+        PasswordField("password label", "", {})
     }
 }
