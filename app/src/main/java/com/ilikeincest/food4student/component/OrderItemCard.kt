@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.util.formatPrice
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -75,10 +76,8 @@ fun OrderItemCard(
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text("x$quantity", style = typography.bodySmall)
-                val locale = Locale.forLanguageTag("vi-VN") // TODO: hard code for now.
-                val priceFormatted = NumberFormat.getIntegerInstance(locale).format(price)
-                val currencySymbol = NumberFormat.getCurrencyInstance(locale).currency?.symbol
-                Text("$priceFormatted$currencySymbol", style = typography.titleMedium)
+                val priceFormatted = formatPrice(price)
+                Text(priceFormatted, style = typography.titleMedium)
             }
         }
     }

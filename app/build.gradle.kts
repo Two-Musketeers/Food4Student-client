@@ -6,6 +6,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     // login things
     id("com.google.gms.google-services")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
