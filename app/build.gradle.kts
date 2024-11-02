@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -24,6 +26,15 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("secret.props").inputStream())
+        val apiKey = properties.getProperty("HERE_API_KEY")
+        val apiSecretKey = properties.getProperty("HERE_API_SECRET_KEY")
+
+        // Define the API key as a build config field
+        buildConfigField("String", "HERE_API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "HERE_API_SECRET_KEY", "\"$apiSecretKey\"")
     }
 
     buildTypes {
@@ -44,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -56,6 +68,9 @@ android {
 }
 
 dependencies {
+    //Here library aar thing
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+
     // api things
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -68,6 +83,7 @@ dependencies {
     // DI - hilt
     implementation(libs.hilt.android)
     implementation(libs.firebase.common.ktx)
+    implementation(libs.play.services.maps)
     kapt(libs.hilt.android.compiler)
 
     // Firebase Auth
