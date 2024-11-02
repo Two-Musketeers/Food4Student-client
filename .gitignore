@@ -34,3 +34,5 @@ google-services.json
 
 # Android Profiling
 *.hprof
+/secret.props
+/app/libs/heresdk-explore-android-4.20.2.0.141526.aar

@@ -61,7 +61,6 @@ fun MapScreen(
     mapViewModel: MapViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val mapViewInitialized by mapViewModel.mapViewInitialized.collectAsState()
     val nearbyPlaces by mapViewModel.nearbyPlaces.collectAsState()
     val searchResults by mapViewModel.searchResults.collectAsState()
 
@@ -77,40 +76,44 @@ fun MapScreen(
     }
 
     initializeHERESDK()
-
-    Box(modifier = modifier.fillMaxSize()) {
-        MapViewContainer(
-            mapViewModel = mapViewModel,
-            modifier = Modifier.fillMaxSize(),
-        )
-        if (mapViewInitialized) {
-            MapSearch(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .background(Color.White),
-                onSearch = { query -> mapViewModel.autoSuggestExample(query) },
-                searchResults = searchResults,
-                onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
-            )
-        }
-        SuggestedAddressList(
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Search Bar on Top
+        MapSearch(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .background(Color.White),
+                .background(Color.LightGray), // Set background to distinguish
+            onSearch = { query -> mapViewModel.autoSuggestExample(query) },
+            searchResults = searchResults,
+            onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
+        )
+
+        // MapViewContainer taking up half the available space
+        MapViewContainer(
+            mapViewModel = mapViewModel,
+            modifier = Modifier
+                .weight(0.5f) // Set weight to take up half of remaining space
+                .fillMaxWidth()
+                .background(Color.Gray) // Set background to distinguish
+        )
+
+        // SuggestedAddressList taking up the other half
+        SuggestedAddressList(
+            modifier = Modifier
+                .weight(0.5f) // Set weight to take up other half
+                .fillMaxWidth()
+                .background(Color.White), // Set background to distinguish
             nearbyPlaces = nearbyPlaces,
             onPlaceClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
         )
     }
 
 }
+
 @Composable
 fun MapViewContainer(
     modifier: Modifier = Modifier,
     mapViewModel: MapViewModel
 ) {
-    val context = LocalContext.current
     var mapViewInitialized by remember { mutableStateOf(false) }
     var nearbyPlaces by remember { mutableStateOf<List<Place>>(emptyList()) }
     lateinit var searchExample: SearchExample
@@ -131,8 +134,7 @@ fun MapViewContainer(
                 }
             }
         },
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
     )
 }
 
@@ -161,7 +163,6 @@ fun MapSearch(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(modifier = modifier.fillMaxWidth()) {
-        // Default expandable Search Bar without height modifications
         SearchBar(
             query = query,
             onQueryChange = {
@@ -202,14 +203,15 @@ fun MapSearch(
             content = {
                 if (isActive && query.isNotEmpty()) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
                     ) {
                         items(searchResults) { place ->
                             Text(
                                 text = place.title,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color.White)
                                     .clickable {
                                         onResultClick(place)
                                         query = place.title // Set search bar text to selected suggestion
@@ -239,9 +241,11 @@ fun SuggestedAddressList(
             color = Color.Black,
             fontWeight = FontWeight.Bold
         )
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
             items(nearbyPlaces) { place ->
                 ListItem(
                     headlineContent = { Text(text = place.title) },

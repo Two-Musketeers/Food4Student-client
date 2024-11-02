@@ -32,6 +32,8 @@ import com.here.sdk.search.SearchOptions
 import com.here.sdk.search.SuggestCallback
 import com.here.sdk.search.TextQuery
 import com.ilikeincest.food4student.R
+import kotlin.collections.addAll
+import kotlin.text.clear
 
 //class MapUtils {}
 class SearchExample(private val context: Context, private val mapView: MapView) {
@@ -169,13 +171,11 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             Log.d(LOG_TAG, "Autosuggest Error: " + searchError.name)
             return@SuggestCallback
         }
-        // If error is null, list is guaranteed to be not empty.
-        Log.d(LOG_TAG, "Autosuggest results: " + list!!.size)
         searchResults.clear()
         searchResults.addAll(list!!.mapNotNull { it.place })
     }
 
-    fun autoSuggestExample(query: String) {
+    fun autoSuggestExample(query: String): List<Place> {
         val centerGeoCoordinates = mapView.camera.state.targetCoordinates
 
         val searchOptions = SearchOptions()
@@ -189,6 +189,7 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             searchOptions,
             autosuggestCallback
         )
+        return searchResults // Return the search results
     }
 
     private fun geocodeAddressAtLocation(queryString: String, geoCoordinates: GeoCoordinates) {
