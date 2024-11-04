@@ -2,6 +2,8 @@ package com.ilikeincest.food4student.util
 
 import android.app.AlertDialog
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
@@ -37,6 +39,9 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
     private var searchEngine: SearchEngine? = null
     val searchResults = mutableStateListOf<Place>()
     var onNearbyPlacesFetched: ((List<Place>) -> Unit)? = null
+    private var centerMarker: MapMarker? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var isDragging = false
 
     private fun geocodeAnAddress() {
         // Set map to expected location.
@@ -225,21 +230,37 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
         }
 
     init {
-        val distanceInMeters = (1000 * 10).toDouble()
-        val mapMeasureZoom = MapMeasure(MapMeasure.Kind.DISTANCE, distanceInMeters)
-        camera.lookAt(GeoCoordinates(52.520798, 13.409408), mapMeasureZoom)
-
         try {
             searchEngine = SearchEngine()
-        } catch (e: InstantiationErrorException) {
-            throw RuntimeException("Initialization of SearchEngine failed: " + e.error.name)
+        } catch (e: Exception) {
+            throw RuntimeException("Initialization of SearchEngine failed: ${e.message}")
         }
 
-        Toast.makeText(
-            context,
-            "Just let you know the mapView has init.",
-            Toast.LENGTH_LONG
-        ).show()
+        // Add a single marker at the center of the map
+        addCenterMarker()
+
+        // Listen for camera movements
+        mapView.camera.addListener {
+            updateCenterMarkerPosition()
+            if (!isDragging) {
+                isDragging = true
+                handler.postDelayed({
+                    isDragging = false
+                    getAddressForCoordinates(camera.state.targetCoordinates)
+                }, 1000)
+            }
+        }
+    }
+
+    private fun addCenterMarker() {
+        val geoCoordinates = camera.state.targetCoordinates
+        val mapImage = MapImageFactory.fromResource(context.resources, R.drawable.poi)
+        centerMarker = MapMarker(geoCoordinates, mapImage)
+        mapView.mapScene.addMapMarker(centerMarker!!)
+    }
+
+    private fun updateCenterMarkerPosition() {
+        centerMarker?.coordinates = camera.state.targetCoordinates
     }
 
     fun addPoiMapMarker(geoCoordinates: GeoCoordinates?) {
@@ -298,13 +319,9 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
 
     fun focusOnPlaceWithMarker(geoCoordinates: GeoCoordinates) {
         val mapMeasureZoom = MapMeasure(MapMeasure.Kind.DISTANCE, 200.0)
-        if (geoCoordinates != null) {
-            mapView.camera.lookAt(geoCoordinates, mapMeasureZoom)
-            addPoiMapMarker(geoCoordinates)
-
-            // Fetch nearby addresses when a place is selected
-            getAddressForCoordinates(geoCoordinates)
-        }
+        camera.lookAt(geoCoordinates, mapMeasureZoom)
+        updateCenterMarkerPosition()
+        getAddressForCoordinates(geoCoordinates)
     }
 
     companion object {
