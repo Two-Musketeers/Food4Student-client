@@ -78,25 +78,25 @@ fun MapScreen(
                 onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
             )
         }
-
-        // MapViewContainer taking up half the available space
-        MapViewContainer(
-            mapViewModel = mapViewModel,
-            modifier = Modifier
+        Column(modifier = Modifier.fillMaxSize()){
+            MapViewContainer(
+                mapViewModel = mapViewModel,
+                modifier = Modifier
+                    .weight(0.5f)
+                    .fillMaxWidth()
+                    .background(Color.Gray)
+            )
+            Box(modifier = Modifier.fillMaxWidth()
                 .weight(0.5f)
-                .fillMaxWidth()
-                .background(Color.Gray)
-        )
+                .background(Color.White))
+            {
+                SuggestedAddressList(
+                    nearbyPlaces = nearbyPlaces,
+                    onPlaceClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
+                )
+            }
 
-        // SuggestedAddressList taking up the other half
-        SuggestedAddressList(
-            modifier = Modifier
-                .weight(0.5f)
-                .fillMaxWidth()
-                .background(Color.White),
-            nearbyPlaces = nearbyPlaces,
-            onPlaceClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
-        )
+        }
     }
 }
 
@@ -222,7 +222,6 @@ fun MapSearch(
 
 @Composable
 fun SuggestedAddressList(
-    modifier: Modifier,
     nearbyPlaces: List<Place>,
     onPlaceClick: (Place) -> Unit
 ) {
