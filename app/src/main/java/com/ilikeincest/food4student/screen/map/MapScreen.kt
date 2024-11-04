@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import com.here.sdk.search.Address
-import com.here.sdk.search.Place
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.MainActivity
 import com.ilikeincest.food4student.component.MapSearch
