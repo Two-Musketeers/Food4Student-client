@@ -2,18 +2,13 @@ package com.ilikeincest.food4student.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.here.sdk.core.errors.InstantiationErrorException
+import com.here.sdk.core.GeoCoordinates
 import com.here.sdk.mapview.MapView
 import com.here.sdk.search.Place
-import com.here.sdk.search.SearchEngine
 import com.ilikeincest.food4student.util.SearchExample
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,11 +49,11 @@ class MapViewModel : ViewModel() {
         _searchResults.addAll(searchExample.autoSuggestExample(query))
     }
 
-    fun focusOnPlaceWithMarker(place: Place) {
+    fun focusOnPlaceWithMarker(geoCoordinates: GeoCoordinates) {
         if (!::searchExample.isInitialized) {
             throw UninitializedPropertyAccessException("SearchExample has not been initialized")
         }
         Log.d("MapViewModel", "Hi i work")
-        searchExample.focusOnPlaceWithMarker(place)
+        searchExample.focusOnPlaceWithMarker(geoCoordinates)
     }
 }

@@ -296,9 +296,8 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
         builder.show()
     }
 
-    fun focusOnPlaceWithMarker(place: Place) {
-        val geoCoordinates = place.geoCoordinates
-        val mapMeasureZoom = MapMeasure(MapMeasure.Kind.DISTANCE, 1000.0)
+    fun focusOnPlaceWithMarker(geoCoordinates: GeoCoordinates) {
+        val mapMeasureZoom = MapMeasure(MapMeasure.Kind.DISTANCE, 2000.0)
         if (geoCoordinates != null) {
             mapView.camera.lookAt(geoCoordinates, mapMeasureZoom)
             addPoiMapMarker(geoCoordinates)

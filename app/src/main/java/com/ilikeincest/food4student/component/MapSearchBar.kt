@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.here.sdk.core.GeoCoordinates
 import com.here.sdk.search.Place
 
 
@@ -36,7 +37,7 @@ fun MapSearch(
     modifier: Modifier = Modifier,
     onSearch: (String) -> Unit,
     searchResults: List<Place>,
-    onResultClick: (Place) -> Unit
+    onResultClick: (GeoCoordinates) -> Unit
 ) {
     var query by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
@@ -110,10 +111,12 @@ fun MapSearch(
                                 text = place.title,
                                 modifier = Modifier
                                     .clickable {
-                                        onResultClick(place)
-                                        query = place.title
-                                        isActive = false
-                                        keyboardController?.hide()
+                                        place.geoCoordinates?.let { coordinates ->
+                                            onResultClick(coordinates)
+                                            query = place.title
+                                            isActive = false
+                                            keyboardController?.hide()
+                                        }
                                     }
                                     .padding(16.dp)
                             )

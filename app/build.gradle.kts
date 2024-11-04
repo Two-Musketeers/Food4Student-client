@@ -71,6 +71,9 @@ dependencies {
     //Here library aar thing
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
+    //Take in current geo location
+    implementation(libs.play.services.location)
+
     // api things
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

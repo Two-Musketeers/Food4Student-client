@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilikeincest.food4student.initializer.HereInitializer
 import com.ilikeincest.food4student.screen.map.MapScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
+import com.ilikeincest.food4student.viewmodel.LocationViewModel
 import com.ilikeincest.food4student.viewmodel.MapViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
@@ -19,6 +20,7 @@ import kotlin.getValue
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val mapViewModel: MapViewModel by viewModels()
+    private val locationViewModel: LocationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +46,7 @@ class MainActivity : ComponentActivity() {
 //                        ),
 //                        modifier = Modifier.fillMaxWidth().padding(innerPadding)
 //                    )
-                MapScreen(mapViewModel = mapViewModel)
+                MapScreen(mapViewModel = mapViewModel, locationViewModel = locationViewModel)
 //                }
             }
         }
