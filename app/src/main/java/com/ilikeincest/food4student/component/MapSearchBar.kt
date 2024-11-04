@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.here.sdk.search.Place
 
@@ -41,7 +42,14 @@ fun MapSearch(
     var isActive by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()
+        .padding(
+            start = if (isActive) 0.dp else 16.dp,
+            end = if (isActive) 0.dp else 16.dp,
+            top = 0.dp,
+            bottom = 12.dp
+        )
+    ) {
         SearchBar(
             inputField = {
                 SearchBarDefaults.InputField(
@@ -57,7 +65,7 @@ fun MapSearch(
                         if (!active) keyboardController?.hide() // Hide keyboard when search bar closes
                     },
                     enabled = true,
-                    placeholder = { Text("Search") },
+                    placeholder = { Text("Tìm vị trí") },
                     leadingIcon = {
                         Icon(
                             imageVector = if (isActive) Icons.Default.ArrowBack else Icons.Default.Search,
@@ -115,4 +123,14 @@ fun MapSearch(
             }
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MapSearchPreview() {
+    MapSearch(
+        onSearch = {},
+        searchResults = emptyList(),
+        onResultClick = {}
+    )
 }
