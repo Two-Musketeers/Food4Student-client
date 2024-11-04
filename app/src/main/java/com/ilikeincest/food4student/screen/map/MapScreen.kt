@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -30,6 +32,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,55 +61,43 @@ import com.ilikeincest.food4student.viewmodel.MapViewModel
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    mapViewModel: MapViewModel = viewModel()
+    mapViewModel: MapViewModel
 ) {
-    val context = LocalContext.current
+    val mapViewInitialized by mapViewModel.mapViewInitialized
     val nearbyPlaces by mapViewModel.nearbyPlaces.collectAsState()
-    val searchResults by mapViewModel.searchResults.collectAsState()
 
-    fun initializeHERESDK() {
-        val accessKeyID = BuildConfig.HERE_API_KEY
-        val accessKeySecret = BuildConfig.HERE_API_SECRET_KEY
-        val options = SDKOptions(accessKeyID, accessKeySecret)
-        try {
-            SDKNativeEngine.makeSharedInstance(context, options)
-        } catch (e: InstantiationErrorException) {
-            throw RuntimeException("Initialization of HERE SDK failed: " + e.error.name)
-        }
-    }
-
-    initializeHERESDK()
     Column(modifier = Modifier.fillMaxSize()) {
         // Search Bar on Top
-        MapSearch(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.LightGray), // Set background to distinguish
-            onSearch = { query -> mapViewModel.autoSuggestExample(query) },
-            searchResults = searchResults,
-            onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
-        )
+        if (mapViewInitialized) {
+            MapSearch(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.LightGray),
+                onSearch = { query -> mapViewModel.autoSuggestExample(query) },
+                searchResults = mapViewModel.searchResults,
+                onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
+            )
+        }
 
         // MapViewContainer taking up half the available space
         MapViewContainer(
             mapViewModel = mapViewModel,
             modifier = Modifier
-                .weight(0.5f) // Set weight to take up half of remaining space
+                .weight(0.5f)
                 .fillMaxWidth()
-                .background(Color.Gray) // Set background to distinguish
+                .background(Color.Gray)
         )
 
         // SuggestedAddressList taking up the other half
         SuggestedAddressList(
             modifier = Modifier
-                .weight(0.5f) // Set weight to take up other half
+                .weight(0.5f)
                 .fillMaxWidth()
-                .background(Color.White), // Set background to distinguish
+                .background(Color.White),
             nearbyPlaces = nearbyPlaces,
             onPlaceClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
         )
     }
-
 }
 
 @Composable
@@ -114,23 +105,14 @@ fun MapViewContainer(
     modifier: Modifier = Modifier,
     mapViewModel: MapViewModel
 ) {
-    var mapViewInitialized by remember { mutableStateOf(false) }
-    var nearbyPlaces by remember { mutableStateOf<List<Place>>(emptyList()) }
-    lateinit var searchExample: SearchExample
-
     AndroidView(
         factory = { context ->
             MapView(context).apply {
                 onCreate(null)
                 onResume()
                 loadMapScene {
-                    mapViewInitialized = true
-                    searchExample = SearchExample(context, this).apply {
-                        onNearbyPlacesFetched = { places ->
-                            nearbyPlaces = places
-                        }
-                    }
-                    mapViewModel.setMapView(this)
+                    mapViewModel.setMapViewInitializedTrue()
+                    mapViewModel.initializeSearchExample(context, this)
                 }
             }
         },
@@ -164,42 +146,53 @@ fun MapSearch(
 
     Box(modifier = modifier.fillMaxWidth()) {
         SearchBar(
-            query = query,
-            onQueryChange = {
-                query = it
-                onSearch(it)
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = {
+                        query = it
+                        onSearch(it)
+                    },
+                    onSearch = { onSearch(query) },
+                    expanded = isActive,
+                    onExpandedChange = { active ->
+                        isActive = active
+                        if (!active) keyboardController?.hide() // Hide keyboard when search bar closes
+                    },
+                    enabled = true,
+                    placeholder = { Text("Search") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = if (isActive) Icons.Default.ArrowBack else Icons.Default.Search,
+                            contentDescription = if (isActive) "Back" else "Search",
+                            modifier = Modifier.clickable {
+                                if (isActive) {
+                                    isActive = false // Collapse search bar
+                                    keyboardController?.hide() // Hide keyboard
+                                }
+                            }
+                        )
+                    },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear",
+                                modifier = Modifier.clickable {
+                                    query = "" // Clear query text
+                                }
+                            )
+                        }
+                    },
+                    interactionSource = remember { MutableInteractionSource() }
+                )
             },
-            onSearch = { onSearch(query) },
-            placeholder = { Text("Search") },
-            modifier = Modifier.fillMaxWidth(),
-            active = isActive,
-            onActiveChange = { active ->
+            expanded = isActive,
+            onExpandedChange = { active ->
                 isActive = active
                 if (!active) keyboardController?.hide() // Hide keyboard when search bar closes
             },
-            leadingIcon = {
-                Icon(
-                    imageVector = if (isActive) Icons.Default.ArrowBack else Icons.Default.Search,
-                    contentDescription = if (isActive) "Back" else "Search",
-                    modifier = Modifier.clickable {
-                        if (isActive) {
-                            isActive = false // Collapse search bar
-                            keyboardController?.hide() // Hide keyboard
-                        }
-                    }
-                )
-            },
-            trailingIcon = {
-                if (query.isNotEmpty()) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear",
-                        modifier = Modifier.clickable {
-                            query = "" // Clear query text
-                        }
-                    )
-                }
-            },
+            modifier = Modifier.fillMaxWidth(),
             content = {
                 if (isActive && query.isNotEmpty()) {
                     LazyColumn(
@@ -211,14 +204,13 @@ fun MapSearch(
                             Text(
                                 text = place.title,
                                 modifier = Modifier
-                                    .fillMaxWidth()
                                     .clickable {
                                         onResultClick(place)
-                                        query = place.title // Set search bar text to selected suggestion
-                                        isActive = false // Collapse search bar
-                                        keyboardController?.hide() // Hide keyboard
+                                        query = place.title
+                                        isActive = false
+                                        keyboardController?.hide()
                                     }
-                                    .padding(12.dp)
+                                    .padding(16.dp)
                             )
                         }
                     }
