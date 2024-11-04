@@ -18,38 +18,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.here.sdk.search.Place
 
-//@Composable
-//fun SuggestedAddressList(
-//    modifier: Modifier,
-//    mapViewModel: MapViewModel
-//) {
-//    val nearbyPlaces = mapViewModel.nearbyPlaces
-//
-//    Column {
-//        Text(
-//            text = "Địa chỉ gợi ý",
-//            modifier = Modifier.align(Alignment.CenterHorizontally),
-//            color = Color.Black,
-//            fontWeight = FontWeight.Bold
-//        )
-//        LazyColumn(modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.White)) {
-//            items(nearbyPlaces) { place ->
-//                ListItem(
-//                    headlineContent = { Text(text = place.title) },
-//                    supportingContent = { Text(text = place.address?.addressText ?: "") },
-//                    modifier = Modifier
-//                        .clickable {
-//                            mapViewModel.focusOnPlaceWithMarker(
-//                                place.geoCoordinates?.latitude ?: 0.0,
-//                                place.geoCoordinates?.longitude ?: 0.0
-//                            )
-//                        }
-//                        .padding(vertical = 8.dp, horizontal = 16.dp)
-//                )
-//                HorizontalDivider()
-//            }
-//        }
-//    }
-//}
+@Composable
+fun SuggestedAddressList(
+    nearbyPlaces: List<Place>,
+    onPlaceClick: (Place) -> Unit
+) {
+    Column {
+        Text(
+            text = "Địa chỉ gợi ý",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
+        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            items(nearbyPlaces) { place ->
+                ListItem(
+                    headlineContent = { Text(text = place.title) },
+                    supportingContent = { Text(text = place.address?.addressText ?: "") },
+                    modifier = Modifier
+                        .clickable {
+                            onPlaceClick(place)
+                        }
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                )
+                HorizontalDivider()
+            }
+        }
+    }
+}
