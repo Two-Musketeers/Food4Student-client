@@ -23,60 +23,42 @@ import com.ilikeincest.food4student.component.MapSearch
 import com.ilikeincest.food4student.component.MapViewContainer
 import com.ilikeincest.food4student.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
-import com.ilikeincest.food4student.viewmodel.LocationViewModel
 import com.ilikeincest.food4student.viewmodel.MapViewModel
 
 @Composable
 fun MapScreen(
-    locationViewModel: LocationViewModel,
     mapViewModel: MapViewModel,
 ) {
+    //Request permission for location
     val context = LocalContext.current
     val locationUtils = LocationUtils(context)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
-            if (permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-                locationUtils.requestLocationUpdates(locationViewModel)
-            } else {
-                val rationaleRequired = ActivityCompat.shouldShowRequestPermissionRationale(
-                    context as MainActivity,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-
-                if (rationaleRequired) {
-                    Toast.makeText(context,
-                        "Location Permission is required for this feature to work", Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    Toast.makeText(context,
-                        "Location Permission is required. Please enable it in the Android Settings", Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
+            locationUtils.handlePermissionResult(permissions, mapViewModel)
         })
 
     LaunchedEffect(Unit) {
         if (!locationUtils.hasLocationPermission(context)) {
-            requestPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
+            locationUtils.requestLocationPermissions(requestPermissionLauncher)
         } else {
-            locationUtils.requestLocationUpdates(locationViewModel)
+            locationUtils.requestLocationUpdates(mapViewModel)
         }
     }
 
+    //The actual mapScreen
     val mapViewInitialized by mapViewModel.mapViewInitialized
     val nearbyPlaces by mapViewModel.nearbyPlaces.collectAsState()
-    val location = locationViewModel.location.value
+    val location = mapViewModel.currentLocation.value
+
+    // Focus on the location if available
+    LaunchedEffect(location) {
+        location?.let {
+            val geoCoordinates = GeoCoordinates(it.latitude, it.longitude)
+            mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Search Bar on Top
@@ -112,14 +94,6 @@ fun MapScreen(
                 )
             }
 
-        }
-    }
-
-    // Focus on the location if available
-    LaunchedEffect(location) {
-        location?.let {
-            val geoCoordinates = GeoCoordinates(it.latitude, it.longitude)
-            mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
         }
     }
 }

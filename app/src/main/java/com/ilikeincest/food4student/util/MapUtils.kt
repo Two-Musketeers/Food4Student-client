@@ -247,7 +247,7 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
                 handler.postDelayed({
                     isDragging = false
                     getAddressForCoordinates(camera.state.targetCoordinates)
-                }, 1000)
+                }, 1500)
             }
         }
     }

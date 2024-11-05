@@ -2,6 +2,7 @@ package com.ilikeincest.food4student.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -23,6 +24,9 @@ class MapViewModel : ViewModel() {
 
     private val _searchResults = mutableStateListOf<Place>()
     val searchResults: SnapshotStateList<Place> = _searchResults
+
+    private val _currentLocation = mutableStateOf<GeoCoordinates?>(null)
+    val currentLocation: State<GeoCoordinates?> = _currentLocation
 
     fun setMapViewInitializedTrue() {
         mapViewInitialized.value = true
@@ -55,5 +59,9 @@ class MapViewModel : ViewModel() {
         }
         Log.d("MapViewModel", "Hi i work")
         searchExample.focusOnPlaceWithMarker(geoCoordinates)
+    }
+
+    fun updateCurrentLocation(newLocation: GeoCoordinates){
+        _currentLocation.value = newLocation
     }
 }
