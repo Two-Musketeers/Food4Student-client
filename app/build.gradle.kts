@@ -28,7 +28,7 @@ android {
         }
 
         val properties = Properties()
-        properties.load(project.rootProject.file("secret.props").inputStream())
+        properties.load(project.rootProject.file("secret.properties").inputStream())
         val apiKey = properties.getProperty("HERE_API_KEY")
         val apiSecretKey = properties.getProperty("HERE_API_SECRET_KEY")
 
