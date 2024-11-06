@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -31,13 +33,14 @@ fun MapScreen(
 ) {
     //Request permission for location
     val context = LocalContext.current
-    val locationUtils = LocationUtils(context)
+    val locationUtils = remember { LocationUtils(context) }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
             locationUtils.handlePermissionResult(permissions, mapViewModel)
-        })
+        }
+    )
 
     LaunchedEffect(Unit) {
         if (!locationUtils.hasLocationPermission(context)) {
@@ -60,40 +63,41 @@ fun MapScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Search Bar on Top
-        if (mapViewInitialized) {
-            MapSearch(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray),
-                onSearch = { query -> mapViewModel.autoSuggestExample(query) },
-                searchResults = mapViewModel.searchResults,
-                onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
-            )
-        }
-        Column(modifier = Modifier.fillMaxSize()){
-            MapViewContainer(
-                mapViewModel = mapViewModel,
-                modifier = Modifier
-                    .weight(0.5f)
-                    .fillMaxWidth()
-                    .background(Color.Gray)
-            )
-            Box(modifier = Modifier.fillMaxWidth()
-                .weight(0.5f)
-                .background(Color.White))
-            {
-                SuggestedAddressList(
-                    nearbyPlaces = nearbyPlaces,
-                    onPlaceClick = { place ->
-                        place.geoCoordinates?.let { geoCoordinates ->
-                            mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
-                        }
-                    }
+    Surface {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Search Bar on Top
+            if (mapViewInitialized) {
+                MapSearch(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onSearch = { query -> mapViewModel.autoSuggestExample(query) },
+                    searchResults = mapViewModel.searchResults,
+                    onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
                 )
             }
-
+            Column(modifier = Modifier.fillMaxSize()) {
+                MapViewContainer(
+                    mapViewModel = mapViewModel,
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.5f)
+                )
+                {
+                    SuggestedAddressList(
+                        nearbyPlaces = nearbyPlaces,
+                        onPlaceClick = { place ->
+                            place.geoCoordinates?.let { geoCoordinates ->
+                                mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }

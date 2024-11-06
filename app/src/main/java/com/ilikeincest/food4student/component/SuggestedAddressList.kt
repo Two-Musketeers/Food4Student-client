@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,23 +35,18 @@ fun SuggestedAddressList(
         Text(
             text = "Địa chỉ gợi ý",
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
-            color = Color.Black,
-            fontWeight = FontWeight(500),
-            letterSpacing = 0.15.sp,
+            style = typography.titleMedium
         )
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
         ) {
             items(nearbyPlaces) { place ->
                 Row(
                     modifier = Modifier
                         .clickable { onPlaceClick(place) }
                         .fillMaxWidth()
-                        .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.location_on),
@@ -63,17 +60,11 @@ fun SuggestedAddressList(
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
                             text = place.title,
-                            fontSize = 16.sp,
-                            lineHeight = 24.sp,
-                            fontWeight = FontWeight(400),
-                            letterSpacing = 0.5.sp
+                            style = typography.bodyLarge
                         )
                         Text(
-                            text = place.address?.addressText ?: "",
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight(400),
-                            letterSpacing = 0.25.sp
+                            text = place.address.addressText,
+                            style = typography.bodyMedium
                         )
                     }
                 }

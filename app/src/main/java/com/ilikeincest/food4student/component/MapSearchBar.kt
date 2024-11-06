@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -16,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.here.sdk.core.GeoCoordinates
 import com.here.sdk.search.Place
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSearch(
@@ -44,12 +45,8 @@ fun MapSearch(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(modifier = modifier.fillMaxWidth()
-        .padding(
-            start = if (isActive) 0.dp else 16.dp,
-            end = if (isActive) 0.dp else 16.dp,
-            top = 0.dp,
-            bottom = 12.dp
-        )
+        .padding(horizontal = if (isActive) 0.dp else 16.dp)
+        .padding(bottom = 12.dp)
     ) {
         SearchBar(
             inputField = {
@@ -69,7 +66,7 @@ fun MapSearch(
                     placeholder = { Text("Tìm vị trí") },
                     leadingIcon = {
                         Icon(
-                            imageVector = if (isActive) Icons.Default.ArrowBack else Icons.Default.Search,
+                            imageVector = if (isActive) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Search,
                             contentDescription = if (isActive) "Back" else "Search",
                             modifier = Modifier.clickable {
                                 if (isActive) {
@@ -90,7 +87,7 @@ fun MapSearch(
                             )
                         }
                     },
-                    interactionSource = remember { MutableInteractionSource() }
+                    interactionSource = remember { MutableInteractionSource() },
                 )
             },
             expanded = isActive,
@@ -104,7 +101,6 @@ fun MapSearch(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
                     ) {
                         items(searchResults) { place ->
                             Text(
@@ -128,7 +124,7 @@ fun MapSearch(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MapSearchPreview() {
     MapSearch(
