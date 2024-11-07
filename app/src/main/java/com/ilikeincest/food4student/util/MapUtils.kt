@@ -16,7 +16,6 @@ import com.here.sdk.core.Metadata
 import com.here.sdk.core.Point2D
 import com.here.sdk.core.Rectangle2D
 import com.here.sdk.core.Size2D
-import com.here.sdk.core.errors.InstantiationErrorException
 import com.here.sdk.mapview.MapImageFactory
 import com.here.sdk.mapview.MapMarker
 import com.here.sdk.mapview.MapMeasure
