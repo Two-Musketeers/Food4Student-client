@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.component.preview_helper
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold

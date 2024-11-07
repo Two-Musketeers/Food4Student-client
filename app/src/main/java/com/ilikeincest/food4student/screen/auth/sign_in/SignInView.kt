@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.NormalField
 import com.ilikeincest.food4student.component.PasswordField
-import com.ilikeincest.food4student.component.ScreenPreview
+import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 
 @Composable
 fun SignInScreen(modifier: Modifier = Modifier) {
