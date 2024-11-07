@@ -127,7 +127,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             })
     }
 
-
     fun searchInViewport(queryString: String) {
         clearMap()
 
@@ -236,9 +235,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             throw RuntimeException("Initialization of SearchEngine failed: ${e.message}")
         }
 
-        // Add a single marker at the center of the map
-        addCenterMarker()
-
         // Listen for camera movements
         mapView.camera.addListener {
             updateCenterMarkerPosition()
@@ -250,13 +246,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
                 }, 1500)
             }
         }
-    }
-
-    private fun addCenterMarker() {
-        val geoCoordinates = camera.state.targetCoordinates
-        val mapImage = MapImageFactory.fromResource(context.resources, R.drawable.poi)
-        centerMarker = MapMarker(geoCoordinates, mapImage)
-        mapView.mapScene.addMapMarker(centerMarker!!)
     }
 
     private fun updateCenterMarkerPosition() {
