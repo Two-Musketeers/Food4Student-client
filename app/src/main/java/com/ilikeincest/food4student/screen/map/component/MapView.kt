@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.map.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

@@ -22,9 +22,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.MapSearchBar
-import com.ilikeincest.food4student.component.MapViewContainer
-import com.ilikeincest.food4student.component.SuggestedAddressList
+import com.ilikeincest.food4student.screen.map.component.MapSearchBar
+import com.ilikeincest.food4student.screen.map.component.MapViewContainer
+import com.ilikeincest.food4student.screen.map.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.viewmodel.MapViewModel
 

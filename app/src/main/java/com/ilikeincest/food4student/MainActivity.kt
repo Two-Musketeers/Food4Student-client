@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ilikeincest.food4student.component.AuthenticationButton
+import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
 import com.ilikeincest.food4student.initializer.HereInitializer
 import com.ilikeincest.food4student.screen.map.MapScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme

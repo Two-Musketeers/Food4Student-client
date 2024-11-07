@@ -172,7 +172,7 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
         // If error is null, list is guaranteed to be not empty.
         Log.d(LOG_TAG, "Autosuggest results: " + list!!.size)
         searchResults.clear()
-        searchResults.addAll(list!!.mapNotNull { it.place })
+        searchResults.addAll(list.mapNotNull { it.place })
     }
 
     fun autoSuggestExample(query: String) : List<Place> {

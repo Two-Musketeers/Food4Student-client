@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.auth.component
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
