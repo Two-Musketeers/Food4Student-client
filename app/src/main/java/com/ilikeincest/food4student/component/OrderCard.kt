@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
@@ -21,9 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice
 import java.time.LocalDate
@@ -43,6 +42,7 @@ fun OrderCard(
 ) {
     Column(
         modifier
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp)) {
         Row(
@@ -116,20 +116,22 @@ fun OrderCard(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun OrderPreview() {
-    OrderCard(
-        id = "5ea765ds",
-        date = LocalDate.of(1969, 2, 28),
-        shopName = "Phúc Long",
-        shopId = "fuck u",
-        shopImage = { MonogramAvatar(initials = "PL", it) },
-        orderItems = listOf(
-            OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000),
-            OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000),
-            OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000),
-        ),
-        modifier = Modifier.width(368.dp)
-    )
+    ComponentPreview {
+        OrderCard(
+            id = "5ea765ds",
+            date = LocalDate.of(1969, 2, 28),
+            shopName = "Phúc Long",
+            shopId = "fuck u",
+            shopImage = { MonogramAvatar(initials = "PL", it) },
+            orderItems = listOf(
+                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000),
+                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000),
+                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000),
+            ),
+            modifier = Modifier.width(368.dp)
+        )
+    }
 }

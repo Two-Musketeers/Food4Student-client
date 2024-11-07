@@ -16,7 +16,6 @@ import com.here.sdk.core.Metadata
 import com.here.sdk.core.Point2D
 import com.here.sdk.core.Rectangle2D
 import com.here.sdk.core.Size2D
-import com.here.sdk.core.errors.InstantiationErrorException
 import com.here.sdk.mapview.MapImageFactory
 import com.here.sdk.mapview.MapMarker
 import com.here.sdk.mapview.MapMeasure
@@ -127,7 +126,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             })
     }
 
-
     fun searchInViewport(queryString: String) {
         clearMap()
 
@@ -174,7 +172,7 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
         // If error is null, list is guaranteed to be not empty.
         Log.d(LOG_TAG, "Autosuggest results: " + list!!.size)
         searchResults.clear()
-        searchResults.addAll(list!!.mapNotNull { it.place })
+        searchResults.addAll(list.mapNotNull { it.place })
     }
 
     fun autoSuggestExample(query: String) : List<Place> {
@@ -236,9 +234,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
             throw RuntimeException("Initialization of SearchEngine failed: ${e.message}")
         }
 
-        // Add a single marker at the center of the map
-        addCenterMarker()
-
         // Listen for camera movements
         mapView.camera.addListener {
             updateCenterMarkerPosition()
@@ -250,13 +245,6 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
                 }, 1500)
             }
         }
-    }
-
-    private fun addCenterMarker() {
-        val geoCoordinates = camera.state.targetCoordinates
-        val mapImage = MapImageFactory.fromResource(context.resources, R.drawable.poi)
-        centerMarker = MapMarker(geoCoordinates, mapImage)
-        mapView.mapScene.addMapMarker(centerMarker!!)
     }
 
     private fun updateCenterMarkerPosition() {

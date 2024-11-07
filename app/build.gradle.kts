@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.ilikeincest.food4student"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.ilikeincest.food4student"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -68,10 +68,14 @@ android {
 }
 
 dependencies {
+    // navigation things
+    implementation(libs.androidx.navigation.compose)
+
     //Here library aar thing
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     //Take in current geo location
+    implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
 
     // api things
@@ -86,7 +90,6 @@ dependencies {
     // DI - hilt
     implementation(libs.hilt.android)
     implementation(libs.firebase.common.ktx)
-    implementation(libs.play.services.maps)
     kapt(libs.hilt.android.compiler)
 
     // Firebase Auth
