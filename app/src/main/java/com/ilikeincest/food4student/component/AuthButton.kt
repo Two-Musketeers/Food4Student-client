@@ -1,32 +1,29 @@
-package com.ilikeincest.food4student
+package com.ilikeincest.food4student.component
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.ilikeincest.food4student.ui.theme.Purple40
+import com.ilikeincest.food4student.ACCOUNT_ERROR_TAG
+import com.ilikeincest.food4student.R
 import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
@@ -45,17 +42,20 @@ fun AuthenticationButton(
     val coroutineScope = rememberCoroutineScope()
     val credentialManager = CredentialManager.create(context)
 
+    val signInWithGoogleOption = remember {
+        GetSignInWithGoogleOption
+            .Builder(context.getString(R.string.google_console_client_id))
+            .build()
+    }
+    val request = remember {
+        GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .setPreferImmediatelyAvailableCredentials(false)
+            .build()
+    }
+
     Button(
         onClick = {
-            val googleIdOption = GetSignInWithGoogleOption
-                .Builder(context.getString(R.string.google_console_client_id))
-                .build()
-
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .setPreferImmediatelyAvailableCredentials(false)
-                .build()
-
             coroutineScope.launch {
                 try {
                     val result = credentialManager.getCredential(

@@ -68,10 +68,14 @@ android {
 }
 
 dependencies {
+    // navigation things
+    implementation(libs.androidx.navigation.compose)
+
     //Here library aar thing
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     //Take in current geo location
+    implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
 
     // api things
@@ -86,7 +90,6 @@ dependencies {
     // DI - hilt
     implementation(libs.hilt.android)
     implementation(libs.firebase.common.ktx)
-    implementation(libs.play.services.maps)
     kapt(libs.hilt.android.compiler)
 
     // Firebase Auth
