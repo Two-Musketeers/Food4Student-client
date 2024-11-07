@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.MapSearch
+import com.ilikeincest.food4student.component.MapSearchBar
 import com.ilikeincest.food4student.component.MapViewContainer
 import com.ilikeincest.food4student.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
@@ -68,9 +68,7 @@ fun MapScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             // Search Bar on Top
             if (mapViewInitialized) {
-                MapSearch(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                MapSearchBar(
                     onSearch = { query -> mapViewModel.autoSuggestExample(query) },
                     searchResults = mapViewModel.searchResults,
                     onResultClick = { place -> mapViewModel.focusOnPlaceWithMarker(place) }
