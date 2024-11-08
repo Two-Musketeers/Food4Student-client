@@ -28,7 +28,9 @@ fun SuggestedAddressList(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = "Địa chỉ gợi ý",
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp),
             style = typography.titleMedium
         )
         LazyColumn(
