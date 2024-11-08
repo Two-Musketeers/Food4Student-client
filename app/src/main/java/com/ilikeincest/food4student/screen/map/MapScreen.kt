@@ -67,6 +67,7 @@ fun MapScreen(
 
     // Focus on the location if available
     LaunchedEffect(location) {
+        if (!mapViewInitialized) return@LaunchedEffect
         location?.let {
             val geoCoordinates = GeoCoordinates(it.latitude, it.longitude)
             mapViewModel.focusOnPlaceWithMarker(geoCoordinates)

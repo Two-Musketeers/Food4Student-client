@@ -57,7 +57,6 @@ class MapViewModel : ViewModel() {
         if (!::searchExample.isInitialized) {
             throw UninitializedPropertyAccessException("SearchExample has not been initialized")
         }
-        Log.d("MapViewModel", "Hi i work")
         searchExample.focusOnPlaceWithMarker(geoCoordinates)
     }
 

@@ -25,6 +25,9 @@ fun MapViewContainer(
                 }
             }
         },
+        update = { mapView ->
+            mapView.onResume()
+        },
         modifier = modifier
     )
 }

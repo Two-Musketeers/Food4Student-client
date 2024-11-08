@@ -31,6 +31,7 @@ import com.here.sdk.search.SuggestCallback
 import com.here.sdk.search.TextQuery
 import com.ilikeincest.food4student.R
 
+// TODO: clean up this fucking mess
 //class MapUtils {}
 class SearchExample(private val context: Context, private val mapView: MapView) {
     private val camera = mapView.camera
