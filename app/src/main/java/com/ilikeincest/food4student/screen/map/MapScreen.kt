@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.screen.map.component.MapSearchBar
@@ -30,7 +31,7 @@ import com.ilikeincest.food4student.viewmodel.MapViewModel
 
 @Composable
 fun MapScreen(
-    mapViewModel: MapViewModel,
+    mapViewModel: MapViewModel = viewModel(),
 ) {
     //Request permission for location
     val context = LocalContext.current

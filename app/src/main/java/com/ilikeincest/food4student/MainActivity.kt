@@ -19,8 +19,6 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val mapViewModel: MapViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Food4StudentTheme {
-                MapScreen(mapViewModel = mapViewModel)
+                AppNavGraph()
             }
         }
     }

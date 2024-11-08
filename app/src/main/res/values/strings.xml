@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Food4Student</string>
+    <string name="home_screen_label">Eat!</string>
+    <string name="order_screen_label">Đơn hàng</string>
+    <string name="favorite_screen_label">Yêu thích</string>
+    <string name="notification_screen_label">Thông báo</string>
 </resources>
