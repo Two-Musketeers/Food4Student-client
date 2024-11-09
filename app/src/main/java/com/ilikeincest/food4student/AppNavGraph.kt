@@ -42,7 +42,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(AppRoutes.SIGN_UP.name){
-            SignUpScreen()
+            SignUpScreen(
+                navController = navController,
+                navigateToSignIn = { navController.navigate(AppRoutes.SIGN_IN.name) }
+            )
         }
         composable(AppRoutes.MAP.name) {
             MapScreen()

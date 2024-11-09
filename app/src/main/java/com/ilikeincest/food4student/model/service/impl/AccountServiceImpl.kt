@@ -44,6 +44,10 @@ class AccountServiceImpl @Inject constructor() : AccountService {
         Firebase.auth.signInAnonymously().await()
     }
 
+    override suspend fun createAccountWithEmail(email: String, password: String) {
+        Firebase.auth.createUserWithEmailAndPassword(email, password).await()
+    }
+
     override suspend fun updateDisplayName(newDisplayName: String) {
         val profileUpdates = userProfileChangeRequest {
             displayName = newDisplayName
