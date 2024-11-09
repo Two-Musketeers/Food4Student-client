@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +56,7 @@ fun AuthenticationButton(
             .build()
     }
 
-    Button(
+    OutlinedButton(
         onClick = {
             coroutineScope.launch {
                 try {
@@ -71,18 +73,7 @@ fun AuthenticationButton(
         },
         modifier = modifier.fillMaxWidth()
     ) {
-        Icon(
-            // TODO: extract icon
-            painter = painterResource(id = R.drawable.google_g),
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .height(18.dp),
-            contentDescription = null
-        )
-        Text(
-            text = buttonText,
-            style = typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
+        Icon(painterResource(R.drawable.google_g), null, tint = Color.Unspecified)
+        Text(buttonText)
     }
 }
