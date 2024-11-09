@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
@@ -32,7 +33,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             SplashScreen(navController)
         }
         composable(AppRoutes.MAIN.name) {
-            MainScreen({ navController.navigate(AppRoutes.MAP.name) })
+            MainScreen({ navController.navigate(AppRoutes.MAP.name) }, { navController.navigate(AppRoutes.PROFILE.name) })
         }
         composable(AppRoutes.SIGN_IN.name) {
             SignInScreen(
@@ -45,6 +46,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(AppRoutes.MAP.name) {
             MapScreen()
+        }
+        composable(AppRoutes.PROFILE.name) {
+            AccountCenterScreen(navController = navController)
         }
     }
 }

@@ -85,7 +85,7 @@ class AccountServiceImpl @Inject constructor() : AccountService {
             id = this.uid,
             email = this.email ?: "",
             provider = this.providerId,
-            fullName = this.displayName ?: "",
+            displayName = this.displayName ?: "",
             isAnonymous = this.isAnonymous
         )
     }
