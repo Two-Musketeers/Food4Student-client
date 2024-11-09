@@ -1,9 +1,11 @@
 package com.ilikeincest.food4student.screen.auth.component
 
 import android.util.Log
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
@@ -74,6 +76,7 @@ fun AuthenticationButton(
         modifier = modifier.fillMaxWidth()
     ) {
         Icon(painterResource(R.drawable.google_g), null, tint = Color.Unspecified)
+        Spacer(Modifier.width(8.dp))
         Text(buttonText)
     }
 }

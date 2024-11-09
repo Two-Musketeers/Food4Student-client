@@ -70,9 +70,8 @@ fun SignInScreen(
             AuthenticationButton(
                 buttonText = "Đăng nhập với Google",
                 onGetCredentialResponse = { credential ->
-                    signInViewModel.onGoogleSignIn(credential)
-                } ,
-                modifier = Modifier.fillMaxWidth()
+                    signInViewModel.onGoogleSignIn(navController, credential)
+                }
             )
             OutlinedButton(onClick = { navigateToSignUp() }, modifier = Modifier.fillMaxWidth()) {
                 Text("Đăng ký?")
