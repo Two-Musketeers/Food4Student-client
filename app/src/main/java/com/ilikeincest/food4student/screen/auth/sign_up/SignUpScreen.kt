@@ -46,7 +46,7 @@ fun SignUpScreen(
     val email by signUpViewModel.email.collectAsState()
     val password by signUpViewModel.password.collectAsState()
     val confirmPassword by signUpViewModel.confirmPassword.collectAsState()
-    val context = LocalContext.current
+    val errorText by signUpViewModel.errorText.collectAsState()
 
     Column(
         verticalArrangement = Arrangement.spacedBy(42.dp, Alignment.CenterVertically),
@@ -67,11 +67,18 @@ fun SignUpScreen(
             NormalField("email", email, { signUpViewModel.updateEmail(it) }, KeyboardType.Email)
             PasswordField("mật khẩu", password, { signUpViewModel.updatePassword(it) })
             PasswordField("nhập lại mật khẩu", confirmPassword, { signUpViewModel.updateConfirmPassword(it) })
+            if (errorText != null) {
+                Text(
+                    text = errorText!!,
+                    color = Color.Red,
+                    style = typography.bodySmall
+                )
+            }
         }
 
         // buttons
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Button(onClick = { signUpViewModel.onSignUpClick(navController, context) }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { signUpViewModel.onSignUpClick(navController) }, modifier = Modifier.fillMaxWidth()) {
                 Text("Let's eat!")
             }
             AuthenticationButton(

@@ -39,6 +39,9 @@ class SignUpViewModel @Inject constructor(
     private val _confirmPassword = MutableStateFlow("")
     val confirmPassword: StateFlow<String> = _confirmPassword.asStateFlow()
 
+    private val _errorText = MutableStateFlow<String?>(null)
+    val errorText: StateFlow<String?> = _errorText.asStateFlow()
+
     fun updateEmail(newEmail: String) {
         _email.value = newEmail
     }
@@ -51,18 +54,23 @@ class SignUpViewModel @Inject constructor(
         _confirmPassword.value = newConfirmPassword
     }
 
-    fun onSignUpClick(navController: NavHostController, context: Context) {
+    fun onSignUpClick(navController: NavHostController) {
         launchCatching {
             try {
+                _errorText.value = null
+
                 if (!_email.value.isValidEmail()) {
+                    _errorText.value = "Invalid email format"
                     throw IllegalArgumentException("Invalid email format")
                 }
 
                 if (!_password.value.isValidPassword()) {
+                    _errorText.value = "Password must be at least 6 characters long and contain an uppercase letter"
                     throw IllegalArgumentException("Invalid password format")
                 }
 
                 if (_password.value != _confirmPassword.value) {
+                    _errorText.value = "Passwords do not match"
                     throw IllegalArgumentException("Passwords do not match")
                 }
 
@@ -70,10 +78,8 @@ class SignUpViewModel @Inject constructor(
                 navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SIGN_UP.name)
             } catch (e: IllegalArgumentException) {
                 Log.e("SignUpError", e.message.orEmpty())
-                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.e("SignUpError", e.message.orEmpty())
-                Toast.makeText(context, "An unexpected error occurred", Toast.LENGTH_LONG).show()
             }
         }
     }
