@@ -1,8 +1,6 @@
 package com.ilikeincest.food4student.screen.account_center
 
-
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight

@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,7 +37,7 @@ fun SignInScreen(
     // big ass TODO: add event callbacks
     val email by signInViewModel.email.collectAsState()
     val password by signInViewModel.password.collectAsState()
-
+    
     Column(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
@@ -51,7 +52,13 @@ fun SignInScreen(
 
         // TODO: add email validation
         // TODO: add wrong creds warning
-        NormalField("email", email, { signInViewModel.updateEmail(it) }, KeyboardType.Email)
+        NormalField(
+            label = "email",
+            value = email,
+            onValueChange = { signInViewModel.updateEmail(it) },
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        )
         Spacer(modifier = Modifier.height(24.dp))
         PasswordField("password", password, { signInViewModel.updatePassword(it) })
         Spacer(modifier = Modifier.height(4.dp))

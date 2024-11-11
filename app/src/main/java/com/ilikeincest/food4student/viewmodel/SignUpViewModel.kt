@@ -1,8 +1,6 @@
 package com.ilikeincest.food4student.viewmodel
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import androidx.lifecycle.ViewModel
@@ -38,48 +36,51 @@ class SignUpViewModel @Inject constructor(
     private val _confirmPassword = MutableStateFlow("")
     val confirmPassword: StateFlow<String> = _confirmPassword.asStateFlow()
 
-    private val _errorText = MutableStateFlow<String?>(null)
-    val errorText: StateFlow<String?> = _errorText.asStateFlow()
+    private val _emailError = MutableStateFlow("")
+    val emailError: StateFlow<String> = _emailError.asStateFlow()
+
+    private val _passwordError = MutableStateFlow("")
+    val passwordError: StateFlow<String> = _passwordError.asStateFlow()
+
+    private val _confirmPasswordError = MutableStateFlow("")
+    val confirmPasswordError: StateFlow<String> = _confirmPasswordError.asStateFlow()
 
     fun updateEmail(newEmail: String) {
+        _emailError.value = ""
         _email.value = newEmail
     }
 
     fun updatePassword(newPassword: String) {
+        _passwordError.value = ""
         _password.value = newPassword
     }
 
     fun updateConfirmPassword(newConfirmPassword: String) {
+        _confirmPasswordError.value = ""
         _confirmPassword.value = newConfirmPassword
     }
 
     fun onSignUpClick(navController: NavHostController) {
         launchCatching {
-            try {
-                _errorText.value = null
-
-                if (!_email.value.isValidEmail()) {
-                    _errorText.value = "Invalid email format"
-                    throw IllegalArgumentException("Invalid email format")
-                }
-
-                if (!_password.value.isValidPassword()) {
-                    _errorText.value = "Password must be at least 6 characters long and contain an uppercase letter"
-                    throw IllegalArgumentException("Invalid password format")
-                }
-
-                if (_password.value != _confirmPassword.value) {
-                    _errorText.value = "Passwords do not match"
-                    throw IllegalArgumentException("Passwords do not match")
-                }
-
-                accountService.createAccountWithEmail(_email.value, _password.value)
-                navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SIGN_UP.name)
-            } catch (e: IllegalArgumentException) {
-                Log.e("SignUpError", e.message.orEmpty())
-            } catch (e: Exception) {
-                Log.e("SignUpError", e.message.orEmpty())
+            var hasError = false
+            if (!_email.value.isValidEmail()) {
+                _emailError.value = "Invalid email format"
+                hasError = true
             }
+
+            if (!_password.value.isValidPassword()) {
+                _passwordError.value = "Password must be at least 6 characters long and contain an uppercase letter"
+                hasError = true
+            }
+
+            if (_password.value != _confirmPassword.value) {
+                _confirmPasswordError.value = "Passwords do not match"
+                hasError = true
+            }
+
+            if (hasError) return@launchCatching
+            accountService.createAccountWithEmail(_email.value, _password.value)
+            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
         }
     }
 

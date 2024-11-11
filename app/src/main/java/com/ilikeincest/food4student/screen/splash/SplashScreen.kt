@@ -12,8 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.ilikeincest.food4student.model.service.AccountService
-import com.ilikeincest.food4student.util.navigateAndPopUp
+import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import kotlinx.coroutines.delay
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.viewmodel.SignInViewModel
@@ -46,9 +45,9 @@ fun SplashScreen(
     LaunchedEffect(true) {
         delay(SPLASH_TIMEOUT)
         if (accountService.hasUser()) {
-            navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SPLASH_SCREEN.name)
+            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
         } else {
-            navigateAndPopUp(navController, AppRoutes.SIGN_IN.name, AppRoutes.SPLASH_SCREEN.name)
+            navigateAsRootRoute(navController, AppRoutes.SIGN_IN.name)
         }
     }
 }

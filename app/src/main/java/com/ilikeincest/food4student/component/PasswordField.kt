@@ -39,6 +39,8 @@ fun PasswordField(
     onPasswordChange: (String) -> Unit,
     imeAction: ImeAction = ImeAction.Default,
     keyboardAction: KeyboardActions = KeyboardActions.Default,
+    isError: Boolean = false,
+    errorMessage: String = ""
 ) {
     var isPasswordVisible by remember { mutableStateOf(false) }
 
@@ -63,9 +65,11 @@ fun PasswordField(
                 )
             }
         },
+        isError = isError,
+        supportingText = if (isError) {{ Text(errorMessage) }} else null,
         visualTransformation =
-        if (isPasswordVisible) VisualTransformation.None
-        else PasswordVisualTransformation(),
+            if (isPasswordVisible) VisualTransformation.None
+            else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             autoCorrectEnabled = false,
