@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
 import com.ilikeincest.food4student.initializer.HereInitializer
+import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.map.MapScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 import com.ilikeincest.food4student.viewmodel.MapViewModel
@@ -32,20 +33,5 @@ class MainActivity : ComponentActivity() {
                 AppNavGraph()
             }
         }
-    }
-}
-
-@Composable
-fun TestLogInWithGoogle(
-    modifier: Modifier = Modifier,
-    appViewModel: AppViewModel = viewModel()
-) {
-    Column(modifier = modifier) {
-        AuthenticationButton(
-            "Login bitch",
-            onGetCredentialResponse = { credential ->
-                appViewModel.onSignInWithGoogle(credential)
-            }
-        )
     }
 }
