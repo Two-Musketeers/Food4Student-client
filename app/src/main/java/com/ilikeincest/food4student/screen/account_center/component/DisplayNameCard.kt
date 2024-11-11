@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component.account_center
+package com.ilikeincest.food4student.screen.account_center.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons

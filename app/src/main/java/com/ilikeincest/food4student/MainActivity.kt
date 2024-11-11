@@ -35,18 +35,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@Composable
-fun TestLogInWithGoogle(
-    modifier: Modifier = Modifier,
-    appViewModel: AppViewModel = viewModel()
-) {
-    Column(modifier = modifier) {
-        AuthenticationButton(
-            "Login bitch",
-            onGetCredentialResponse = { credential ->
-                appViewModel.onSignInWithGoogle(credential)
-            }
-        )
-    }
-}

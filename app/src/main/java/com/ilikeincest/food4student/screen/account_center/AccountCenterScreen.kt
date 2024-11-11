@@ -18,14 +18,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.account_center.DisplayNameCard
-import com.ilikeincest.food4student.component.account_center.ExitAppCard
-import com.ilikeincest.food4student.component.account_center.RemoveAccountCard
-import com.ilikeincest.food4student.component.account_center.card
+import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
+import com.ilikeincest.food4student.screen.account_center.component.DisplayNameCard
+import com.ilikeincest.food4student.screen.account_center.component.ExitAppCard
+import com.ilikeincest.food4student.screen.account_center.component.RemoveAccountCard
+import com.ilikeincest.food4student.screen.account_center.component.card
 import com.ilikeincest.food4student.model.User
 import com.ilikeincest.food4student.viewmodel.AccountCenterViewModel
 import java.util.Locale
@@ -111,12 +114,21 @@ fun AccountCenterScreen(
 
             ExitAppCard(
                 navController,
-                context
-            ) { navController, context -> viewModel.onSignOutClick(navController, context) }
+            ) { navController -> viewModel.onSignOutClick(navController, context) }
             RemoveAccountCard(
                 navController,
-                context
-            ) { navController, context -> viewModel.onDeleteAccountClick(navController, context) }
+            ) { navController -> viewModel.onDeleteAccountClick(navController, context) }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun AccountCenterPrev() {
+    ScreenPreview {
+        AccountCenterScreen(
+            NavController(LocalContext.current),
+            viewModel = hiltViewModel()
+        )
     }
 }

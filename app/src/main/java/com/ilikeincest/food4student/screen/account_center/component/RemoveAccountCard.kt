@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component.account_center
+package com.ilikeincest.food4student.screen.account_center.component
 
 import com.ilikeincest.food4student.R
 import android.content.Context
@@ -17,7 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 @Composable
-fun RemoveAccountCard(navController: NavController, context: Context, onDeleteAccountClick: (NavController, Context) -> Unit) {
+fun RemoveAccountCard(navController: NavController, onDeleteAccountClick: (NavController) -> Unit) {
     var showRemoveAccDialog by remember { mutableStateOf(false) }
 
     AccountCenterCard(stringResource(R.string.delete_account), Icons.Filled.Delete, Modifier.card()) {
@@ -35,7 +35,7 @@ fun RemoveAccountCard(navController: NavController, context: Context, onDeleteAc
             },
             confirmButton = {
                 Button(onClick = {
-                    onDeleteAccountClick(navController, context)
+                    onDeleteAccountClick(navController)
                     showRemoveAccDialog = false
                 }) {
                     Text(text = stringResource(R.string.delete_account))

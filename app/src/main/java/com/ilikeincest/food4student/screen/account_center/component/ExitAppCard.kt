@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component.account_center
+package com.ilikeincest.food4student.screen.account_center.component
 
 import android.content.Context
 import androidx.compose.foundation.layout.padding
@@ -18,8 +18,9 @@ import com.ilikeincest.food4student.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
+// TODO: yank this shit out
 @Composable
-fun ExitAppCard(navController: NavController, context: Context, onSignOutClick: (NavController, Context) -> Unit) {
+fun ExitAppCard(navController: NavController, onSignOutClick: (NavController) -> Unit) {
     var showExitAppDialog by remember { mutableStateOf(false) }
 
     AccountCenterCard(stringResource(R.string.sign_out),
@@ -38,7 +39,7 @@ fun ExitAppCard(navController: NavController, context: Context, onSignOutClick: 
             },
             confirmButton = {
                 Button(onClick = {
-                    onSignOutClick(navController, context)
+                    onSignOutClick(navController)
                     showExitAppDialog = false
                 }) {
                     Text(text = stringResource(R.string.sign_out))
