@@ -9,6 +9,7 @@ plugins {
     // login things
     id("com.google.gms.google-services")
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
 }
 
 android {

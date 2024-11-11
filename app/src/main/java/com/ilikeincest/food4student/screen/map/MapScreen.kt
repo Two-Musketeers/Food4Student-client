@@ -12,14 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +41,7 @@ import com.ilikeincest.food4student.screen.map.component.MapViewContainer
 import com.ilikeincest.food4student.screen.map.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.viewmodel.MapViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun MapScreen(
@@ -43,12 +49,21 @@ fun MapScreen(
 ) {
     //Request permission for location
     val context = LocalContext.current
-    val locationUtils = remember { LocationUtils(context) }
+    // TODO: refactor this shit lmao
+    // TODO: stop location client when this screen is not visible
+    val locationUtils = rememberSaveable { LocationUtils(context) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            locationUtils.stopLocationUpdates()
+        }
+    }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
             locationUtils.handlePermissionResult(permissions, mapViewModel)
+            locationUtils.requestLocationOnce(mapViewModel)
         }
     )
 
@@ -57,6 +72,7 @@ fun MapScreen(
             locationUtils.requestLocationPermissions(requestPermissionLauncher)
         } else {
             locationUtils.requestLocationUpdates(mapViewModel)
+            locationUtils.requestLocationOnce(mapViewModel)
         }
     }
 
@@ -68,6 +84,7 @@ fun MapScreen(
     // Focus on the location if available
     LaunchedEffect(location) {
         if (!mapViewInitialized) return@LaunchedEffect
+        delay(200)
         location?.let {
             val geoCoordinates = GeoCoordinates(it.latitude, it.longitude)
             mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
@@ -113,6 +130,19 @@ fun MapScreen(
                     null, tint = Color.Unspecified,
                     modifier = Modifier.align(Alignment.Center).size(40.dp)
                 )
+                // Current location button
+                FilledIconButton(
+                    onClick = { locationUtils.requestLocationOnce(mapViewModel) },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Go to current location"
+                    )
+                }
             }
             SuggestedAddressList(
                 nearbyPlaces = nearbyPlaces,

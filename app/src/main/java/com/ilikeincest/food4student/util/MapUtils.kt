@@ -26,6 +26,7 @@ import com.here.sdk.search.AddressQuery
 import com.here.sdk.search.Place
 import com.here.sdk.search.SearchCallback
 import com.here.sdk.search.SearchEngine
+import com.here.sdk.search.SearchError
 import com.here.sdk.search.SearchOptions
 import com.here.sdk.search.SuggestCallback
 import com.here.sdk.search.TextQuery
@@ -71,6 +72,9 @@ class SearchExample(private val context: Context, private val mapView: MapView) 
     }
 
     private val addressSearchCallback = SearchCallback { searchError, list ->
+        if (searchError == SearchError.OPERATION_CANCELLED) {
+            return@SearchCallback
+        }
         if (searchError != null) {
             showDialog("Reverse geocoding", "Error: $searchError")
             return@SearchCallback

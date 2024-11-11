@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Looper
+import android.os.Parcelable
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
@@ -11,34 +12,44 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.MainActivity
 import com.ilikeincest.food4student.viewmodel.MapViewModel
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.RawValue
+import kotlinx.parcelize.Parcelize
 
-class LocationUtils(val context: Context) {
-
+@Parcelize
+class LocationUtils( val context: @RawValue Context) : Parcelable {
+    @IgnoredOnParcel
     private val _fusedLocationClient: FusedLocationProviderClient
             = LocationServices.getFusedLocationProviderClient(context)
 
+    @IgnoredOnParcel
+    private val _locationCallback = object : LocationCallback() {}
     @SuppressLint("MissingPermission")
-    fun requestLocationUpdates(viewModel: MapViewModel){
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(p0: LocationResult) {
-                super.onLocationResult(p0)
-                p0.lastLocation?.let {
-                    val currentLocation = GeoCoordinates(it.latitude, it.longitude)
-                    viewModel.updateCurrentLocation(currentLocation)
-                }
-            }
-        }
+    fun requestLocationUpdates(viewModel: MapViewModel) {
         val locationRequest = LocationRequest
-            .Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
             .build()
 
-        _fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        _fusedLocationClient.requestLocationUpdates(locationRequest, _locationCallback, Looper.getMainLooper())
+    }
+
+    fun stopLocationUpdates() {
+        _fusedLocationClient.removeLocationUpdates(_locationCallback)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun requestLocationOnce(viewModel: MapViewModel) {
+        _fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                val currentLocation = GeoCoordinates(it.latitude, it.longitude)
+                viewModel.updateCurrentLocation(currentLocation)
+            }
+        }
     }
 
     fun hasLocationPermission(context: Context): Boolean {
