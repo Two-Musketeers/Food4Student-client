@@ -10,7 +10,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.ilikeincest.food4student.AppRoutes
 import com.ilikeincest.food4student.model.service.AccountService
-import com.ilikeincest.food4student.util.navigateAndPopUp
+import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,6 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ViewModel() {
-
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
 
@@ -49,7 +48,7 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(navController: NavHostController) {
         launchCatching {
             accountService.signInWithEmail(_email.value, _password.value)
-            navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SIGN_IN.name)
+            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
         }
     }
 
@@ -58,7 +57,7 @@ class SignInViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SIGN_IN.name)
+                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
             }

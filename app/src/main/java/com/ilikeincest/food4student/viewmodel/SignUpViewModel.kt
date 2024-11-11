@@ -14,7 +14,7 @@ import com.ilikeincest.food4student.AppRoutes
 import com.ilikeincest.food4student.model.service.AccountService
 import com.ilikeincest.food4student.util.isValidEmail
 import com.ilikeincest.food4student.util.isValidPassword
-import com.ilikeincest.food4student.util.navigateAndPopUp
+import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -89,7 +88,7 @@ class SignUpViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                navigateAndPopUp(navController, AppRoutes.MAIN.name, AppRoutes.SIGN_IN.name)
+                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
             }
