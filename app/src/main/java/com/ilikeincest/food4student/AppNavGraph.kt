@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student
 
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,16 +37,20 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             MainScreen({ navController.navigate(AppRoutes.MAP.name) }, { navController.navigate(AppRoutes.PROFILE.name) })
         }
         composable(AppRoutes.SIGN_IN.name) {
-            SignInScreen(
-                navController = navController,
-                navigateToSignUp = { navController.navigate(AppRoutes.SIGN_UP.name) }
-            )
+            Surface {
+                SignInScreen(
+                    navController = navController,
+                    navigateToSignUp = { navController.navigate(AppRoutes.SIGN_UP.name) }
+                )
+            }
         }
         composable(AppRoutes.SIGN_UP.name){
-            SignUpScreen(
-                navController = navController,
-                navigateToSignIn = { navController.navigate(AppRoutes.SIGN_IN.name) }
-            )
+            Surface {
+                SignUpScreen(
+                    navController = navController,
+                    navigateToSignIn = { navController.navigate(AppRoutes.SIGN_IN.name) }
+                )
+            }
         }
         composable(AppRoutes.MAP.name) {
             MapScreen()
