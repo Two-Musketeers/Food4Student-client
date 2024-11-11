@@ -67,6 +67,7 @@ private enum class MainRoutes(
 @Composable
 fun MainScreen(
     onNavigateToMap: () -> Unit,
+    onNavigateToAccountCenter: () -> Unit,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -114,6 +115,9 @@ fun MainScreen(
                     Button(onClick = onNavigateToMap) {
                         Text("Go to map")
                     }
+                    Button(onClick = onNavigateToAccountCenter) {
+                        Text("Go to account center")
+                    }
                 }
             }
             composable(MainRoutes.ORDER.name) {
@@ -132,5 +136,5 @@ fun MainScreen(
 @Preview
 @Composable
 private fun MainScreenPrev() {
-    MainScreen({})
+    MainScreen({}, {})
 }
