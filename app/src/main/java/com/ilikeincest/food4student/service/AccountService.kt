@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.model.service
+package com.ilikeincest.food4student.service
 
 import com.ilikeincest.food4student.model.User
 import kotlinx.coroutines.flow.Flow
