@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice
@@ -96,8 +95,7 @@ fun OrderCard(
             for (it in orderItems) {
                 totalPrice += it.price
                 OrderItemCard(
-                    // TODO: add item image link to model
-                    image = rememberAsyncImagePainter("https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                    imageModel = it.imageUrl,
                     title = it.name,
                     notes = it.note,
                     price = it.price,
@@ -127,9 +125,9 @@ private fun OrderPreview() {
             shopId = "fuck u",
             shopImage = { MonogramAvatar(initials = "PL", it) },
             orderItems = listOf(
-                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000),
-                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000),
-                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000),
+                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
             ),
             modifier = Modifier.width(368.dp)
         )

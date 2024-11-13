@@ -5,5 +5,5 @@ data class OrderItem(
     val note: String,
     val quantity: Int,
     val price: Int,
-    // TODO: add image
+    val imageUrl: String
 )
