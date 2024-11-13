@@ -2,7 +2,6 @@ package com.ilikeincest.food4student.screen.main_page
 
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
