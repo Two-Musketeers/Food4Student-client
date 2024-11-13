@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+// TODO: switch to coil for the image with Monogram as fallback
 @Composable
 fun OrderCard(
     id: String, // To be configured with db apis
@@ -51,7 +52,7 @@ fun OrderCard(
                 .fillMaxWidth()
                 .height(34.dp)
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.Bottom) {
                 Text("Đơn hàng", style = typography.titleMedium)
                 Spacer(Modifier.width(6.dp))
                 Text("#${id}",

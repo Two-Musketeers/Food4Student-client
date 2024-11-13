@@ -17,4 +17,7 @@
     <string name="delete_account">Delete account</string>
     <string name="delete_account_title">Delete account?</string>
     <string name="delete_account_description">You will lose all your notes and your account will be deleted. This action is irreversible.</string>
+    <string name="order_state_pending">Chờ xác nhận</string>
+    <string name="order_state_delivering">Đang giao</string>
+    <string name="order_state_delivered">Đã giao</string>
 </resources>
