@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.order.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.ilikeincest.food4student.component.MonogramAvatar
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice

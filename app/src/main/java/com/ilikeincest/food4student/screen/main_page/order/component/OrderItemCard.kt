@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.order.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
