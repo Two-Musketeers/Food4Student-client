@@ -67,7 +67,9 @@ import kotlinx.coroutines.delay
 fun GlobalSearchBar(
     modifier: Modifier = Modifier,
     onExpandedChange: (Boolean) -> Unit = {},
+    isVisible: Boolean = true,
 ) {
+    if (isVisible) return
     var query by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -93,7 +95,6 @@ fun GlobalSearchBar(
 
     SearchBar(
         modifier = modifier
-//            .offset(y = (-8).dp)
             .fillMaxWidth()
             .padding(horizontal = searchBarPadding),
         inputField = { SearchBarDefaults.InputField(
