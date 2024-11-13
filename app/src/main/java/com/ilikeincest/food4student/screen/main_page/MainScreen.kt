@@ -1,7 +1,13 @@
 package com.ilikeincest.food4student.screen.main_page
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
@@ -23,16 +29,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.screen.main_page.component.GlobalSearchBar
+import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
 
 private enum class MainRoutes(
     @StringRes val labelResId: Int,
@@ -64,6 +77,7 @@ private enum class MainRoutes(
     ),
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MainScreen(
     onNavigateToMap: () -> Unit,
@@ -89,7 +103,10 @@ fun MainScreen(
                     else route.unselectedIcon
                 NavigationBarItem(
                     selected = isSelected,
-                    onClick = { navController.navigate(route.name) },
+                    onClick = {
+                        if (currentRoute != route)
+                            navController.navigate(route.name)
+                    },
                     label = { Text(stringResource(route.labelResId)) },
                     icon = {
                         val badge = badgeInNavBar[route]
@@ -103,11 +120,30 @@ fun MainScreen(
             }
         } }
     ) { innerPadding ->
+        // Search bar on top
+        var expanded by remember { mutableStateOf(false) }
+        val animatedOffset by animateIntOffsetAsState(
+            targetValue = if (expanded) IntOffset(0, 100) else IntOffset(0, 0),
+            label = "Search bar expanded content offset"
+        )
+        GlobalSearchBar(
+            modifier = Modifier,
+            onExpandedChange = { expanded = it }
+        )
         // Main screen content
+        val inTransition = fadeIn(tween(durationMillis = 250))
+        val outTransition = fadeOut(tween(durationMillis = 250))
         NavHost(
             navController = navController,
             startDestination = MainRoutes.HOME.name,
-            modifier = Modifier.padding(innerPadding)
+            enterTransition = { inTransition },
+            popEnterTransition = { inTransition },
+            exitTransition = { outTransition },
+            popExitTransition = { outTransition },
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(top = 76.dp)
+                .offset { animatedOffset }
         ) {
             composable(MainRoutes.HOME.name) {
                 Column {
@@ -121,7 +157,7 @@ fun MainScreen(
                 }
             }
             composable(MainRoutes.ORDER.name) {
-                Text("Order")
+                OrderScreen()
             }
             composable(MainRoutes.FAVORITE.name) {
                 Text("Favorite")

@@ -1,7 +1,15 @@
 package com.ilikeincest.food4student
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,9 +34,19 @@ enum class AppRoutes {
 
 @Composable
 fun AppNavGraph(navController: NavHostController = rememberNavController()) {
+    val bgColor = if (isSystemInDarkTheme()) {
+        Color.Black
+    } else {
+        Color.White
+    }
     NavHost(
         navController = navController,
-        startDestination = AppRoutes.SPLASH_SCREEN.name
+        enterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn() },
+        popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth }) + fadeOut() },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut() },
+        startDestination = AppRoutes.SPLASH_SCREEN.name,
+        modifier = Modifier.background(color = bgColor)
     ) {
         composable(AppRoutes.SPLASH_SCREEN.name){
             SplashScreen(navController)
