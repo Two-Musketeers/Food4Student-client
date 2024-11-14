@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.MonogramAvatar
 import com.ilikeincest.food4student.screen.main_page.order.component.OrderCard
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.OrderItem
@@ -102,7 +101,7 @@ fun OrderScreen(
                             date = LocalDate.of(1969, 2, 28),
                             shopName = "Phúc Long - Trần Hưng Đạo",
                             shopId = "nuh uh",
-                            shopImage = { MonogramAvatar(initials = "PL", it) },
+                            shopImageUrl = "",
                             orderItems = listOf(
                                 OrderItem(
                                     "Trà sữa Phô mai tươi",

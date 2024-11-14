@@ -134,6 +134,9 @@ fun MainScreen(
 
         // Search bar on top
         GlobalSearchBar(
+            // TODO: replace with actual data
+            userName = "Hồ Nguyên Minh",
+            userAvatarUrl = "",
             modifier = Modifier
                 .offset { animatedSearchBarOffset }
                 .alpha(animatedSearchBarAlpha),

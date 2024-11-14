@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,7 +42,7 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.DEBOUNCE_DELAY
-import com.ilikeincest.food4student.component.MonogramAvatar
+import com.ilikeincest.food4student.component.AsyncImageOrMonogram
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import kotlinx.coroutines.delay
 
@@ -56,6 +56,8 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GlobalSearchBar(
+    userName: String,
+    userAvatarUrl: String,
     modifier: Modifier = Modifier,
     onExpandedChange: (Boolean) -> Unit = {},
     isVisible: Boolean = true,
@@ -116,7 +118,8 @@ fun GlobalSearchBar(
                 )
             },
             trailingIcon = {
-                val testToast = Toast.makeText(LocalContext.current, "Avatar clicked", Toast.LENGTH_SHORT)
+                val context = LocalContext.current
+                val testToast = remember { Toast.makeText(context, "Avatar clicked", Toast.LENGTH_SHORT) }
                 if (expanded) {
                     if (query.isNotEmpty()) Icon(
                         imageVector = Icons.Default.Clear,
@@ -126,13 +129,12 @@ fun GlobalSearchBar(
                         }
                     )
                 }
-                // TODO: replace with actual avatar from user model
-                else MonogramAvatar(
-                    initials = "A",
-                    onClick = {
-                        testToast.show()
-                    },
-                    modifier = Modifier.size(42.dp)
+                else AsyncImageOrMonogram(
+                    model = userAvatarUrl,
+                    name = userName,
+                    contentDescription = "User avatar",
+                    size = 38.dp,
+                    onClick = { testToast.show() }
                 )
             },
         ) },
@@ -169,7 +171,11 @@ fun GlobalSearchBar(
 private fun SearchPrev() {
     ComponentPreview {
         Box(Modifier.fillMaxSize()) {
-            GlobalSearchBar(modifier = Modifier.align(Alignment.TopCenter))
+            GlobalSearchBar(
+                userName = "Ho Nguyen",
+                userAvatarUrl = "",
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
             LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, top = 68.dp, end = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
