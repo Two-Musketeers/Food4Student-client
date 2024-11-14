@@ -1,6 +1,6 @@
-package com.ilikeincest.food4student.model.service
+package com.ilikeincest.food4student.service
 
-import com.ilikeincest.food4student.model.service.impl.AccountServiceImpl
+import com.ilikeincest.food4student.service.impl.AccountServiceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

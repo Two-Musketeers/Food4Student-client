@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.order.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import com.ilikeincest.food4student.component.AsyncImageOrMonogram
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice
@@ -35,7 +35,7 @@ fun OrderCard(
     id: String, // To be configured with db apis
     shopName: String,
     shopId: String, // For extra lookup
-    shopImage: @Composable (modifier: Modifier) -> Unit,
+    shopImageUrl: String,
     date: LocalDate,
     orderItems: List<OrderItem>,
     modifier: Modifier = Modifier
@@ -52,7 +52,7 @@ fun OrderCard(
                 .fillMaxWidth()
                 .height(34.dp)
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.Bottom) {
                 Text("Đơn hàng", style = typography.titleMedium)
                 Spacer(Modifier.width(6.dp))
                 Text("#${id}",
@@ -73,7 +73,11 @@ fun OrderCard(
             // peak ui code
             // the chevron will stay after the text,
             // but text will ellipses and chevron will still be visible
-            shopImage(Modifier.size(28.dp))
+            AsyncImageOrMonogram(
+                model = shopImageUrl,
+                name = shopName,
+                contentDescription = "Shop avatar"
+            )
             Spacer(Modifier.width(10.dp))
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -96,8 +100,7 @@ fun OrderCard(
             for (it in orderItems) {
                 totalPrice += it.price
                 OrderItemCard(
-                    // TODO: add item image link to model
-                    image = rememberAsyncImagePainter("https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                    imageModel = it.imageUrl,
                     title = it.name,
                     notes = it.note,
                     price = it.price,
@@ -125,11 +128,11 @@ private fun OrderPreview() {
             date = LocalDate.of(1969, 2, 28),
             shopName = "Phúc Long",
             shopId = "fuck u",
-            shopImage = { MonogramAvatar(initials = "PL", it) },
+            shopImageUrl = "",
             orderItems = listOf(
-                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000),
-                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000),
-                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000),
+                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
             ),
             modifier = Modifier.width(368.dp)
         )

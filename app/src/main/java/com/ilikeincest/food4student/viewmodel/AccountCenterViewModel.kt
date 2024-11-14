@@ -3,15 +3,13 @@ package com.ilikeincest.food4student.viewmodel
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.MainActivity
 import com.ilikeincest.food4student.model.User
-import com.ilikeincest.food4student.model.service.AccountService
+import com.ilikeincest.food4student.service.AccountService
 import dagger.hilt.android.lifecycle.HiltViewModel
-
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,7 +56,7 @@ class AccountCenterViewModel @Inject constructor(
             accountService.signOut()
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(context, intent, null)
+            context.startActivity(intent, null)
         }
     }
 
@@ -67,7 +65,7 @@ class AccountCenterViewModel @Inject constructor(
             accountService.deleteAccount()
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(context, intent, null)
+            context.startActivity(intent, null)
         }
     }
 

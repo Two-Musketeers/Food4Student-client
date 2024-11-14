@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.ilikeincest.food4student.AppRoutes
-import com.ilikeincest.food4student.model.service.AccountService
+import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler

@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.map
 
+import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -50,7 +51,6 @@ fun MapScreen(
     //Request permission for location
     val context = LocalContext.current
     // TODO: refactor this shit lmao
-    // TODO: stop location client when this screen is not visible
     val locationUtils = rememberSaveable { LocationUtils(context) }
 
     DisposableEffect(Unit) {
@@ -59,9 +59,14 @@ fun MapScreen(
         }
     }
 
+    var hasLocationPermission by remember { mutableStateOf(false) }
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
+            if (permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                hasLocationPermission = true
+            }
             locationUtils.handlePermissionResult(permissions, mapViewModel)
             locationUtils.requestLocationOnce(mapViewModel)
         }
@@ -71,6 +76,7 @@ fun MapScreen(
         if (!locationUtils.hasLocationPermission(context)) {
             locationUtils.requestLocationPermissions(requestPermissionLauncher)
         } else {
+            hasLocationPermission = true
             locationUtils.requestLocationUpdates(mapViewModel)
             locationUtils.requestLocationOnce(mapViewModel)
         }
@@ -115,7 +121,7 @@ fun MapScreen(
 
         Column(Modifier.fillMaxSize().padding(it).absoluteOffset { animatedOffset }) {
             // Placeholder for the search bar
-            Spacer(Modifier.height(68.dp))
+            Spacer(Modifier.height(76.dp))
             Box(
                 modifier = Modifier
                     .weight(0.5f)
@@ -131,17 +137,19 @@ fun MapScreen(
                     modifier = Modifier.align(Alignment.Center).size(40.dp)
                 )
                 // Current location button
-                FilledIconButton(
-                    onClick = { locationUtils.requestLocationOnce(mapViewModel) },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                        .size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MyLocation,
-                        contentDescription = "Go to current location"
-                    )
+                if (hasLocationPermission) {
+                    FilledIconButton(
+                        onClick = { locationUtils.requestLocationOnce(mapViewModel) },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = "Go to current location"
+                        )
+                    }
                 }
             }
             SuggestedAddressList(

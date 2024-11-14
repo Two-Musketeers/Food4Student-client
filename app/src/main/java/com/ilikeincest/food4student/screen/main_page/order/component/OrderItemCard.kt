@@ -1,6 +1,5 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.order.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,20 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.util.formatPrice
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun OrderItemCard(
-    image: Painter,
+    imageModel: Any?,
     title: String,
     notes: String,
     price: Int,
@@ -43,8 +41,10 @@ fun OrderItemCard(
         verticalAlignment = Alignment.Top,
         modifier = modifier.height(itemHeight)
     ) {
-        Image(
-            painter = image, contentDescription = "Food image",
+        AsyncImage(
+            model = imageModel, contentDescription = "Food image",
+            placeholder = ColorPainter(colorScheme.primaryContainer),
+            error = ColorPainter(colorScheme.error),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .height(itemHeight)
@@ -83,15 +83,17 @@ fun OrderItemCard(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun OrderItemPreview() {
-    OrderItemCard(
-        image = painterResource(id = R.drawable.ic_launcher_background),
-        title = "Trà sữa Phô mai tươi 123123213123213123",
-        notes = "Size S - Không đá",
-        price = 56000,
-        quantity = 2,
-        modifier = Modifier.width(300.dp),
-    )
+    ComponentPreview {
+        OrderItemCard(
+            imageModel = R.drawable.ic_launcher_background,
+            title = "Trà sữa Phô mai tươi 123123213123213123",
+            notes = "Size S - Không đá",
+            price = 56000,
+            quantity = 2,
+            modifier = Modifier.width(300.dp),
+        )
+    }
 }

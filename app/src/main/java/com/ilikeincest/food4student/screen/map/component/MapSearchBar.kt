@@ -29,9 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.here.sdk.core.GeoCoordinates
 import com.here.sdk.search.Place
+import com.ilikeincest.food4student.DEBOUNCE_DELAY
 import kotlinx.coroutines.delay
-
-private const val DEBOUNCE_DELAY = 200L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,19 +58,17 @@ fun MapSearchBar(
 
     val searchBarPadding by animateDpAsState(
         targetValue = if(expanded) 0.dp else 16.dp,
-        label = "Search bar padding"
+        label = "Map search bar padding"
     )
 
     SearchBar(
         modifier = modifier
-            .offset(y = (-8).dp)
+//            .offset(y = (-8).dp)
             .fillMaxWidth()
             .padding(horizontal = searchBarPadding),
         inputField = { SearchBarDefaults.InputField(
             query = query,
-            onQueryChange = {
-                query = it
-            },
+            onQueryChange = { query = it },
             onSearch = { onSearch(query) },
             expanded = expanded,
             onExpandedChange = { newValue ->

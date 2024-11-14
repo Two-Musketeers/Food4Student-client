@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.model.service.impl
+package com.ilikeincest.food4student.service.impl
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
@@ -8,7 +8,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.ilikeincest.food4student.model.User
-import com.ilikeincest.food4student.model.service.AccountService
+import com.ilikeincest.food4student.service.AccountService
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
