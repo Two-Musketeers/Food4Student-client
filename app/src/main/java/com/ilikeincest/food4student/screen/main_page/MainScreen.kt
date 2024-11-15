@@ -137,6 +137,7 @@ fun MainScreen(
             // TODO: replace with actual data
             userName = "Hồ Nguyên Minh",
             userAvatarUrl = "",
+            onAvatarClicked = onNavigateToAccountCenter,
             modifier = Modifier
                 .offset { animatedSearchBarOffset }
                 .alpha(animatedSearchBarAlpha),
@@ -148,7 +149,6 @@ fun MainScreen(
         MainScreenNavGraph(
             navController = navController,
             onNavigateToMap = onNavigateToMap,
-            onNavigateToAccountCenter = onNavigateToAccountCenter,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)

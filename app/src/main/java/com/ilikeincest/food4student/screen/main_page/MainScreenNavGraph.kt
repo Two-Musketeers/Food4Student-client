@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
 import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
 
 internal enum class MainRoutes(
@@ -59,7 +60,6 @@ internal enum class MainRoutes(
 internal fun MainScreenNavGraph(
     navController: NavHostController,
     onNavigateToMap: () -> Unit,
-    onNavigateToAccountCenter: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val inTransition = fadeIn(tween(durationMillis = 250))
@@ -79,9 +79,6 @@ internal fun MainScreenNavGraph(
                 Button(onClick = onNavigateToMap) {
                     Text("Go to map")
                 }
-                Button(onClick = onNavigateToAccountCenter) {
-                    Text("Go to account center")
-                }
             }
         }
         composable(MainRoutes.ORDER.name) {
@@ -91,7 +88,7 @@ internal fun MainScreenNavGraph(
             Text("Favorite")
         }
         composable(MainRoutes.NOTIFICATION.name) {
-            Text("Notification")
+            NotificationScreen()
         }
     }
 }
