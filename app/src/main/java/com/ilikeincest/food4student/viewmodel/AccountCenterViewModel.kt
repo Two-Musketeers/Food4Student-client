@@ -75,5 +75,4 @@ class AccountCenterViewModel @Inject constructor(
                 Log.d("SignInViewModel", throwable.message.orEmpty())
             }, block = block
         )
-
 }
