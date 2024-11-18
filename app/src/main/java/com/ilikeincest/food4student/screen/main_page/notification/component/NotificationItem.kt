@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.notification.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
@@ -23,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.badge.DotBadge
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -48,7 +49,7 @@ fun NotificationItem(
 
     val bgColor =
         if (isUnread) colorScheme.surface
-        else colorScheme.secondaryContainer
+        else colorScheme.surfaceVariant
 
     Surface(color = bgColor) {
         Row(
@@ -78,9 +79,10 @@ fun NotificationItem(
                         modifier = Modifier.weight(1f)
                     )
                     if (isUnread) {
-                        DotBadge(Modifier
+                        Badge(Modifier
                             .align(Alignment.CenterVertically)
                             .padding(horizontal = 6.dp)
+                            .size(10.dp)
                         )
                     }
                 }

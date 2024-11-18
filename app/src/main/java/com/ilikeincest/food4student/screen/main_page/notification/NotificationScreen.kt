@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.component.NotificationItem
+import com.ilikeincest.food4student.screen.main_page.notification.component.NotificationItem
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
 import java.time.LocalDateTime

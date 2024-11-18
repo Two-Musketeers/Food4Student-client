@@ -4,14 +4,17 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.PrimaryTabRow
@@ -20,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,9 +54,12 @@ private enum class OrderState(@StringRes val tabTitleRes: Int) {
 fun OrderScreen(
     modifier: Modifier = Modifier,
 ) {
-    // TODO: add badge for each tab
     val pagerState = rememberPagerState(pageCount = { OrderState.entries.size })
     val coroutineScope = rememberCoroutineScope()
+
+    val orderStateBadges = remember { listOf(3, 2, 0) }
+    assert(orderStateBadges.size == OrderState.entries.size)
+
     Column(modifier = modifier.fillMaxSize()) {
         PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
             OrderState.entries.forEachIndexed { i, orderState ->
@@ -61,32 +68,39 @@ fun OrderScreen(
                     onClick = { coroutineScope.launch {
                         pagerState.animateScrollToPage(i)
                     } },
-                    // TODO: write a custom badge composable
-                    text = { Text(stringResource(orderState.tabTitleRes)) },
+                    text = { Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(orderState.tabTitleRes))
+                        if (orderStateBadges[i] != 0) {
+                            Spacer(Modifier.width(4.dp))
+                            Badge {
+                                Text(orderStateBadges[i].toString())
+                            }
+                        }
+                    } },
                 )
             }
         }
 
-        var isRefreshing by remember { mutableStateOf(false) }
-        PullToRefreshBox(
-            state = rememberPullToRefreshState(),
-            onRefresh = {
-                isRefreshing = true
-                coroutineScope.launch {
-                    // fake load
-                    // TODO: replace with actual data
-                    delay(2000)
-                    isRefreshing = false
-                }
-            },
-            isRefreshing = isRefreshing,
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                beyondViewportPageCount = 2,
-                verticalAlignment = Alignment.Top,
-            ) { page ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = 2,
+            verticalAlignment = Alignment.Top,
+        ) { page ->
+            var isRefreshing by remember { mutableStateOf(false) }
+            PullToRefreshBox(
+                state = rememberPullToRefreshState(),
+                onRefresh = {
+                    isRefreshing = true
+                    coroutineScope.launch {
+                        // fake load
+                        // TODO: replace with actual data
+                        delay(2000)
+                        isRefreshing = false
+                    }
+                },
+                isRefreshing = isRefreshing,
+            ) {
                 LazyColumn(
                     contentPadding = PaddingValues(0.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
