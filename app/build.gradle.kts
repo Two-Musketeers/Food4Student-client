@@ -32,10 +32,12 @@ android {
         properties.load(project.rootProject.file("secret.properties").inputStream())
         val apiKey = properties.getProperty("HERE_API_KEY")
         val apiSecretKey = properties.getProperty("HERE_API_SECRET_KEY")
+        val backendUrl = properties.getProperty("BACKEND_URL")
 
         // Define the API key as a build config field
         buildConfigField("String", "HERE_API_KEY", "\"$apiKey\"")
         buildConfigField("String", "HERE_API_SECRET_KEY", "\"$apiSecretKey\"")
+        buildConfigField("String", "BACKEND_URL", "\"$backendUrl\"")
     }
 
     buildTypes {
