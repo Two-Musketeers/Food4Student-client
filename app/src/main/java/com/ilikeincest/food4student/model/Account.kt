@@ -1,9 +1,11 @@
 package com.ilikeincest.food4student.model
 
-data class User (
+import android.net.Uri
+
+data class Account (
     val id: String = "",
     val email: String = "",
-    val provider: String = "",
     val displayName: String = "",
-    val isAnonymous: Boolean = true
+    val provider: String = "",
+    val photoUrl: Uri? = null,
 )

@@ -45,5 +45,5 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    fun provideApiService(retrofit: Retrofit): UserApiService = retrofit.create(UserApiService::class.java)
 }

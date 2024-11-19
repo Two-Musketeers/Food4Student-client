@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
-import com.ilikeincest.food4student.model.User
+import com.ilikeincest.food4student.model.Account
 import com.ilikeincest.food4student.service.AccountService
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -15,33 +15,31 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
+// If shit throws here, you are calling it before logging in.
 class AccountServiceImpl @Inject constructor() : AccountService {
-    override val currentUser: Flow<User?>
+    override val currentUser: Flow<Account?>
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser.toAppUser())
+                    this.trySend(auth.currentUser!!.toAppUser())
                 }
             Firebase.auth.addAuthStateListener(listener)
             awaitClose { Firebase.auth.removeAuthStateListener(listener) }
         }
 
     override val currentUserId: String
-        get() = Firebase.auth.currentUser?.uid.orEmpty()
+        get() = Firebase.auth.currentUser!!.uid
 
     override suspend fun getUserToken(): String {
         return Firebase.auth.currentUser!!.getIdToken(false).await().token ?: ""
     }
+
     override fun hasUser(): Boolean {
         return Firebase.auth.currentUser != null
     }
 
-    override fun getUserProfile(): User {
-        return Firebase.auth.currentUser.toAppUser()
-    }
-
-    override suspend fun createAnonymousAccount() {
-        Firebase.auth.signInAnonymously().await()
+    override fun getUserProfile(): Account {
+        return Firebase.auth.currentUser!!.toAppUser()
     }
 
     override suspend fun createAccountWithEmail(email: String, password: String) {
@@ -77,20 +75,19 @@ class AccountServiceImpl @Inject constructor() : AccountService {
 
     override suspend fun signOut() {
         Firebase.auth.signOut()
-
     }
 
     override suspend fun deleteAccount() {
         Firebase.auth.currentUser!!.delete().await()
     }
 
-    private fun FirebaseUser?.toAppUser(): User {
-        return if (this == null) User() else User(
+    private fun FirebaseUser.toAppUser(): Account {
+        return Account(
             id = this.uid,
             email = this.email ?: "",
             provider = this.providerId,
             displayName = this.displayName ?: "",
-            isAnonymous = this.isAnonymous
+            photoUrl = this.photoUrl,
         )
     }
 }
