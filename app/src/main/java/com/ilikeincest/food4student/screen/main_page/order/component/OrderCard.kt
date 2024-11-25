@@ -132,7 +132,7 @@ private fun OrderPreview() {
             orderItems = listOf(
                 OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
                 OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
-                OrderItem("Trà sữa Phô mai tươi 3", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
+                OrderItem("Trà sữa Phô mai tươi nhưng mà nó siêu dài cmnl lmao", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
             ),
             modifier = Modifier.width(368.dp)
         )

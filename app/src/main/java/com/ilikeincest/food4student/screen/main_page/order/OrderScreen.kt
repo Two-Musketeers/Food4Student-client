@@ -61,6 +61,7 @@ fun OrderScreen(
     assert(orderStateBadges.size == OrderState.entries.size)
 
     Column(modifier = modifier.fillMaxSize()) {
+        Spacer(Modifier.height(10.dp))
         PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
             OrderState.entries.forEachIndexed { i, orderState ->
                 Tab(
@@ -89,7 +90,6 @@ fun OrderScreen(
         ) { page ->
             var isRefreshing by remember { mutableStateOf(false) }
             PullToRefreshBox(
-                state = rememberPullToRefreshState(),
                 onRefresh = {
                     isRefreshing = true
                     coroutineScope.launch {
