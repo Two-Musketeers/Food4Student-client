@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
@@ -29,10 +28,9 @@ import com.ilikeincest.food4student.screen.account_center.component.DisplayNameC
 import com.ilikeincest.food4student.screen.account_center.component.ExitAppCard
 import com.ilikeincest.food4student.screen.account_center.component.RemoveAccountCard
 import com.ilikeincest.food4student.screen.account_center.component.card
-import com.ilikeincest.food4student.model.User
+import com.ilikeincest.food4student.model.Account
 import com.ilikeincest.food4student.viewmodel.AccountCenterViewModel
 import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,7 +40,7 @@ fun AccountCenterScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountCenterViewModel = hiltViewModel()
 ) {
-    val user by viewModel.user.collectAsState(initial = User())
+    val user by viewModel.user.collectAsState(initial = Account())
     val provider = user.provider.replaceFirstChar { it.titlecase(Locale.getDefault()) }
     val context = LocalContext.current
 
@@ -78,17 +76,15 @@ fun AccountCenterScreen(
                         .fillMaxWidth()
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 ) {
-                    if (!user.isAnonymous) {
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.profile_email),
-                                user.email
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                        )
-                    }
+                    Text(
+                        text = String.format(
+                            stringResource(R.string.profile_email),
+                            user.email
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
 
                     Text(
                         text = String.format(stringResource(R.string.profile_uid), user.id),

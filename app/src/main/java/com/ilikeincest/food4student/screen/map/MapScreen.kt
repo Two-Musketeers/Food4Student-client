@@ -7,17 +7,26 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -44,8 +54,10 @@ import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.viewmodel.MapViewModel
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
+    onNavigateUp: () -> Unit,
     mapViewModel: MapViewModel = viewModel(),
 ) {
     //Request permission for location
@@ -102,9 +114,32 @@ fun MapScreen(
         targetValue = if (expanded) IntOffset(0, 100) else IntOffset(0, 0),
         label = "Search bar expanded content offset"
     )
+    val density = LocalDensity.current
+    val animateTopBarOffset by animateIntOffsetAsState(
+        targetValue = if (expanded) IntOffset(0, -300) else IntOffset(0, 0),
+        label = "Top bar move up"
+    )
 
-    Scaffold { Box(Modifier.fillMaxSize()) {
+    Scaffold(
+        topBar = { TopAppBar(
+            title = { Text("Chọn địa chỉ") },
+            navigationIcon = { IconButton(onNavigateUp) {
+                Icon(Icons.AutoMirrored.Default.ArrowBack, "back")
+            } },
+            modifier = Modifier.absoluteOffset { animateTopBarOffset }
+        ) }
+    ) { Box(Modifier.fillMaxSize()) {
         // Search bar on top
+        val topBarHeight = it.calculateTopPadding() -
+                WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        var topBarHeightPx: Int
+        with(density) {
+            topBarHeightPx = topBarHeight.roundToPx()
+        }
+        val searchBarOffset by animateIntOffsetAsState(
+            targetValue = if (expanded) IntOffset(0, 0) else IntOffset(0, topBarHeightPx),
+            label = "Push searchbar up when expanded"
+        )
         if (mapViewInitialized) {
             MapSearchBar(
                 onSearch = { query -> mapViewModel.autoSuggestExample(query) },
@@ -115,7 +150,7 @@ fun MapScreen(
                 onExpandedChange = { newValue ->
                     expanded = newValue
                 },
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter).absoluteOffset { searchBarOffset }
             )
         }
 

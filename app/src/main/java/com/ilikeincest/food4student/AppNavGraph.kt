@@ -71,7 +71,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             }
         }
         composable(AppRoutes.MAP.name) {
-            MapScreen()
+            MapScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(AppRoutes.PROFILE.name) {
             AccountCenterScreen(navController = navController)

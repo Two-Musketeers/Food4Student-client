@@ -1,15 +1,16 @@
-package com.ilikeincest.food4student.component
+package com.ilikeincest.food4student.screen.main_page.notification.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
@@ -18,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -39,6 +39,7 @@ fun NotificationItem(
     isUnread: Boolean,
     modifier: Modifier = Modifier
 ) {
+    // this is janky. don't do this. please.
     val locale = Locale.forLanguageTag("vi-VN")
     val date = timestamp.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale))
     val time = timestamp.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale))
@@ -47,8 +48,8 @@ fun NotificationItem(
     val imageSize = 76.dp
 
     val bgColor =
-        if (isUnread) colorScheme.secondaryContainer
-        else colorScheme.surface
+        if (isUnread) colorScheme.surface
+        else colorScheme.surfaceVariant
 
     Surface(color = bgColor) {
         Row(
@@ -72,7 +73,19 @@ fun NotificationItem(
                 val textColor =
                     if (isUnread) colorScheme.onSecondaryContainer
                     else colorScheme.onSurface
-                Text(title, style = typography.titleMedium, color = textColor)
+                Row(Modifier.fillMaxWidth()) {
+                    Text(title,
+                        style = typography.titleMedium, color = textColor,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isUnread) {
+                        Badge(Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(horizontal = 6.dp)
+                            .size(10.dp)
+                        )
+                    }
+                }
                 Text(content, style = typography.bodyMedium, color = textColor)
                 Text(dateTime, style = typography.bodySmall, color = colorScheme.onSurfaceVariant)
             }
@@ -97,7 +110,7 @@ private fun ReadPreview() {
 private fun UnreadPreview() {
     NotificationItem(
         image = painterResource(id = R.drawable.ic_launcher_background),
-        title = "Phúc Long",
+        title = "Phúc Long nhưng mà nó dài ác trời ơi hỡi",
         content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
         timestamp = LocalDateTime.now(),
         isUnread = true,

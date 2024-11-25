@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.MainActivity
-import com.ilikeincest.food4student.model.User
+import com.ilikeincest.food4student.model.Account
 import com.ilikeincest.food4student.service.AccountService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -23,8 +23,8 @@ class AccountCenterViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ViewModel() {
     // Backing property to avoid state updates from other classes
-    private val _user = MutableStateFlow(User())
-    val user: StateFlow<User> = _user.asStateFlow()
+    private val _user = MutableStateFlow(Account())
+    val user: StateFlow<Account> = _user.asStateFlow()
 
     init {
         launchCatching {
@@ -75,5 +75,4 @@ class AccountCenterViewModel @Inject constructor(
                 Log.d("SignInViewModel", throwable.message.orEmpty())
             }, block = block
         )
-
 }

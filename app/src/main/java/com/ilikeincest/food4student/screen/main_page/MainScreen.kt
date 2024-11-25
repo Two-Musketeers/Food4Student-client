@@ -122,7 +122,7 @@ fun MainScreen(
                 if (isRouteWithSearchBar) IntOffset(0, 0) else IntOffset(0, -100),
             label = "Search bar animated offset"
         )
-        val searchBarHeight = 76.dp
+        val searchBarHeight = 64.dp
         val animatedContentPaddingSearchBar by animateDpAsState(
             targetValue = if (isRouteWithSearchBar) searchBarHeight else 0.dp,
             label = "Search bar animated content padding"
@@ -137,6 +137,7 @@ fun MainScreen(
             // TODO: replace with actual data
             userName = "Hồ Nguyên Minh",
             userAvatarUrl = "",
+            onAvatarClicked = onNavigateToAccountCenter,
             modifier = Modifier
                 .offset { animatedSearchBarOffset }
                 .alpha(animatedSearchBarAlpha),
@@ -148,7 +149,6 @@ fun MainScreen(
         MainScreenNavGraph(
             navController = navController,
             onNavigateToMap = onNavigateToMap,
-            onNavigateToAccountCenter = onNavigateToAccountCenter,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)
