@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -26,8 +27,6 @@ import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Locale
 
 @Composable
@@ -46,23 +45,32 @@ fun OrderCard(
             .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp)) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(34.dp)
         ) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text("Đơn hàng", style = typography.titleMedium)
-                Spacer(Modifier.width(6.dp))
-                Text("#${id}",
-                    style = typography.bodyLarge,
-                    color = colorScheme.onSurfaceVariant
-                )
-            }
+            Text("Đơn hàng",
+                style = typography.titleMedium,
+                modifier = Modifier.alignByBaseline()
+            )
+            Spacer(Modifier.width(6.dp))
+            Text("#${id}",
+                style = typography.bodyLarge,
+                color = colorScheme.onSurfaceVariant,
+                modifier = Modifier.alignByBaseline()
+            )
+
+            Spacer(Modifier.weight(1f))
+
             val locale = Locale.forLanguageTag("vi-VN")
-            val dateStr = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale))
-            Text(dateStr, style = typography.bodyMedium)
+            // format month as fixed 2digits
+            val monthAsStr = String.format(locale, "%02d", date.monthValue)
+            val dateStr = "${date.dayOfMonth}/${monthAsStr}/${date.year}"
+            Text(dateStr,
+                style = typography.bodyMedium,
+                modifier = Modifier.alignByBaseline()
+            )
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -113,7 +121,7 @@ fun OrderCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Tổng cộng:", style = typography.titleMedium)
-                Text(formatPrice(totalPrice), style = typography.titleLarge)
+                Text(formatPrice(totalPrice), style = typography.titleLarge.copy(fontWeight = FontWeight(600)))
             }
         }
     }

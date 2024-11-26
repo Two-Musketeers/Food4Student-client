@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.screen.main_page.favorite.FavoriteScreen
+import com.ilikeincest.food4student.screen.main_page.home.HomeScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
 import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
 
@@ -75,13 +76,7 @@ internal fun MainScreenNavGraph(
         modifier = modifier
     ) {
         composable(MainRoutes.HOME.name) {
-//            HomeScreen()
-            Column {
-                Text("Home")
-                Button(onClick = onNavigateToShippingLocation) {
-                    Text("Go to map")
-                }
-            }
+            HomeScreen(onNavigateToShippingLocation)
         }
         composable(MainRoutes.ORDER.name) {
             OrderScreen()
