@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -112,7 +113,7 @@ fun OrderScreen(
                     itemsIndexed(list) { i, id ->
                         OrderCard(
                             id = id,
-                            date = LocalDate.of(1969, 2, 28),
+                            date = LocalDate.of(2024, 2, 28),
                             shopName = "Phúc Long - Trần Hưng Đạo",
                             shopId = "nuh uh",
                             shopImageUrl = "",
@@ -139,7 +140,7 @@ fun OrderScreen(
                                     "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"
                                 ),
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                         )
                         if (i != list.size - 1) {
                             HorizontalDivider()

@@ -61,7 +61,7 @@ internal enum class MainRoutes(
 @Composable
 internal fun MainScreenNavGraph(
     navController: NavHostController,
-    onNavigateToMap: () -> Unit,
+    onNavigateToShippingLocation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val inTransition = fadeIn(tween(durationMillis = 250))
@@ -76,13 +76,7 @@ internal fun MainScreenNavGraph(
         modifier = modifier
     ) {
         composable(MainRoutes.HOME.name) {
-            HomeScreen()
-//            Column {
-//                Text("Home")
-//                Button(onClick = onNavigateToMap) {
-//                    Text("Go to map")
-//                }
-//            }
+            HomeScreen(onNavigateToShippingLocation)
         }
         composable(MainRoutes.ORDER.name) {
             OrderScreen()

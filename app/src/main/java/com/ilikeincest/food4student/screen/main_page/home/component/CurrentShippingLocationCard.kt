@@ -3,15 +3,11 @@ package com.ilikeincest.food4student.screen.main_page.home.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -25,11 +21,13 @@ import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 
 @Composable
-fun ShippingLocationCard(
+fun CurrentShippingLocationCard(
+    onClick: () -> Unit,
     currentLocation: String,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
 //        colors = CardDefaults.cardColors()
 //            .copy(containerColor = colorScheme.surfaceContainerHigh),
         modifier = modifier
@@ -57,8 +55,9 @@ fun ShippingLocationCard(
 @Preview
 @Composable
 private fun Prev() { ComponentPreview {
-    ShippingLocationCard(
+    CurrentShippingLocationCard(
+        onClick = {},
         currentLocation = "24 Lý Thường Kiệt, Quận 69, Tp. Thủ Đức",
-        modifier = Modifier.width(400.dp)
+        modifier = Modifier.width(400.dp).padding(16.dp)
     )
 } }
