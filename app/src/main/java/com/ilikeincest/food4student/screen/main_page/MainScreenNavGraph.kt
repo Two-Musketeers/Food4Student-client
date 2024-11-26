@@ -24,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.screen.main_page.favorite.FavoriteScreen
-import com.ilikeincest.food4student.screen.main_page.home.HomeScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
 import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
 
@@ -61,7 +60,7 @@ internal enum class MainRoutes(
 @Composable
 internal fun MainScreenNavGraph(
     navController: NavHostController,
-    onNavigateToMap: () -> Unit,
+    onNavigateToShippingLocation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val inTransition = fadeIn(tween(durationMillis = 250))
@@ -76,13 +75,13 @@ internal fun MainScreenNavGraph(
         modifier = modifier
     ) {
         composable(MainRoutes.HOME.name) {
-            HomeScreen()
-//            Column {
-//                Text("Home")
-//                Button(onClick = onNavigateToMap) {
-//                    Text("Go to map")
-//                }
-//            }
+//            HomeScreen()
+            Column {
+                Text("Home")
+                Button(onClick = onNavigateToShippingLocation) {
+                    Text("Go to map")
+                }
+            }
         }
         composable(MainRoutes.ORDER.name) {
             OrderScreen()

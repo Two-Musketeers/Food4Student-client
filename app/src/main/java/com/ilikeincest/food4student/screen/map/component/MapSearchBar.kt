@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -78,18 +79,22 @@ fun MapSearchBar(
             },
             placeholder = { Text("Tìm vị trí") },
             leadingIcon = {
-                Icon(
-                    imageVector =
-                        if (expanded) Icons.AutoMirrored.Filled.ArrowBack
-                        else Icons.Default.Search,
-                    contentDescription = if (expanded) "Back" else "Search",
-                    modifier = Modifier.clickable {
-                        if (expanded) {
-                            expanded = false // Collapse search bar
-                            keyboardController?.hide() // Hide keyboard
-                        }
+                if (expanded) {
+                    IconButton(onClick = {
+                        expanded = false // Collapse search bar
+                        keyboardController?.hide() // Hide keyboard
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                        )
                     }
-                )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
+                    )
+                }
             },
             trailingIcon = {
                 if (query.isNotEmpty()) {

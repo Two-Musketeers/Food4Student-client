@@ -40,7 +40,7 @@ import com.ilikeincest.food4student.screen.main_page.component.GlobalSearchBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onNavigateToMap: () -> Unit,
+    onNavigateToShippingLocation: () -> Unit,
     onNavigateToAccountCenter: () -> Unit,
     navController: NavHostController = rememberNavController()
 ) {
@@ -148,7 +148,7 @@ fun MainScreen(
         // Main screen content
         MainScreenNavGraph(
             navController = navController,
-            onNavigateToMap = onNavigateToMap,
+            onNavigateToShippingLocation = onNavigateToShippingLocation,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)

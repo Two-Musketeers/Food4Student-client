@@ -30,7 +30,7 @@ import com.ilikeincest.food4student.viewmodel.SignInViewModel
 @Composable
 fun SignInScreen(
     navController: NavHostController,
-    navigateToSignUp: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel = hiltViewModel()
 ) {
@@ -80,7 +80,7 @@ fun SignInScreen(
                     signInViewModel.onGoogleSignIn(navController, credential)
                 }
             )
-            OutlinedButton(onClick = { navigateToSignUp() }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { onNavigateToSignUp() }, modifier = Modifier.fillMaxWidth()) {
                 Text("Đăng ký?")
             }
         }

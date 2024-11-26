@@ -28,7 +28,7 @@ import com.ilikeincest.food4student.viewmodel.SignUpViewModel
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
-    navigateToSignIn: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
@@ -92,7 +92,7 @@ fun SignUpScreen(
                     signUpViewModel.onGoogleSignIn(navController, credential)
                 }
             )
-            OutlinedButton(onClick = { navigateToSignIn() }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { onNavigateToSignIn() }, modifier = Modifier.fillMaxWidth()) {
                 Text("Đã có tài khoản?")
             }
         }

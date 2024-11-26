@@ -19,6 +19,7 @@ import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
 import com.ilikeincest.food4student.screen.map.MapScreen
+import com.ilikeincest.food4student.screen.shipping_location.ShippingLocationScreen
 import com.ilikeincest.food4student.screen.splash.SplashScreen
 
 enum class AppRoutes {
@@ -52,13 +53,16 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             SplashScreen(navController)
         }
         composable(AppRoutes.MAIN.name) {
-            MainScreen({ navController.navigate(AppRoutes.MAP.name) }, { navController.navigate(AppRoutes.PROFILE.name) })
+            MainScreen(
+                onNavigateToAccountCenter = { navController.navigate(AppRoutes.PROFILE.name) },
+                onNavigateToShippingLocation = { navController.navigate(AppRoutes.SHIPPING_LOCATION.name) }
+            )
         }
         composable(AppRoutes.SIGN_IN.name) {
             Surface {
                 SignInScreen(
                     navController = navController,
-                    navigateToSignUp = { navController.navigate(AppRoutes.SIGN_UP.name) }
+                    onNavigateToSignUp = { navController.navigate(AppRoutes.SIGN_UP.name) }
                 )
             }
         }
@@ -66,9 +70,16 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             Surface {
                 SignUpScreen(
                     navController = navController,
-                    navigateToSignIn = { navController.navigate(AppRoutes.SIGN_IN.name) }
+                    onNavigateToSignIn = { navController.navigate(AppRoutes.SIGN_IN.name) }
                 )
             }
+        }
+        composable(AppRoutes.SHIPPING_LOCATION.name) {
+            ShippingLocationScreen(
+                locationList = listOf(), // TODO: move to vm
+                onNavigateUp = { navController.navigateUp() },
+                onPickFromMap = { navController.navigate(AppRoutes.MAP.name) }
+            )
         }
         composable(AppRoutes.MAP.name) {
             MapScreen(onNavigateUp = { navController.navigateUp() })
