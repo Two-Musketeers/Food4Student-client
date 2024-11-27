@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -61,6 +62,7 @@ internal enum class MainRoutes(
 internal fun MainScreenNavGraph(
     navController: NavHostController,
     onNavigateToShippingLocation: () -> Unit,
+    scrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier
 ) {
     // view models are declared here to force their scope to the root NavHost
@@ -87,7 +89,7 @@ internal fun MainScreenNavGraph(
             FavoriteScreen()
         }
         composable(MainRoutes.NOTIFICATION.name) {
-            NotificationScreen(notificationViewModel)
+            NotificationScreen(scrollConnection, notificationViewModel)
         }
     }
 }

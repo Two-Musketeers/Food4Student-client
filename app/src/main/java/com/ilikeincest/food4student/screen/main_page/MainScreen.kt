@@ -82,6 +82,7 @@ fun MainScreen(
 
     val routesWithoutSearchBar = listOf(MainRoutes.NOTIFICATION)
     val isRouteWithSearchBar = !routesWithoutSearchBar.contains(currentRoute)
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         bottomBar = { NavigationBar {
@@ -127,6 +128,7 @@ fun MainScreen(
                         Icon(Icons.Filled.Checklist, "Mark all as read")
                     }
                 },
+                scrollBehavior = scrollBehavior,
                 expandedHeight = topBarHeight,
             )
         },
@@ -171,6 +173,7 @@ fun MainScreen(
         MainScreenNavGraph(
             navController = navController,
             onNavigateToShippingLocation = onNavigateToShippingLocation,
+            scrollConnection = scrollBehavior.nestedScrollConnection,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)

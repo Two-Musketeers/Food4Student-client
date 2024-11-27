@@ -24,8 +24,12 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
+    private val _newNotificationAvailable = MutableStateFlow(false)
+    val newNotificationAvailable = _newNotificationAvailable.asStateFlow()
+
     fun refreshNotifications() {
         _alreadyInit.value = true
+        _newNotificationAvailable.value = false
         viewModelScope.launch {
             _isRefreshing.value = true
             // TODO: connect api here
@@ -67,9 +71,15 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
         _notifications.replaceAll {
             it.copy(isUnread = false)
         }
+        _newNotificationAvailable.value = false
     }
 
     fun addNewNotification(it: Notification) {
         _notifications.add(0, it)
+        _newNotificationAvailable.value = true
+    }
+
+    fun newNotificationAlreadySeen() {
+        _newNotificationAvailable.value = false
     }
 }
