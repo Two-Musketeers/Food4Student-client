@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -14,11 +13,10 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +24,7 @@ import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.screen.main_page.favorite.FavoriteScreen
 import com.ilikeincest.food4student.screen.main_page.home.HomeScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
+import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
 import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
 
 internal enum class MainRoutes(
@@ -64,6 +63,9 @@ internal fun MainScreenNavGraph(
     onNavigateToShippingLocation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // view models are declared here to force their scope to the root NavHost
+    val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
+
     val inTransition = fadeIn(tween(durationMillis = 250))
     val outTransition = fadeOut(tween(durationMillis = 250))
     NavHost(
@@ -85,7 +87,7 @@ internal fun MainScreenNavGraph(
             FavoriteScreen()
         }
         composable(MainRoutes.NOTIFICATION.name) {
-            NotificationScreen()
+            NotificationScreen(notificationViewModel)
         }
     }
 }

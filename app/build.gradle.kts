@@ -71,6 +71,9 @@ android {
 }
 
 dependencies {
+    // permission things
+    implementation(libs.accompanist.permissions)
+
     // navigation things
     implementation(libs.androidx.navigation.compose)
 
@@ -92,13 +95,14 @@ dependencies {
 
     // DI - hilt
     implementation(libs.hilt.android)
-    implementation(libs.firebase.common.ktx)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Firebase Auth
+    // Firebase Auth and fcm
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
 
     // view model
     implementation(libs.androidx.lifecycle.viewmodel.compose)
