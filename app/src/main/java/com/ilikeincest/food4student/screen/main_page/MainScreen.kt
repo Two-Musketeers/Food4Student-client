@@ -1,6 +1,8 @@
 package com.ilikeincest.food4student.screen.main_page
 
-import android.widget.Toast
+import android.Manifest
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -20,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +30,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.ilikeincest.food4student.screen.main_page.component.GlobalSearchBar
+import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
+
+@OptIn(ExperimentalPermissionsApi::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun RequestNotificationPermissionDialog() {
+    val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
+    if (!permissionState.status.isGranted) {
+//        if (permissionState.status.shouldShowRationale) RationaleDialog()
+        LaunchedEffect(Unit) {
+            permissionState.launchPermissionRequest()
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +65,10 @@ fun MainScreen(
     onNavigateToAccountCenter: () -> Unit,
     navController: NavHostController = rememberNavController()
 ) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        RequestNotificationPermissionDialog()
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route?.let { route ->
         MainRoutes.entries.find { it.name == route }
@@ -57,6 +82,7 @@ fun MainScreen(
 
     val routesWithoutSearchBar = listOf(MainRoutes.NOTIFICATION)
     val isRouteWithSearchBar = !routesWithoutSearchBar.contains(currentRoute)
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         bottomBar = { NavigationBar {
@@ -93,18 +119,16 @@ fun MainScreen(
                     TopAppBarDefaults.TopAppBarExpandedHeight else 0.dp,
                 label = "Top bar height"
             )
-            val context = LocalContext.current
             TopAppBar(
                 title = { Text("Notification") },
                 modifier = Modifier.alpha(topBarAlpha),
                 actions = {
-                    // TODO: add read all button logic
-                    IconButton(onClick = {
-                        Toast.makeText(context, "Mark all as read", Toast.LENGTH_SHORT).show()
-                    }) {
+                    val vm: NotificationScreenViewModel = hiltViewModel()
+                    IconButton(onClick = { vm.markAllAsRead() }) {
                         Icon(Icons.Filled.Checklist, "Mark all as read")
                     }
                 },
+                scrollBehavior = scrollBehavior,
                 expandedHeight = topBarHeight,
             )
         },
@@ -149,6 +173,7 @@ fun MainScreen(
         MainScreenNavGraph(
             navController = navController,
             onNavigateToShippingLocation = onNavigateToShippingLocation,
+            scrollConnection = scrollBehavior.nestedScrollConnection,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)

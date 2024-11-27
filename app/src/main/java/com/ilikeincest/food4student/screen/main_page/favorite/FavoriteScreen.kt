@@ -44,7 +44,7 @@ fun FavoriteScreen(modifier: Modifier = Modifier) {
                     starRating = "4.2",
                     distance = "2.5km",
                     timeAway = "42 phút",
-                    shopImageModel = null,
+                    shopImageModel = "https://images.pexels.com/photos/1525041/pexels-photo-1525041.jpeg?cs=srgb&dl=pexels-francesco-ungaro-1525041.jpg&fm=jpg",
                     isFavorite = true,
                     onFavoriteChange = {},
                     modifier = Modifier.fillMaxWidth()
