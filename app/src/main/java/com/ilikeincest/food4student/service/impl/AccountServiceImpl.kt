@@ -81,6 +81,10 @@ class AccountServiceImpl @Inject constructor() : AccountService {
         Firebase.auth.currentUser!!.delete().await()
     }
 
+    override suspend fun getUserRole(): String? {
+        return Firebase.auth.currentUser!!.getIdToken(false).await().claims["role"] as String?
+    }
+
     private fun FirebaseUser.toAppUser(): Account {
         return Account(
             id = this.uid,
