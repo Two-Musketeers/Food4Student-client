@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.splash
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,13 @@ fun SplashScreen(
     LaunchedEffect(true) {
         delay(SPLASH_TIMEOUT)
         if (accountService.hasUser()) {
-            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            val role = accountService.getUserRole()
+            Log.d("SplashScreen", "User role: $role")
+            if(role == "Admin"){
+                navigateAsRootRoute(navController, AppRoutes.ADMIN.name)
+            } else {
+                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            }
         } else {
             navigateAsRootRoute(navController, AppRoutes.SIGN_IN.name)
         }
