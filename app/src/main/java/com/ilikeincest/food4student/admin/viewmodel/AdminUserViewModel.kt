@@ -6,17 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ilikeincest.food4student.admin.service.ModeratorApiService
 import com.ilikeincest.food4student.model.User
-import com.ilikeincest.food4student.service.UserApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(
-    private val apiService: UserApiService
+class AdminUserViewModel @Inject constructor(
+    private val apiService: ModeratorApiService
 ) : ViewModel() {
     // Stores the full list of users fetched from the server
     private var allUsers: List<User> = emptyList()
@@ -59,15 +57,15 @@ class UserViewModel @Inject constructor(
                     // Store all users and apply initial filtering
                     allUsers = response.body() ?: emptyList()
                     filterUsers()
-                    Log.d("UserViewModel", "Fetched users: $allUsers")
+                    Log.d("AdminUserViewModel", "Fetched users: $allUsers")
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e("UserViewModel", "Error fetching users: $errorBody")
-                    Log.e("UserViewModel", "HTTP status code: ${response.code()}")
-                    Log.e("UserViewModel", "HTTP headers: ${response.headers()}")
+                    Log.e("AdminUserViewModel", "Error fetching users: $errorBody")
+                    Log.e("AdminUserViewModel", "HTTP status code: ${response.code()}")
+                    Log.e("AdminUserViewModel", "HTTP headers: ${response.headers()}")
                 }
             } catch (e: Exception) {
-                Log.e("UserViewModel", "Exception fetching users", e)
+                Log.e("AdminUserViewModel", "Exception fetching users", e)
             }
         }
     }
@@ -88,10 +86,10 @@ class UserViewModel @Inject constructor(
                         }
                     }
                 } else {
-                    Log.e("UserViewModel", "Error updating user role: ${response.errorBody()?.string()}")
+                    Log.e("AdminUserViewModel", "Error updating user role: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("UserViewModel", "Exception updating user role", e)
+                Log.e("AdminUserViewModel", "Exception updating user role", e)
             }
         }
     }

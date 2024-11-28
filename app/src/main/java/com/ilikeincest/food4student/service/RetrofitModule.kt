@@ -2,6 +2,7 @@ package com.ilikeincest.food4student.service
 
 import android.content.Context
 import com.ilikeincest.food4student.BuildConfig
+import com.ilikeincest.food4student.admin.service.ModeratorApiService
 import com.ilikeincest.food4student.platform.retrofit.NetworkErrorInterceptor
 import dagger.Module
 import dagger.Provides
@@ -46,4 +47,9 @@ object RetrofitModule {
     @Provides
     @Singleton
     fun provideApiService(retrofit: Retrofit): UserApiService = retrofit.create(UserApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideModeratorApiService(retrofit: Retrofit): ModeratorApiService = retrofit.create(
+        ModeratorApiService::class.java)
 }
