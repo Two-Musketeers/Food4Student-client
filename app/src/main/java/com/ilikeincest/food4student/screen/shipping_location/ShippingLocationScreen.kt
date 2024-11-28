@@ -36,11 +36,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
-import com.ilikeincest.food4student.model.SavedShippingLocation as Location
 import com.ilikeincest.food4student.screen.map.component.MapSearchBar
 import com.ilikeincest.food4student.screen.shipping_location.component.AddLocationCard
 import com.ilikeincest.food4student.screen.shipping_location.component.CurrentLocationCard
 import com.ilikeincest.food4student.screen.shipping_location.component.SavedLocationCard
+import com.ilikeincest.food4student.model.SavedShippingLocation as Location
 import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +82,10 @@ fun ShippingLocationScreen(
     ) { innerPadding ->
         Box(Modifier.fillMaxSize()) {
             // Search bar on top
-            val topBarHeight = innerPadding.calculateTopPadding() -
-                    WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+            val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+            val topBarHeight = remember {
+                innerPadding.calculateTopPadding() - statusBarPadding.calculateTopPadding()
+            }
             var topBarHeightPx: Int
             with(density) {
                 topBarHeightPx = topBarHeight.roundToPx()
