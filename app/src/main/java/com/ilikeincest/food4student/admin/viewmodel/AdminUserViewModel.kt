@@ -19,8 +19,8 @@ class AdminUserViewModel @Inject constructor(
     private val accountService: AccountService
 ) : ViewModel() {
 
-    // Stores the full list of users fetched from the server
-    private var allUsers: List<User> = emptyList()
+    // Stores the accumulated list of users fetched from the server
+    private var allUsers: MutableList<User> = mutableListOf()
 
     // The list of users to display, filtered based on the search query and selected role
     var users by mutableStateOf<List<User>>(emptyList())
@@ -38,8 +38,17 @@ class AdminUserViewModel @Inject constructor(
     var currentUserRole by mutableStateOf<String?>(null)
         private set
 
+    // Pagination variables
+    private var currentPage = 1
+    private var pageSize = 20 // Initial page size
+    var isLoading by mutableStateOf(false)
+        private set
+    var hasMore by mutableStateOf(true)
+        private set
+
     init {
-        fetchUsers(pageNumber = 1, pageSize = 30)
+        // Initial fetch with pageSize = 20
+        fetchUsers()
         fetchCurrentUserRole()
     }
 
@@ -69,22 +78,38 @@ class AdminUserViewModel @Inject constructor(
         users = allUsers.filter { user ->
             (query.isEmpty() ||
                     user.id.lowercase().contains(query) ||
-                    (user.displayName?.lowercase()?.contains(query) ?: false) ||
-                    (user.email?.lowercase()?.contains(query) ?: false))
+                    (user.displayName?.lowercase()?.contains(query) == true) ||
+                    (user.email.lowercase().contains(query) == true))
                     &&
                     (selectedRole == "All" || user.role.equals(selectedRole, ignoreCase = true))
         }
     }
 
-    fun fetchUsers(pageNumber: Int, pageSize: Int) {
+    fun fetchUsers() {
+        // Prevent multiple simultaneous fetches and stop if no more data
+        if (isLoading || !hasMore) return
+
+        isLoading = true
+
         viewModelScope.launch {
             try {
-                val response = apiService.getUsers(pageNumber, pageSize)
+                val response = apiService.getUsers(currentPage, pageSize)
                 if (response.isSuccessful) {
-                    // Store all users and apply initial filtering
-                    allUsers = response.body() ?: emptyList()
+                    val fetchedUsers = response.body() ?: emptyList()
+                    if (fetchedUsers.size < pageSize) {
+                        // Fewer items received than requested implies no more data
+                        hasMore = false
+                    }
+                    // Append fetched users to the accumulated list
+                    allUsers.addAll(fetchedUsers)
                     filterUsers()
-                    Log.d("AdminUserViewModel", "Fetched users: $allUsers")
+                    currentPage++ // Increment page for next fetch
+                    Log.d("AdminUserViewModel", "Fetched users: $fetchedUsers")
+
+                    // Update pageSize for subsequent fetches
+                    if (currentPage > 1) {
+                        pageSize = 10
+                    }
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e("AdminUserViewModel", "Error fetching users: $errorBody")
@@ -93,8 +118,14 @@ class AdminUserViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("AdminUserViewModel", "Exception fetching users", e)
+            } finally {
+                isLoading = false
             }
         }
+    }
+
+    fun loadMoreUsers() {
+        fetchUsers()
     }
 
     // Ban User

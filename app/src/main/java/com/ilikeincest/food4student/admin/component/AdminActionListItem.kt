@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun ActionListItem(text: String, icon: ImageVector, onClick: () -> Unit) {
+fun AdminActionListItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(text) },
         leadingContent = { Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },

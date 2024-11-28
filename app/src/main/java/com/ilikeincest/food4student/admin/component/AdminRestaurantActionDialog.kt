@@ -1,6 +1,5 @@
 package com.ilikeincest.food4student.admin.component
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,28 +11,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.admin.viewmodel.AdminRestaurantViewModel
 import com.ilikeincest.food4student.model.Restaurant
 
 @Composable
-fun RestaurantActionDialog(
+fun AdminRestaurantActionDialog(
     restaurant: Restaurant,
     onDismiss: () -> Unit,
     viewModel: AdminRestaurantViewModel
 ) {
-    val context = LocalContext.current
-
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
@@ -47,13 +40,13 @@ fun RestaurantActionDialog(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Select an action for ${restaurant.name ?: "this restaurant"}.",
+                    text = "Select an action for ${restaurant.name}.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Divider(
+                HorizontalDivider(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                     thickness = 1.dp
                 )
@@ -71,16 +64,11 @@ fun RestaurantActionDialog(
                         .background(Color.Transparent)
                 ) {
                     item {
-                        ActionListItem(
+                        AdminActionListItem(
                             text = if (restaurant.isApproved) "Unapprove Restaurant" else "Approve Restaurant",
                             icon = if (restaurant.isApproved) Icons.Default.Block else Icons.Default.Check,
                             onClick = {
-                                viewModel.updateRestaurantApproval(restaurant.id ?: "", !restaurant.isApproved)
-                                Toast.makeText(
-                                    context,
-                                    if (restaurant.isApproved) "Restaurant Unapproved" else "Restaurant Approved",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                viewModel.updateRestaurantApproval(restaurant.id, !restaurant.isApproved)
                                 onDismiss()
                             }
                         )

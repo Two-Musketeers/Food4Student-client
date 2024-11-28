@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.FilterList
 fun AdminUserSearchBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    selectedRole: String,
     onRoleFilterChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }

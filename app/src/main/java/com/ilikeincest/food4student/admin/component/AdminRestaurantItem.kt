@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,18 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.rememberAsyncImagePainter
 import com.ilikeincest.food4student.admin.viewmodel.AdminRestaurantViewModel
 import com.ilikeincest.food4student.model.Restaurant
 
 @Composable
-fun RestaurantItem(
+fun AdminRestaurantItem(
     restaurant: Restaurant,
     viewModel: AdminRestaurantViewModel
 ) {
@@ -86,7 +82,7 @@ fun RestaurantItem(
     }
 
     if (showDialog) {
-        RestaurantActionDialog(
+        AdminRestaurantActionDialog(
             restaurant = restaurant,
             onDismiss = { showDialog = false },
             viewModel = viewModel

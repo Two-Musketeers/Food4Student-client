@@ -1,7 +1,9 @@
 package com.ilikeincest.food4student.admin.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.admin.service.ModeratorApiService
@@ -9,50 +11,58 @@ import com.ilikeincest.food4student.model.Restaurant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.compose.runtime.State
 
 @HiltViewModel
 class AdminRestaurantViewModel @Inject constructor(
     private val apiService: ModeratorApiService
 ) : ViewModel() {
 
-    // Stores the full list of restaurants fetched from the server
-    private var allRestaurants: List<Restaurant> = emptyList()
+    // Stores the accumulated list of restaurants fetched from the server
+    private var allRestaurants: MutableList<Restaurant> = mutableListOf()
 
     // The list of restaurants to display, filtered based on the search query and approval status
-    private val _restaurants = mutableStateOf<List<Restaurant>>(emptyList())
-    val restaurants: State<List<Restaurant>> get() = _restaurants
+    var restaurants by mutableStateOf<List<Restaurant>>(emptyList())
+        private set
 
     // The current search query
-    private val _searchQuery = mutableStateOf("")
-    val searchQuery: State<String> get() = _searchQuery
+    var searchQuery by mutableStateOf("")
+        private set
 
-    // The current filter status (true = show only approved, false = show all)
-    private val _isFilterApproved = mutableStateOf(false)
-    val isFilterApproved: State<Boolean> get() = _isFilterApproved
+    // The currently selected filter status (true = show only approved, false = show all)
+    var isFilterApproved by mutableStateOf(false)
+        private set
+
+    // Pagination variables
+    private var currentPage = 1
+    private val pageSize = 10
+    var isLoading by mutableStateOf(false)
+        private set
+    var hasMore by mutableStateOf(true)
+        private set
 
     init {
-        fetchRestaurants(pageNumber = 1, pageSize = 30)
+        // Initial fetch
+        fetchRestaurants()
     }
 
     fun updateSearchQuery(newQuery: String) {
-        _searchQuery.value = newQuery
+        searchQuery = newQuery
         filterRestaurants()
     }
 
     fun toggleFilterApproved() {
-        _isFilterApproved.value = !_isFilterApproved.value
+        isFilterApproved = !isFilterApproved
         filterRestaurants()
     }
 
     private fun filterRestaurants() {
-        val query = _searchQuery.value.lowercase().trim()
-        _restaurants.value = allRestaurants.filter { restaurant ->
+        val query = searchQuery.lowercase().trim()
+        restaurants = allRestaurants.filter { restaurant ->
             val matchesQuery = query.isEmpty() ||
                     restaurant.id.lowercase().contains(query) ||
                     restaurant.name.lowercase().contains(query)
 
-            val matchesApproval = if (_isFilterApproved.value) {
+            val matchesApproval = if (isFilterApproved) {
                 restaurant.isApproved
             } else {
                 true // Include all if not filtering
@@ -62,14 +72,26 @@ class AdminRestaurantViewModel @Inject constructor(
         }
     }
 
-    fun fetchRestaurants(pageNumber: Int, pageSize: Int) {
+    fun fetchRestaurants() {
+        // Prevent multiple simultaneous fetches and stop if no more data
+        if (isLoading || !hasMore) return
+
+        isLoading = true
+
         viewModelScope.launch {
             try {
-                val response = apiService.getRestaurants(pageNumber, pageSize)
+                val response = apiService.getRestaurants(currentPage, pageSize)
                 if (response.isSuccessful) {
-                    allRestaurants = response.body() ?: emptyList()
+                    val fetchedRestaurants = response.body() ?: emptyList()
+                    if (fetchedRestaurants.size < pageSize) {
+                        // Fewer items received than requested implies no more data
+                        hasMore = false
+                    }
+                    // Append fetched restaurants to the accumulated list
+                    allRestaurants.addAll(fetchedRestaurants)
                     filterRestaurants()
-                    Log.d("AdminRestaurantViewModel", "Fetched restaurants: $allRestaurants")
+                    currentPage++ // Increment page for next fetch
+                    Log.d("AdminRestaurantViewModel", "Fetched restaurants: $fetchedRestaurants")
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e("AdminRestaurantViewModel", "Error fetching restaurants: $errorBody")
@@ -78,8 +100,14 @@ class AdminRestaurantViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("AdminRestaurantViewModel", "Exception fetching restaurants", e)
+            } finally {
+                isLoading = false
             }
         }
+    }
+
+    fun loadMoreRestaurants() {
+        fetchRestaurants()
     }
 
     fun updateRestaurantApproval(restaurantId: String, shouldApprove: Boolean) {
@@ -93,13 +121,11 @@ class AdminRestaurantViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     val updatedRestaurant = response.body()
                     if (updatedRestaurant != null) {
+                        // Find and update the restaurant in the accumulated list
                         val index = allRestaurants.indexOfFirst { it.id == restaurantId }
                         if (index != -1) {
-                            allRestaurants = allRestaurants.toMutableList().apply {
-                                set(index, updatedRestaurant)
-                            }
+                            allRestaurants[index] = updatedRestaurant
                             filterRestaurants()
-                            Log.d("AdminRestaurantViewModel", "Updated restaurant: $updatedRestaurant")
                         }
                     }
                 } else {
