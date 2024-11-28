@@ -22,12 +22,16 @@ class AdminUserViewModel @Inject constructor(
     // Stores the full list of users fetched from the server
     private var allUsers: List<User> = emptyList()
 
-    // The list of users to display, filtered based on the search query
+    // The list of users to display, filtered based on the search query and selected role
     var users by mutableStateOf<List<User>>(emptyList())
         private set
 
     // The current search query
     var searchQuery by mutableStateOf("")
+        private set
+
+    // The currently selected role for filtering
+    var selectedRole by mutableStateOf("All") // Default to "All"
         private set
 
     // Current user's role
@@ -41,8 +45,12 @@ class AdminUserViewModel @Inject constructor(
 
     private fun fetchCurrentUserRole() {
         viewModelScope.launch {
-            currentUserRole = accountService.getUserRole()
-            Log.d("AdminUserViewModel", "Current user role: $currentUserRole")
+            try {
+                currentUserRole = accountService.getUserRole()
+                Log.d("AdminUserViewModel", "Current user role: $currentUserRole")
+            } catch (e: Exception) {
+                Log.e("AdminUserViewModel", "Error fetching current user role", e)
+            }
         }
     }
 
@@ -51,16 +59,20 @@ class AdminUserViewModel @Inject constructor(
         filterUsers()
     }
 
+    fun updateSelectedRole(role: String) {
+        selectedRole = role
+        filterUsers()
+    }
+
     private fun filterUsers() {
         val query = searchQuery.lowercase().trim()
-        users = if (query.isEmpty()) {
-            allUsers
-        } else {
-            allUsers.filter { user ->
-                user.id.lowercase().contains(query) ||
-                        (user.displayName?.lowercase()?.contains(query) ?: false) ||
-                        (user.email?.lowercase()?.contains(query) ?: false)
-            }
+        users = allUsers.filter { user ->
+            (query.isEmpty() ||
+                    user.id.lowercase().contains(query) ||
+                    (user.displayName?.lowercase()?.contains(query) ?: false) ||
+                    (user.email?.lowercase()?.contains(query) ?: false))
+                    &&
+                    (selectedRole == "All" || user.role.equals(selectedRole, ignoreCase = true))
         }
     }
 

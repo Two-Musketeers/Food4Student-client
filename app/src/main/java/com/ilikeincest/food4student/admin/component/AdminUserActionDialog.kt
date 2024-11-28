@@ -1,10 +1,10 @@
 package com.ilikeincest.food4student.admin.component
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +19,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,28 +36,42 @@ fun AdminUserActionDialog(
     val context = LocalContext.current
     val currentUserRole = viewModel.currentUserRole
 
-    Log.d("AdminUserActionDialog", "Current user role: $currentUserRole")
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("User Actions") },
+        confirmButton = {},
+        dismissButton = {},
+        title = {
+            Text(text = "User Actions", style = MaterialTheme.typography.titleLarge)
+        },
         text = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
                 Text(
-                    "Select an action for ${user.displayName ?: "this user"}.",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Select an action for ${user.displayName ?: "this user"}.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                HorizontalDivider()
+                Divider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    thickness = 1.dp
+                )
 
                 // User Management Actions
                 Text(
-                    "User Management",
+                    text = "User Management",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                ) {
                     when (user.role) {
                         "Banned" -> {
                             item {
@@ -93,12 +106,12 @@ fun AdminUserActionDialog(
                                     icon = Icons.Default.Block,
                                     onClick = {
                                         viewModel.banUser(user.id)
-                                        onDismiss()
                                         Toast.makeText(
                                             context,
                                             "User banned",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                        onDismiss()
                                     }
                                 )
                             }
@@ -111,12 +124,12 @@ fun AdminUserActionDialog(
                                         icon = Icons.Default.PersonRemove,
                                         onClick = {
                                             viewModel.revokeModeratorRole(user.id)
-                                            onDismiss()
                                             Toast.makeText(
                                                 context,
                                                 "Moderator role revoked",
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                            onDismiss()
                                         }
                                     )
                                 }
@@ -124,32 +137,32 @@ fun AdminUserActionDialog(
                         }
                     }
 
-                    if (user.role != "Admin" && user.role != "Moderator") {
+                    if (user.role == "User") {
                         item {
                             ActionListItem(
                                 text = "Give Moderator Role",
                                 icon = Icons.Default.AddModerator,
                                 onClick = {
                                     viewModel.giveModeratorRole(user.id)
-                                    onDismiss()
                                     Toast.makeText(
                                         context,
                                         "User promoted to Moderator",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    onDismiss()
                                 }
                             )
                         }
                     }
                 }
 
-                HorizontalDivider()
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    thickness = 1.dp
+                )
             }
         },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close")
-            }
-        }
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f), shape = MaterialTheme.shapes.medium)
     )
 }

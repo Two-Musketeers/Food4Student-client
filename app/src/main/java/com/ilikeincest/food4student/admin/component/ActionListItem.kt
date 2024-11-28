@@ -16,9 +16,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 fun ActionListItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(text) },
-        leadingContent = { Icon(imageVector = icon, contentDescription = null) },
+        leadingContent = { Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
         modifier = Modifier.Companion
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            .background(Color.Transparent)
     )
 }
