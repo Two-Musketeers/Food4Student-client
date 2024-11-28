@@ -23,6 +23,6 @@
     <string name="order_state_delivering">Đang giao</string>
     <string name="order_state_delivered">Đã giao</string>
     <string name="users">Người dùng</string>
-    <string name="unapproved_restaurants">Nhà hàng chưa xác nhận</string>
+    <string name="restaurants">Nhà hàng</string>
     <string name="account">Tài khoản</string>
 </resources>

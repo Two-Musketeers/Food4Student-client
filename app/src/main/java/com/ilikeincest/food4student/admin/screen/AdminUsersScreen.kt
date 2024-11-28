@@ -13,11 +13,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.admin.component.AdminUserItem
 import com.ilikeincest.food4student.admin.viewmodel.AdminUserViewModel
 
 @Composable
-fun AdminUsersScreen(viewModel: AdminUserViewModel) {
+fun AdminUsersScreen(viewModel: AdminUserViewModel = hiltViewModel()) {
     val users = viewModel.users
     val searchQuery = viewModel.searchQuery
 
@@ -27,7 +28,7 @@ fun AdminUsersScreen(viewModel: AdminUserViewModel) {
             value = searchQuery,
             onValueChange = { newQuery -> viewModel.updateSearchQuery(newQuery) },
             label = { Text("Search by ID, Name, or Email") },
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             singleLine = true,
@@ -39,7 +40,7 @@ fun AdminUsersScreen(viewModel: AdminUserViewModel) {
         // User List
         LazyColumn {
             items(users) { user ->
-                AdminUserItem(user)
+                AdminUserItem(user = user, viewModel = viewModel)
             }
         }
     }

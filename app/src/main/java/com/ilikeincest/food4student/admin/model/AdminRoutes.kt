@@ -10,6 +10,6 @@ import com.ilikeincest.food4student.R
 
 sealed class AdminRoutes(val route: String, val icon: ImageVector, @StringRes val labelResId: Int) {
     object Users : AdminRoutes("users", Icons.Default.Person, R.string.users)
-    object UnapprovedRestaurants : AdminRoutes("unapproved_restaurants", Icons.Default.Restaurant, R.string.unapproved_restaurants)
+    object UnapprovedRestaurants : AdminRoutes("unapproved_restaurants", Icons.Default.Restaurant, R.string.restaurants)
     object Account : AdminRoutes("account", Icons.Default.AccountCircle, R.string.account)
 }

@@ -24,18 +24,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import com.ilikeincest.food4student.admin.viewmodel.AdminUserViewModel
 import com.ilikeincest.food4student.model.User
 
 @Composable
-fun AdminUserItem(user: User) {
+fun AdminUserItem(user: User, viewModel: AdminUserViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.Companion
+        modifier = Modifier
             .fillMaxWidth()
             .clickable { showDialog = true }
             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -44,9 +44,9 @@ fun AdminUserItem(user: User) {
         Icon(
             imageVector = getRoleIcon(user.role),
             contentDescription = null,
-            modifier = Modifier.Companion.size(48.dp)
+            modifier = Modifier.size(48.dp)
         )
-        Spacer(modifier = Modifier.Companion.width(16.dp))
+        Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(text = "Id: ${user.id}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Name: ${user.displayName}", style = MaterialTheme.typography.bodyMedium)
@@ -59,7 +59,7 @@ fun AdminUserItem(user: User) {
         AdminUserActionDialog(
             user = user,
             onDismiss = { showDialog = false },
-            viewModel = hiltViewModel()
+            viewModel = viewModel
         )
     }
 }

@@ -48,7 +48,7 @@ fun SplashScreen(
         if (accountService.hasUser()) {
             val role = accountService.getUserRole()
             Log.d("SplashScreen", "User role: $role")
-            if(role == "Admin"){
+            if(role == "Admin" || role == "Moderator") {
                 navigateAsRootRoute(navController, AppRoutes.ADMIN.name)
             } else {
                 navigateAsRootRoute(navController, AppRoutes.MAIN.name)

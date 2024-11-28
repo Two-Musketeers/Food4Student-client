@@ -5,5 +5,6 @@ data class User(
     val phoneNumber: String?,
     val displayName: String?,
     val email: String,
-    val role: String
+    val role: String,
+    val ownedRestaurant: Boolean
 )
