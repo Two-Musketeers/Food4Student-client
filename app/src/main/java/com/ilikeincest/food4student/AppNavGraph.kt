@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ilikeincest.food4student.admin.screen.AdminScreen
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
@@ -29,6 +30,7 @@ enum class AppRoutes {
     PROFILE,
     SHIPPING_LOCATION,
     PICK_LOCATION,
+    ADMIN,
     MAP,
     SPLASH_SCREEN,
 }
@@ -57,6 +59,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onNavigateToAccountCenter = { navController.navigate(AppRoutes.PROFILE.name) },
                 onNavigateToShippingLocation = { navController.navigate(AppRoutes.SHIPPING_LOCATION.name) }
             )
+        }
+        composable(AppRoutes.ADMIN.name) {
+            AdminScreen()
         }
         composable(AppRoutes.SIGN_IN.name) {
             Surface {

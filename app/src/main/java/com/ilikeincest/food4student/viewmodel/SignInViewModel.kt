@@ -48,7 +48,7 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(navController: NavHostController) {
         launchCatching {
             accountService.signInWithEmail(_email.value, _password.value)
-            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            navigateAsRootRoute(navController, AppRoutes.SPLASH_SCREEN.name)
         }
     }
 
@@ -57,7 +57,7 @@ class SignInViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+                navigateAsRootRoute(navController, AppRoutes.SPLASH_SCREEN.name)
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
             }

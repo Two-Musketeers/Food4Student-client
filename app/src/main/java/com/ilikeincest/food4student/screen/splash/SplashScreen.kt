@@ -45,7 +45,12 @@ fun SplashScreen(
     LaunchedEffect(true) {
         delay(SPLASH_TIMEOUT)
         if (accountService.hasUser()) {
-            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            val role = accountService.getUserRole()
+            if(role == "Admin" || role == "Moderator") {
+                navigateAsRootRoute(navController, AppRoutes.ADMIN.name)
+            } else {
+                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            }
         } else {
             navigateAsRootRoute(navController, AppRoutes.SIGN_IN.name)
         }
