@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val PAGE_SIZE = 10
+
 @HiltViewModel
 class AdminRestaurantViewModel @Inject constructor(
     private val apiService: ModeratorApiService
@@ -34,15 +36,18 @@ class AdminRestaurantViewModel @Inject constructor(
 
     // Pagination variables
     private var currentPage = 1
-    private val pageSize = 10
     var isLoading by mutableStateOf(false)
+        private set
+    var isRefreshing by mutableStateOf(false)
         private set
     var hasMore by mutableStateOf(true)
         private set
 
     init {
         // Initial fetch
-        fetchRestaurants()
+        viewModelScope.launch {
+            fetchMoreRestaurants()
+        }
     }
 
     fun updateSearchQuery(newQuery: String) {
@@ -56,11 +61,13 @@ class AdminRestaurantViewModel @Inject constructor(
     }
 
     private fun filterRestaurants() {
+        // TODO: move filters to backend
         val query = searchQuery.lowercase().trim()
         restaurants = allRestaurants.filter { restaurant ->
-            val matchesQuery = query.isEmpty() ||
-                    restaurant.id.lowercase().contains(query) ||
-                    restaurant.name.lowercase().contains(query)
+            val matchesQuery =
+                query.isEmpty() ||
+                restaurant.id.lowercase().contains(query) ||
+                restaurant.name.lowercase().contains(query)
 
             val matchesApproval = if (isFilterApproved) {
                 restaurant.isApproved
@@ -72,42 +79,51 @@ class AdminRestaurantViewModel @Inject constructor(
         }
     }
 
-    fun fetchRestaurants() {
-        // Prevent multiple simultaneous fetches and stop if no more data
-        if (isLoading || !hasMore) return
-
-        isLoading = true
-
+    fun refreshRestaurants() {
+        // reset all metrics
+        isRefreshing = true
+        currentPage = 1
+        isLoading = false
+        hasMore = true
         viewModelScope.launch {
-            try {
-                val response = apiService.getRestaurants(currentPage, pageSize)
-                if (response.isSuccessful) {
-                    val fetchedRestaurants = response.body() ?: emptyList()
-                    if (fetchedRestaurants.size < pageSize) {
-                        // Fewer items received than requested implies no more data
-                        hasMore = false
-                    }
-                    // Append fetched restaurants to the accumulated list
-                    allRestaurants.addAll(fetchedRestaurants)
-                    filterRestaurants()
-                    currentPage++ // Increment page for next fetch
-                    Log.d("AdminRestaurantViewModel", "Fetched restaurants: $fetchedRestaurants")
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("AdminRestaurantViewModel", "Error fetching restaurants: $errorBody")
-                    Log.e("AdminRestaurantViewModel", "HTTP status code: ${response.code()}")
-                    Log.e("AdminRestaurantViewModel", "HTTP headers: ${response.headers()}")
-                }
-            } catch (e: Exception) {
-                Log.e("AdminRestaurantViewModel", "Exception fetching restaurants", e)
-            } finally {
-                isLoading = false
-            }
+            fetchMoreRestaurants(clearExisting = true)
+            isRefreshing = false
         }
     }
 
-    fun loadMoreRestaurants() {
-        fetchRestaurants()
+    suspend fun fetchMoreRestaurants(clearExisting: Boolean = false) {
+        // Prevent multiple simultaneous fetches and stop if no more data
+        if (isLoading || !hasMore) return
+
+        if (!isRefreshing) isLoading = true
+
+        try {
+            val response = apiService.getRestaurants(currentPage,
+                PAGE_SIZE
+            )
+            if (response.isSuccessful) {
+                val fetchedRestaurants = response.body() ?: emptyList()
+                if (fetchedRestaurants.size < PAGE_SIZE) {
+                    // Fewer items received than requested implies no more data
+                    hasMore = false
+                }
+                if (clearExisting) allRestaurants.clear()
+                // Append fetched restaurants to the accumulated list
+                allRestaurants.addAll(fetchedRestaurants)
+                filterRestaurants()
+                currentPage++ // Increment page for next fetch
+                Log.d("AdminRestaurantViewModel", "Fetched restaurants: $fetchedRestaurants")
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("AdminRestaurantViewModel", "Error fetching restaurants: $errorBody")
+                Log.e("AdminRestaurantViewModel", "HTTP status code: ${response.code()}")
+                Log.e("AdminRestaurantViewModel", "HTTP headers: ${response.headers()}")
+            }
+        } catch (e: Exception) {
+            Log.e("AdminRestaurantViewModel", "Exception fetching restaurants", e)
+        } finally {
+            isLoading = false
+        }
     }
 
     fun updateRestaurantApproval(restaurantId: String, shouldApprove: Boolean) {

@@ -25,7 +25,8 @@ fun AdminUserSearchBar(
         label = { Text("Search by ID, Name, or Email") },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(top = 16.dp)
+            .padding(horizontal = 16.dp),
         singleLine = true,
         leadingIcon = {
             Icon(

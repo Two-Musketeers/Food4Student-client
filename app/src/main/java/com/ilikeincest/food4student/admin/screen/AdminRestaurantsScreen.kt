@@ -1,10 +1,13 @@
 package com.ilikeincest.food4student.admin.screen
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
@@ -27,8 +30,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.draw.shadow
 import com.ilikeincest.food4student.admin.component.LoadingItem
 import com.ilikeincest.food4student.admin.component.NoMoreRestaurant
+import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,8 +43,8 @@ fun AdminRestaurantsScreen(
     val restaurants = viewModel.restaurants
     val searchQuery = viewModel.searchQuery
     val isFilterApproved = viewModel.isFilterApproved
-    val isLoading by remember { derivedStateOf { viewModel.isLoading } }
-    val hasMore by remember { derivedStateOf { viewModel.hasMore } }
+    val isLoading = viewModel.isLoading
+    val hasMore = viewModel.hasMore
 
     // Scroll state to detect when to load more
     val listState = rememberLazyListState()
@@ -51,16 +56,13 @@ fun AdminRestaurantsScreen(
                 if (visibleItems.isNotEmpty()) {
                     val lastVisibleItemIndex = visibleItems.last().index
                     if (lastVisibleItemIndex >= viewModel.restaurants.size - 5 && !isLoading && hasMore) {
-                        viewModel.loadMoreRestaurants()
+                        viewModel.fetchMoreRestaurants()
                     }
                 }
             }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Column(Modifier.fillMaxSize()) {
         // Search Bar with Filter Icon
         TextField(
             value = searchQuery,
@@ -70,7 +72,8 @@ fun AdminRestaurantsScreen(
             label = { Text("Search by ID or Name") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(top = 16.dp)
+                .padding(horizontal = 16.dp),
             singleLine = true,
             leadingIcon = {
                 Icon(
@@ -89,26 +92,33 @@ fun AdminRestaurantsScreen(
         )
 
         // Restaurant List with Pagination
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
+        BetterPullToRefreshBox(
+            lazyListState = listState,
+            isRefreshing = viewModel.isRefreshing,
+            onRefresh = { viewModel.refreshRestaurants() }
         ) {
-            items(restaurants) { restaurant ->
-                AdminRestaurantItem(restaurant = restaurant, viewModel = viewModel)
-            }
-
-            // Loading Indicator
-            if (isLoading) {
-                item {
-                    LoadingItem()
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                item { Spacer(Modifier.height(16.dp)) }
+                items(restaurants) { restaurant ->
+                    AdminRestaurantItem(restaurant = restaurant, viewModel = viewModel)
                 }
-            }
 
-            // No More Data Indicator
-            if (!hasMore && !isLoading) {
-                item {
-                    NoMoreRestaurant()
+                // Loading Indicator
+                if (isLoading) {
+                    item {
+                        LoadingItem()
+                    }
+                }
+
+                // No More Data Indicator
+                if (!hasMore && !isLoading) {
+                    item {
+                        NoMoreRestaurant()
+                    }
                 }
             }
         }

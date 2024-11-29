@@ -13,6 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val PAGE_SIZE: Int = 20
+
 @HiltViewModel
 class AdminUserViewModel @Inject constructor(
     private val apiService: ModeratorApiService,
@@ -40,15 +42,17 @@ class AdminUserViewModel @Inject constructor(
 
     // Pagination variables
     private var currentPage = 1
-    private var pageSize = 20 // Initial page size
     var isLoading by mutableStateOf(false)
+        private set
+    var isRefreshing by mutableStateOf(false)
         private set
     var hasMore by mutableStateOf(true)
         private set
 
     init {
-        // Initial fetch with pageSize = 20
-        fetchUsers()
+        viewModelScope.launch {
+            fetchNewUsers()
+        }
         fetchCurrentUserRole()
     }
 
@@ -74,58 +78,66 @@ class AdminUserViewModel @Inject constructor(
     }
 
     private fun filterUsers() {
+        if (searchQuery.isEmpty()) {
+            users = allUsers
+        }
         val query = searchQuery.lowercase().trim()
         users = allUsers.filter { user ->
-            (query.isEmpty() ||
-                    user.id.lowercase().contains(query) ||
-                    (user.displayName?.lowercase()?.contains(query) == true) ||
-                    (user.email.lowercase().contains(query) == true))
-                    &&
-                    (selectedRole == "All" || user.role.equals(selectedRole, ignoreCase = true))
+            (
+                query.isEmpty() ||
+                user.id.lowercase().contains(query) ||
+                user.displayName?.lowercase()?.contains(query) == true ||
+                user.email.lowercase().contains(query)
+            ) && (
+                selectedRole == "All" ||
+                user.role.equals(selectedRole, ignoreCase = true)
+            )
         }
     }
 
-    fun fetchUsers() {
+    fun refreshUsers() {
+        // reset all metrics
+        isRefreshing = true
+        currentPage = 1
+        isLoading = false
+        hasMore = true
+        viewModelScope.launch {
+            fetchNewUsers(clearExisting = true)
+            isRefreshing = false
+        }
+    }
+
+    suspend fun fetchNewUsers(clearExisting: Boolean = false) {
         // Prevent multiple simultaneous fetches and stop if no more data
         if (isLoading || !hasMore) return
 
-        isLoading = true
+        if (!isRefreshing) isLoading = true
 
-        viewModelScope.launch {
-            try {
-                val response = apiService.getUsers(currentPage, pageSize)
-                if (response.isSuccessful) {
-                    val fetchedUsers = response.body() ?: emptyList()
-                    if (fetchedUsers.size < pageSize) {
-                        // Fewer items received than requested implies no more data
-                        hasMore = false
-                    }
-                    // Append fetched users to the accumulated list
-                    allUsers.addAll(fetchedUsers)
-                    filterUsers()
-                    currentPage++ // Increment page for next fetch
-                    Log.d("AdminUserViewModel", "Fetched users: $fetchedUsers")
-
-                    // Update pageSize for subsequent fetches
-                    if (currentPage > 1) {
-                        pageSize = 10
-                    }
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("AdminUserViewModel", "Error fetching users: $errorBody")
-                    Log.e("AdminUserViewModel", "HTTP status code: ${response.code()}")
-                    Log.e("AdminUserViewModel", "HTTP headers: ${response.headers()}")
+        try {
+            val response = apiService.getUsers(currentPage, PAGE_SIZE)
+            if (response.isSuccessful) {
+                val fetchedUsers = response.body() ?: emptyList()
+                if (fetchedUsers.size < PAGE_SIZE) {
+                    // Fewer items received than requested implies no more data
+                    hasMore = false
                 }
-            } catch (e: Exception) {
-                Log.e("AdminUserViewModel", "Exception fetching users", e)
-            } finally {
-                isLoading = false
+                if (clearExisting) allUsers.clear()
+                // Append fetched users to the accumulated list
+                allUsers.addAll(fetchedUsers)
+                filterUsers()
+                currentPage++ // Increment page for next fetch
+                Log.d("AdminUserViewModel", "Fetched users: $fetchedUsers")
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("AdminUserViewModel", "Error fetching users: $errorBody")
+                Log.e("AdminUserViewModel", "HTTP status code: ${response.code()}")
+                Log.e("AdminUserViewModel", "HTTP headers: ${response.headers()}")
             }
+        } catch (e: Exception) {
+            Log.e("AdminUserViewModel", "Exception fetching users", e)
+        } finally {
+            isLoading = false
         }
-    }
-
-    fun loadMoreUsers() {
-        fetchUsers()
     }
 
     // Ban User

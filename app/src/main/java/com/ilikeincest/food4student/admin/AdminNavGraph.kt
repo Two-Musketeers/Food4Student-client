@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.admin.component
+package com.ilikeincest.food4student.admin
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

@@ -102,6 +102,7 @@ fun OrderScreen(
                 },
                 isRefreshing = isRefreshing,
             ) {
+                val list = remember { List(20) { "5ea765ds$it" } }
                 LazyColumn(
                     contentPadding = PaddingValues(0.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -109,7 +110,6 @@ fun OrderScreen(
                 ) {
                     item { Spacer(Modifier.height(0.dp)) }
                     // TODO: replace with actual data
-                    val list = List(20) { "5ea765ds$it" }
                     itemsIndexed(list) { i, id ->
                         OrderCard(
                             id = id,

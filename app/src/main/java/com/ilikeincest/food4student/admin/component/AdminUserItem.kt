@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.AddModerator
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Error
@@ -27,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.vectorResource
+import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.admin.viewmodel.AdminUserViewModel
 import com.ilikeincest.food4student.model.User
 
@@ -44,9 +49,9 @@ fun AdminUserItem(user: User, viewModel: AdminUserViewModel) {
         Icon(
             imageVector = getRoleIcon(user.role),
             contentDescription = null,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(42.dp)
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp))
         Column {
             Text(text = "Id: ${user.id}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Name: ${user.displayName}", style = MaterialTheme.typography.bodyMedium)
@@ -64,12 +69,13 @@ fun AdminUserItem(user: User, viewModel: AdminUserViewModel) {
     }
 }
 
+@Composable
 fun getRoleIcon(role: String): ImageVector {
     return when (role) {
-        "Admin" -> Icons.Filled.Android
+        "Admin" -> Icons.Filled.AccessibilityNew
         "User" -> Icons.Filled.Person
-        "RestaurantOwner" -> Icons.Filled.Restaurant
-        "Moderator" -> Icons.Filled.AddModerator
+        "RestaurantOwner" -> ImageVector.vectorResource(R.drawable.chef_hat)
+        "Moderator" -> Icons.Filled.AdminPanelSettings
         "Banned" -> Icons.Filled.Block
         else -> Icons.Filled.Error
     }
