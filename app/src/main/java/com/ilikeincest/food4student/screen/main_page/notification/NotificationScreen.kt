@@ -41,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 import com.ilikeincest.food4student.component.BroadcastReceiver
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
@@ -109,14 +110,10 @@ private fun NotificationScreenContent(
                 && state.firstVisibleItemScrollOffset == 0
     } }
 
-    val pullState = rememberPullToRefreshState()
-    Box(
-        modifier = Modifier.pullToRefresh(
-            state = pullState,
-            isRefreshing = isRefreshing,
-            onRefresh = onRefresh,
-            enabled = isScrolledToTop
-        ),
+    BetterPullToRefreshBox(
+        lazyListState = state,
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
     ) {
         LazyColumn(
             state = state,
@@ -165,11 +162,6 @@ private fun NotificationScreenContent(
                     .padding(top = 16.dp)
             )
         }
-        Indicator(
-            modifier = Modifier.align(Alignment.TopCenter),
-            isRefreshing = isRefreshing,
-            state = pullState
-        )
     }
 }
 

@@ -46,10 +46,11 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): UserApiService = retrofit.create(UserApiService::class.java)
+    fun provideApiService(retrofit: Retrofit): UserApiService
+        = retrofit.create(UserApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideModeratorApiService(retrofit: Retrofit): ModeratorApiService = retrofit.create(
-        ModeratorApiService::class.java)
+    fun provideModeratorApiService(retrofit: Retrofit): ModeratorApiService
+        = retrofit.create(ModeratorApiService::class.java)
 }
