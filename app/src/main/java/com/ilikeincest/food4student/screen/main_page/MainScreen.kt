@@ -2,6 +2,7 @@ package com.ilikeincest.food4student.screen.main_page
 
 import android.Manifest
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,9 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,16 +62,12 @@ fun RequestNotificationPermissionDialog() {
 fun MainScreen(
     onNavigateToShippingLocation: () -> Unit,
     onNavigateToAccountCenter: () -> Unit,
-    navController: NavHostController = rememberNavController()
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         RequestNotificationPermissionDialog()
     }
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route?.let { route ->
-        MainRoutes.entries.find { it.name == route }
-    } ?: MainRoutes.HOME
+    var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
 
     // TODO: add logic to populate this on load and maybe move to viewmodel
     val badgeInNavBar = remember { mutableStateMapOf<MainRoutes, String>(
@@ -84,25 +79,30 @@ fun MainScreen(
     val isRouteWithSearchBar = !routesWithoutSearchBar.contains(currentRoute)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    BackHandler(enabled = currentRoute != defaultRoute) {
+        currentRoute = defaultRoute
+    }
+
     Scaffold(
         bottomBar = { NavigationBar {
             for (route in MainRoutes.entries) {
                 val isSelected = route == currentRoute
-                val icon = if (isSelected) route.selectedIcon
+                val iconRes = if (isSelected) route.selectedIcon
                     else route.unselectedIcon
+                val icon = @Composable {
+                    Icon(iconRes, null)
+                }
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = {
                         if (currentRoute != route)
-                            navController.navigate(route.name)
+                            currentRoute = route
                     },
                     label = { Text(stringResource(route.labelResId)) },
                     icon = {
                         val badge = badgeInNavBar[route]
                         if (badge != null) {
-                            BadgedBox(
-                                badge = { Badge { Text(badge) } }
-                            ) { icon() }
+                            BadgedBox({ Badge { Text(badge) } }) { icon() }
                         } else { icon() }
                     }
                 )
@@ -170,8 +170,8 @@ fun MainScreen(
         )
 
         // Main screen content
-        MainScreenNavGraph(
-            navController = navController,
+        MainScreenPageGraph(
+            currentRoute = currentRoute,
             onNavigateToShippingLocation = onNavigateToShippingLocation,
             scrollConnection = scrollBehavior.nestedScrollConnection,
             modifier = Modifier
