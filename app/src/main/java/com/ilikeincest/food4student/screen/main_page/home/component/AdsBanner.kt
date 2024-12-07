@@ -20,7 +20,7 @@ import com.ilikeincest.food4student.component.LoopingHorizontalPager
 fun AdsBanner(modifier: Modifier = Modifier) {
     LoopingHorizontalPager(
         itemCount = 5,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .aspectRatio(3f),
