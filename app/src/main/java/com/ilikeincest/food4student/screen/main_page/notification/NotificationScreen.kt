@@ -67,24 +67,6 @@ fun NotificationScreen(
         viewModel.refreshNotifications()
     }
 
-    BroadcastReceiver("com.ilikeincest.food4student.NEW_MESSAGE") {
-        val title = it?.getStringExtra("title")
-        val message = it?.getStringExtra("message")
-        val imageUrl = it?.getStringExtra("imageUrl")
-
-        if (message == null) throw Error("Message cant be null")
-
-        val newNoti = Notification(
-            id = Random.nextInt().toString(),
-            image = imageUrl,
-            title = title ?: "Thông báo",
-            timestamp = Clock.System.now(),
-            content = message,
-            isUnread = true
-        )
-        viewModel.addNewNotification(newNoti)
-    }
-
     NotificationScreenContent(
         notifications = notifications,
         isRefreshing = isRefreshing,

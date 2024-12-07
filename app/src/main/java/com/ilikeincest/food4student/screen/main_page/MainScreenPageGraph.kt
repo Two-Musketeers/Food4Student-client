@@ -25,11 +25,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.component.BroadcastReceiver
+import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.favorite.FavoriteScreen
 import com.ilikeincest.food4student.screen.main_page.home.HomeScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
 import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
+import kotlinx.datetime.Clock
+import kotlin.random.Random
 
 internal val defaultRoute = MainRoutes.HOME
 
@@ -72,6 +76,24 @@ internal fun MainScreenPageGraph(
 ) {
     // view models are declared here to force their scope to the root NavHost
     val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
+
+    BroadcastReceiver("com.ilikeincest.food4student.NEW_MESSAGE") {
+        val title = it?.getStringExtra("title")
+        val message = it?.getStringExtra("message")
+        val imageUrl = it?.getStringExtra("imageUrl")
+
+        if (message == null) throw Error("Message cant be null")
+
+        val newNoti = Notification(
+            id = Random.nextInt().toString(),
+            image = imageUrl,
+            title = title ?: "Thông báo",
+            timestamp = Clock.System.now(),
+            content = message,
+            isUnread = true
+        )
+        notificationViewModel.addNewNotification(newNoti)
+    }
 
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 14 }
     val outTransition = fadeOut(tween(durationMillis = 250))
