@@ -47,6 +47,7 @@ import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.notification.component.NotificationItem
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import java.time.LocalDateTime
 import kotlin.random.Random
 
@@ -77,7 +78,7 @@ fun NotificationScreen(
             id = Random.nextInt().toString(),
             image = imageUrl,
             title = title ?: "Thông báo",
-            timestamp = LocalDateTime.now(),
+            timestamp = Clock.System.now(),
             content = message,
             isUnread = true
         )
@@ -176,7 +177,7 @@ private fun Prev() { ScreenPreview {
                 image = null,
                 title = "Phúc Long",
                 content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-                timestamp = LocalDateTime.now(),
+                timestamp = Clock.System.now(),
                 isUnread = listOf(0, 2, 3, 8).contains(it)
             )
         },

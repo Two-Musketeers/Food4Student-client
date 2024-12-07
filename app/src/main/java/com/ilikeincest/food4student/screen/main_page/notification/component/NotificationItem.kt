@@ -13,41 +13,60 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.R
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
+import com.ilikeincest.food4student.util.timeFrom
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun NotificationItem(
     imageModel: Any?,
     title: String,
     content: String,
-    timestamp: LocalDateTime,
+    timestamp: Instant,
     isUnread: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // this is janky. don't do this. please.
-    val locale = Locale.forLanguageTag("vi-VN")
-    val date = timestamp.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale))
-    val time = timestamp.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale))
-    val dateTime = "$date $time"
+    var currentTime by remember { mutableStateOf(Clock.System.now()) }
+    // update currentTime every half a minute to save resources
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            while (true) {
+                delay(0.5.minutes)
+                currentTime = Clock.System.now()
+            }
+        }
+    }
+    val dateTime = timestamp.timeFrom(currentTime)
 
     val imageSize = 76.dp
 
     val bgColor =
         if (isUnread) colorScheme.surface
         else colorScheme.surfaceVariant
+
+    val textColor =
+        if (isUnread) colorScheme.onSurface
+        else colorScheme.onSurfaceVariant
 
     Surface(color = bgColor) {
         Row(
@@ -69,9 +88,6 @@ fun NotificationItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val textColor =
-                    if (isUnread) colorScheme.onSecondaryContainer
-                    else colorScheme.onSurface
                 Row(Modifier.fillMaxWidth()) {
                     Text(title,
                         style = typography.titleMedium, color = textColor,
@@ -96,10 +112,10 @@ fun NotificationItem(
 @Composable
 private fun ReadPreview() {
     NotificationItem(
-        imageModel = painterResource(id = R.drawable.ic_launcher_background),
+        imageModel = R.drawable.ic_launcher_background,
         title = "Phúc Long",
         content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-        timestamp = LocalDateTime.now(),
+        timestamp = Clock.System.now().minus(1.hours),
         isUnread = false,
     )
 }
@@ -108,10 +124,10 @@ private fun ReadPreview() {
 @Composable
 private fun UnreadPreview() {
     NotificationItem(
-        imageModel = painterResource(id = R.drawable.ic_launcher_background),
+        imageModel = R.drawable.ic_launcher_background,
         title = "Phúc Long nhưng mà nó dài ác trời ơi hỡi",
         content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-        timestamp = LocalDateTime.now(),
+        timestamp = Clock.System.now().minus(5.minutes),
         isUnread = true,
     )
 }
