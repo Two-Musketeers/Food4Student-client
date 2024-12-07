@@ -93,13 +93,13 @@ internal fun MainScreenPageGraph(
         notificationViewModel.addNewNotification(newNoti)
     }
 
-    val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 14 }
+    val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
     val outTransition = fadeOut(tween(durationMillis = 250))
     AnimatedContent(
         targetState = currentRoute,
         modifier = modifier,
         transitionSpec = {
-            inTransition togetherWith outTransition using SizeTransform(clip = false)
+            inTransition togetherWith outTransition using SizeTransform()
         },
         label = "Main screen swap page"
     ) {
