@@ -35,6 +35,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun NotificationItem(
@@ -46,12 +47,12 @@ fun NotificationItem(
     modifier: Modifier = Modifier
 ) {
     var currentTime by remember { mutableStateOf(Clock.System.now()) }
-    // update currentTime every half a minute to save resources
+    // update currentTime every 10 seconds to save resources
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             while (true) {
-                delay(0.5.minutes)
+                delay(10.seconds)
                 currentTime = Clock.System.now()
             }
         }
