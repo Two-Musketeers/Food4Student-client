@@ -1,7 +1,7 @@
 [versions]
 accompanistPermissions = "0.36.0"
 agp = "8.7.3"
-coilBom = "3.0.3"
+coilBom = "3.0.4"
 converterGson = "2.11.0"
 credentialsVersion = "1.3.0"
 firebaseBom = "33.7.0"
