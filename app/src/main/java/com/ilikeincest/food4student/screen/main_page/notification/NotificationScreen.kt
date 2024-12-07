@@ -1,9 +1,6 @@
 package com.ilikeincest.food4student.screen.main_page.notification
 
-import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,10 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
-import androidx.compose.material3.pulltorefresh.pullToRefresh
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,20 +34,18 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
-import com.ilikeincest.food4student.component.BroadcastReceiver
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.notification.component.NotificationItem
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import java.time.LocalDateTime
-import kotlin.random.Random
 
 @Composable
 fun NotificationScreen(
     nestedScrollConnection: NestedScrollConnection,
-    viewModel: NotificationScreenViewModel
+    viewModel: NotificationScreenViewModel = hiltViewModel()
 ) {
     val notifications = viewModel.notifications
     val isRefreshing by viewModel.isRefreshing.collectAsState()

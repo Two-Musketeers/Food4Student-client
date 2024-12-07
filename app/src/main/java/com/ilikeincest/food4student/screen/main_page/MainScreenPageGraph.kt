@@ -74,9 +74,9 @@ internal fun MainScreenPageGraph(
     scrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier
 ) {
-    // view models are declared here to force their scope to the root NavHost
+    // Allow receiving new notifications and appending it to list
+    // so that we dont have to full reload everytime we navigate to notification screen
     val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
-
     BroadcastReceiver("com.ilikeincest.food4student.NEW_MESSAGE") {
         val title = it?.getStringExtra("title")
         val message = it?.getStringExtra("message")
@@ -113,7 +113,7 @@ internal fun MainScreenPageGraph(
             MainRoutes.FAVORITE ->
                 FavoriteScreen()
             MainRoutes.NOTIFICATION ->
-                NotificationScreen(scrollConnection, notificationViewModel)
+                NotificationScreen(scrollConnection)
         }
     }
 }
