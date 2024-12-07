@@ -37,7 +37,7 @@ class NotificationService : FirebaseMessagingService() {
         val intent = Intent("com.ilikeincest.food4student.NEW_MESSAGE").apply {
             putExtra("message", message.body)
             putExtra("title", message.title)
-            putExtra("imageUrl", message.imageUrl)
+            putExtra("imageUrl", message.imageUrl.toString())
             // because java fucking do an equal comparison on namespaces
             setPackage("com.ilikeincest.food4student")
         }

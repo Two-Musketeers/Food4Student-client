@@ -1,9 +1,6 @@
 package com.ilikeincest.food4student.screen.main_page.notification
 
-import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,10 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
-import androidx.compose.material3.pulltorefresh.pullToRefresh
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,19 +34,18 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
-import com.ilikeincest.food4student.component.BroadcastReceiver
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.notification.component.NotificationItem
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import kotlin.random.Random
+import kotlinx.datetime.Clock
 
 @Composable
 fun NotificationScreen(
     nestedScrollConnection: NestedScrollConnection,
-    viewModel: NotificationScreenViewModel
+    viewModel: NotificationScreenViewModel = hiltViewModel()
 ) {
     val notifications = viewModel.notifications
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -64,24 +56,6 @@ fun NotificationScreen(
     LaunchedEffect(Unit) {
         if (alreadyInit) return@LaunchedEffect
         viewModel.refreshNotifications()
-    }
-
-    BroadcastReceiver("com.ilikeincest.food4student.NEW_MESSAGE") {
-        val title = it?.getStringExtra("title")
-        val message = it?.getStringExtra("message")
-        val imageUrl = it?.getStringExtra("imageUrl")
-
-        if (message == null) throw Error("Message cant be null")
-
-        val newNoti = Notification(
-            id = Random.nextInt().toString(),
-            image = imageUrl,
-            title = title ?: "Thông báo",
-            timestamp = LocalDateTime.now(),
-            content = message,
-            isUnread = true
-        )
-        viewModel.addNewNotification(newNoti)
     }
 
     NotificationScreenContent(
@@ -176,7 +150,7 @@ private fun Prev() { ScreenPreview {
                 image = null,
                 title = "Phúc Long",
                 content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-                timestamp = LocalDateTime.now(),
+                timestamp = Clock.System.now(),
                 isUnread = listOf(0, 2, 3, 8).contains(it)
             )
         },

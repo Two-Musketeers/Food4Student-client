@@ -1,13 +1,12 @@
 package com.ilikeincest.food4student.model
 
-import androidx.compose.ui.graphics.painter.Painter
-import java.time.LocalDateTime
+import kotlinx.datetime.Instant
 
 data class Notification(
     val id: String,
     val image: String?,
     val title: String,
     val content: String,
-    val timestamp: LocalDateTime,
+    val timestamp: Instant,
     val isUnread: Boolean,
 )

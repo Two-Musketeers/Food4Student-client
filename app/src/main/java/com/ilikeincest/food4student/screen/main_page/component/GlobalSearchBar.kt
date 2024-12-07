@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.main_page.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -83,6 +84,10 @@ fun GlobalSearchBar(
         targetValue = if(expanded) 0.dp else 16.dp,
         label = "Global search bar padding"
     )
+
+    BackHandler(enabled = expanded) {
+        expanded = false
+    }
 
     SearchBar(
         modifier = modifier

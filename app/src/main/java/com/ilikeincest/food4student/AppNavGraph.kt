@@ -15,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ilikeincest.food4student.admin.screen.AdminScreen
+import com.ilikeincest.food4student.model.SavedShippingLocation
+import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
@@ -81,7 +83,32 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(AppRoutes.SHIPPING_LOCATION.name) {
             ShippingLocationScreen(
-                locationList = listOf(), // TODO: move to vm
+                locationList = listOf(
+                    SavedShippingLocation(
+                        locationType = SavedShippingLocationType.Home,
+                        buildingNote = "Cổng trước",
+                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
+                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
+                        receiverName = "Hồ Nguyên Minh",
+                        receiverPhone = "01234567879",
+                    ),
+                    SavedShippingLocation(
+                        locationType = SavedShippingLocationType.Work,
+                        buildingNote = "Cổng trước",
+                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
+                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
+                        receiverName = "Hồ Nguyên Minh",
+                        receiverPhone = "01234567879",
+                    ),
+                    SavedShippingLocation(
+                        locationType = SavedShippingLocationType.Other,
+                        otherLocationTypeTitle = "Dating location",
+                        location = "Trường mẫu giáo Tư thục Sao Mai",
+                        address = "Lmao u believe me fr?",
+                        receiverName = "Hứa Văn Lý",
+                        receiverPhone = "0123456789",
+                    )
+                ), // TODO: move to vm
                 onNavigateUp = { navController.navigateUp() },
                 onPickFromMap = { navController.navigate(AppRoutes.MAP.name) }
             )

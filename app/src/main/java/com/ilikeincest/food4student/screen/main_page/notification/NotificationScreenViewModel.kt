@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -40,7 +41,7 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
                     image = "https://upload.wikimedia.org/wikipedia/vi/thumb/3/32/Logo_Ph%C3%BAc_Long.svg/2560px-Logo_Ph%C3%BAc_Long.svg.png",
                     title = "Phúc Long",
                     content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-                    timestamp = LocalDateTime.now(),
+                    timestamp = Clock.System.now(),
                     isUnread = listOf(0, 2, 3, 8).contains(it)
                 )
             }

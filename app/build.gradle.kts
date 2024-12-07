@@ -71,6 +71,10 @@ android {
 }
 
 dependencies {
+    // clock things
+    implementation(libs.human.readable)
+    implementation(libs.kotlinx.datetime)
+
     // permission things
     implementation(libs.accompanist.permissions)
 
