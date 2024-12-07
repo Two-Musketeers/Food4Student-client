@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Badge
@@ -21,10 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,9 +34,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.screen.main_page.order.component.OrderCard
+import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.OrderItem
+import com.ilikeincest.food4student.screen.main_page.order.component.OrderCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -89,8 +88,10 @@ fun OrderScreen(
             beyondViewportPageCount = 2,
             verticalAlignment = Alignment.Top,
         ) { page ->
+            val state = rememberLazyListState()
             var isRefreshing by remember { mutableStateOf(false) }
-            PullToRefreshBox(
+            BetterPullToRefreshBox(
+                lazyListState = state,
                 onRefresh = {
                     isRefreshing = true
                     coroutineScope.launch {
@@ -104,6 +105,7 @@ fun OrderScreen(
             ) {
                 val list = remember { List(20) { "5ea765ds$it" } }
                 LazyColumn(
+                    state = state,
                     contentPadding = PaddingValues(0.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
