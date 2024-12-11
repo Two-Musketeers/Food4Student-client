@@ -8,8 +8,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.ilikeincest.food4student.AppRoutes
+import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.service.AccountService
+import com.ilikeincest.food4student.service.api.AccountApiService
 import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,11 +22,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val accountApiService: AccountApiService
 ) : ViewModel() {
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -48,6 +54,7 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(navController: NavHostController) {
         launchCatching {
             accountService.signInWithEmail(_email.value, _password.value)
+            registerDeviceToken()
             navigateAsRootRoute(navController, AppRoutes.SPLASH_SCREEN.name)
         }
     }
@@ -57,11 +64,21 @@ class SignInViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+                registerDeviceToken()
                 navigateAsRootRoute(navController, AppRoutes.SPLASH_SCREEN.name)
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
             }
         }
+    }
+
+    private suspend fun registerDeviceToken() {
+            // Retrieve FCM Token
+            val token = Firebase.messaging.token.await()
+            // Create DeviceTokenDto
+            val deviceTokenDto = DeviceTokenDto(token)
+            // Send Device Token to Server
+            accountApiService.registerDeviceToken(deviceTokenDto)
     }
 
     fun getAccountService(): AccountService {

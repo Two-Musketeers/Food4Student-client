@@ -8,8 +8,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.ilikeincest.food4student.AppRoutes
+import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.service.AccountService
+import com.ilikeincest.food4student.service.api.AccountApiService
 import com.ilikeincest.food4student.util.isValidEmail
 import com.ilikeincest.food4student.util.isValidPassword
 import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
@@ -20,11 +24,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val accountApiService: AccountApiService
 ) : ViewModel() {
     // Backing properties to avoid state updates from other classes
     private val _email = MutableStateFlow("")
@@ -80,6 +86,9 @@ class SignUpViewModel @Inject constructor(
 
             if (hasError) return@launchCatching
             accountService.createAccountWithEmail(_email.value, _password.value)
+            val token = Firebase.messaging.token.await()
+            val deviceTokenDto = DeviceTokenDto(token)
+            accountApiService.registerDeviceToken(deviceTokenDto)
             navigateAsRootRoute(navController, AppRoutes.MAIN.name)
         }
     }
@@ -89,6 +98,9 @@ class SignUpViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+                val token = Firebase.messaging.token.await()
+                val deviceTokenDto = DeviceTokenDto(token)
+                accountApiService.registerDeviceToken(deviceTokenDto)
                 navigateAsRootRoute(navController, AppRoutes.MAIN.name)
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
