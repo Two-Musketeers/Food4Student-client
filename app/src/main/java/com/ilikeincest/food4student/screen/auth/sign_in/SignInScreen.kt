@@ -21,12 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.NormalField
 import com.ilikeincest.food4student.component.PasswordField
-import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
 import com.ilikeincest.food4student.viewmodel.SignInViewModel
 

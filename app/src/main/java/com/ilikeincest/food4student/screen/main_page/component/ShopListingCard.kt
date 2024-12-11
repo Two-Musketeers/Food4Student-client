@@ -1,5 +1,6 @@
-package com.ilikeincest.food4student.screen.main_page.favorite.component
+package com.ilikeincest.food4student.screen.main_page.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +35,7 @@ import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 
 @Composable
-fun FavoriteCard(
+fun ShopListingCard(
     shopName: String,
     starRating: String,
     distance: String,
@@ -46,7 +47,11 @@ fun FavoriteCard(
     modifier: Modifier = Modifier
 ) {
     val height = 92.dp
-    Row(modifier.height(height)) {
+    Row(Modifier
+        .clickable { onClick() }
+        .then(modifier)
+        .height(height)
+    ) {
         // TODO: refactor this to global component, and share with order item card
         AsyncImage(
             model = shopImageModel,
@@ -104,7 +109,7 @@ fun FavoriteCard(
 @PreviewLightDark
 @Composable
 private fun FavoriteCardPrev() { ComponentPreview {
-    FavoriteCard(
+    ShopListingCard(
         "Phúc Long",
         "4.2",
         "2.5km",
@@ -120,7 +125,7 @@ private fun FavoriteCardPrev() { ComponentPreview {
 @PreviewLightDark
 @Composable
 private fun LongAssName() { ComponentPreview {
-    FavoriteCard(
+    ShopListingCard(
         "Phúc Long Coop Test tiêu đề siêu dài holy shit nó còn dài hơn",
         "4.2",
         "2.5km",

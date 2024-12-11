@@ -15,7 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ilikeincest.food4student.screen.main_page.favorite.component.FavoriteCard
+import com.ilikeincest.food4student.screen.main_page.component.ShopListingCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -39,7 +39,7 @@ fun FavoriteScreen(modifier: Modifier = Modifier) {
         ) {
             item {} // to get the default 16dp spacing as padding
             itemsIndexed(testInfo) { i, it ->
-                FavoriteCard(
+                ShopListingCard(
                     shopName = "Phúc Long",
                     starRating = "4.2",
                     distance = "2.5km",
