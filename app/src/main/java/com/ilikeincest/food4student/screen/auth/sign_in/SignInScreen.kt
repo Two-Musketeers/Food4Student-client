@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,29 +21,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.ilikeincest.food4student.component.NormalField
 import com.ilikeincest.food4student.component.PasswordField
+import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
 import com.ilikeincest.food4student.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
-    navController: NavHostController,
     onNavigateToSignUp: () -> Unit,
+    onSetRootSplash: () -> Unit,
     modifier: Modifier = Modifier,
-    signInViewModel: SignInViewModel = hiltViewModel()
+    viewModel: SignInViewModel = hiltViewModel()
 ) {
     // big ass TODO: add event callbacks
-    val email by signInViewModel.email.collectAsState()
-    val password by signInViewModel.password.collectAsState()
-    
-    Column(
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+
+    Surface { Column(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(32.dp, 10.dp)
     ) {
         Text(
@@ -55,14 +59,21 @@ fun SignInScreen(
         NormalField(
             label = "email",
             value = email,
-            onValueChange = { signInViewModel.updateEmail(it) },
+            onValueChange = { viewModel.setEmail(it) },
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         )
-        Spacer(modifier = Modifier.height(24.dp))
-        PasswordField("password", password, { signInViewModel.updatePassword(it) })
-        Spacer(modifier = Modifier.height(4.dp))
-        TextButton(onClick = {}, modifier = Modifier.align(Alignment.End)) {
+        Spacer(Modifier.height(24.dp))
+        PasswordField(
+            label = "password",
+            password = password,
+            onPasswordChange = { viewModel.setPassword(it) }
+        )
+        Spacer(Modifier.height(4.dp))
+        TextButton(
+            onClick = {}, // TODO
+            modifier = Modifier.align(Alignment.End)
+        ) {
             Text("quên mật khẩu?")
         }
 
@@ -70,27 +81,22 @@ fun SignInScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
-                onClick = { signInViewModel.onSignInClick(navController) },
+                onClick = { viewModel.onSignIn(onSuccess = onSetRootSplash) },
                 modifier = Modifier.fillMaxWidth()) {
                 Text("Let's eat!")
             }
             AuthenticationButton(
                 buttonText = "Đăng nhập với Google",
                 onGetCredentialResponse = { credential ->
-                    signInViewModel.onGoogleSignIn(navController, credential)
+                    viewModel.onGoogleSignIn(credential, onSuccess = onSetRootSplash)
                 }
             )
-            OutlinedButton(onClick = { onNavigateToSignUp() }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = { onNavigateToSignUp() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Đăng ký?")
             }
         }
-    }
+    } }
 }
-
-//@PreviewLightDark
-//@Composable
-//private fun SignInPrev() {
-//    ScreenPreview {
-//        SignInScreen({}, {})
-//    }
-//}

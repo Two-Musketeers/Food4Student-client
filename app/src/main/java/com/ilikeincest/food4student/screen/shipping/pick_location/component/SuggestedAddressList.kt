@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.map.component
+package com.ilikeincest.food4student.screen.shipping.pick_location.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
