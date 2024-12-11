@@ -47,6 +47,7 @@ fun FavoriteScreen(modifier: Modifier = Modifier) {
                     shopImageModel = "https://images.pexels.com/photos/1525041/pexels-photo-1525041.jpeg?cs=srgb&dl=pexels-francesco-ungaro-1525041.jpg&fm=jpg",
                     isFavorite = true,
                     onFavoriteChange = {},
+                    onClick = {},
                     modifier = Modifier.fillMaxWidth()
                 )
             }

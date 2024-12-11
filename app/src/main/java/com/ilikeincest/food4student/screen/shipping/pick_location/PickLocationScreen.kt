@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.map
+package com.ilikeincest.food4student.screen.shipping.pick_location
 
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -47,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.screen.map.component.MapSearchBar
-import com.ilikeincest.food4student.screen.map.component.MapViewContainer
-import com.ilikeincest.food4student.screen.map.component.SuggestedAddressList
+import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapSearchBar
+import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapViewContainer
+import com.ilikeincest.food4student.screen.shipping.pick_location.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.viewmodel.MapViewModel
 import kotlinx.coroutines.delay

@@ -5,14 +5,11 @@ import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-import com.ilikeincest.food4student.AppRoutes
 import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.util.isValidEmail
 import com.ilikeincest.food4student.util.isValidPassword
-import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -45,22 +42,22 @@ class SignUpViewModel @Inject constructor(
     private val _confirmPasswordError = MutableStateFlow("")
     val confirmPasswordError: StateFlow<String> = _confirmPasswordError.asStateFlow()
 
-    fun updateEmail(newEmail: String) {
+    fun setEmail(newEmail: String) {
         _emailError.value = ""
         _email.value = newEmail
     }
 
-    fun updatePassword(newPassword: String) {
+    fun setPassword(newPassword: String) {
         _passwordError.value = ""
         _password.value = newPassword
     }
 
-    fun updateConfirmPassword(newConfirmPassword: String) {
+    fun setConfirmPassword(newConfirmPassword: String) {
         _confirmPasswordError.value = ""
         _confirmPassword.value = newConfirmPassword
     }
 
-    fun onSignUpClick(navController: NavHostController) {
+    fun onSignUp(onSuccess: () -> Unit) {
         launchCatching {
             var hasError = false
             if (!_email.value.isValidEmail()) {
@@ -80,16 +77,16 @@ class SignUpViewModel @Inject constructor(
 
             if (hasError) return@launchCatching
             accountService.createAccountWithEmail(_email.value, _password.value)
-            navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+            onSuccess()
         }
     }
 
-    fun onGoogleSignIn(navController: NavHostController,credential: Credential) {
+    fun onGoogleSignIn(credential: Credential, onSuccess: () -> Unit) {
         launchCatching {
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                navigateAsRootRoute(navController, AppRoutes.MAIN.name)
+                onSuccess()
             } else {
                 Log.e("SignInViewModel", "Unexpected credentials")
             }

@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -27,7 +29,7 @@ import com.ilikeincest.food4student.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(
-    navController: NavHostController,
+    onSetRootMain: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     signUpViewModel: SignUpViewModel = hiltViewModel()
@@ -40,10 +42,11 @@ fun SignUpScreen(
     val passwordError by signUpViewModel.passwordError.collectAsState()
     val confirmPasswordError by signUpViewModel.confirmPasswordError.collectAsState()
 
-    Column(
+    Surface { Column(
         verticalArrangement = Arrangement.spacedBy(42.dp, Alignment.CenterVertically),
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(32.dp, 10.dp)
     ) {
         Text(
@@ -51,12 +54,9 @@ fun SignUpScreen(
             style = typography.displayMedium
         )
 
-        // fields
-        Column(
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
             TextField(
-                value = email, onValueChange = { signUpViewModel.updateEmail(it) },
+                value = email, onValueChange = { signUpViewModel.setEmail(it) },
                 singleLine = true,
                 label = { Text("email") },
                 keyboardOptions = KeyboardOptions(
@@ -68,14 +68,17 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             PasswordField(
-                "mật khẩu", password, { signUpViewModel.updatePassword(it) },
+                label = "mật khẩu",
+                password = password,
+                onPasswordChange = { signUpViewModel.setPassword(it) },
                 imeAction = ImeAction.Next,
                 isError = passwordError != "",
                 errorMessage = passwordError,
             )
             PasswordField(
-                "nhập lại mật khẩu", confirmPassword,
-                { signUpViewModel.updateConfirmPassword(it) },
+                label = "nhập lại mật khẩu",
+                password = confirmPassword,
+                onPasswordChange = { signUpViewModel.setConfirmPassword(it) },
                 isError = confirmPasswordError != "",
                 errorMessage = confirmPasswordError
             )
@@ -83,24 +86,24 @@ fun SignUpScreen(
 
         // buttons
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Button(onClick = { signUpViewModel.onSignUpClick(navController) }, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = { signUpViewModel.onSignUp(onSuccess = onSetRootMain) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Let's eat!")
             }
             AuthenticationButton(
                 buttonText = "Đăng nhập với Google",
                 onGetCredentialResponse = { credential ->
-                    signUpViewModel.onGoogleSignIn(navController, credential)
+                    signUpViewModel.onGoogleSignIn(credential, onSuccess = onSetRootMain)
                 }
             )
-            OutlinedButton(onClick = { onNavigateToSignIn() }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                onClick = onNavigateToSignIn,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Đã có tài khoản?")
             }
         }
-    }
+    } }
 }
-
-//@PreviewLightDark
-//@Composable
-//private fun SignUpPrev() {lmao
-//    ScreenPreview { SignUpScreen() }
-//}

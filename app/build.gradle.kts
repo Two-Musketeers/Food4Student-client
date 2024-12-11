@@ -3,13 +3,15 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     // DI things
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     // login things
     id("com.google.gms.google-services")
-    alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
+    // Kotlin serialization plugin for type safe routes and navigation arguments
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -80,6 +82,7 @@ dependencies {
 
     // navigation things
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     //Here library aar thing
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))

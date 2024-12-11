@@ -1,13 +1,15 @@
-package com.ilikeincest.food4student.screen.map.component
+package com.ilikeincest.food4student.screen.shipping.pick_location.component
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
@@ -20,6 +22,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +36,7 @@ import com.here.sdk.search.Place
 import com.ilikeincest.food4student.DEBOUNCE_DELAY
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MapSearchBar(
     onSearch: (String) -> Unit,
@@ -118,7 +121,18 @@ fun MapSearchBar(
             if (!expanded || query.isEmpty())
                 return@SearchBar
 
+            val state = rememberLazyListState()
+            val isScrolledToTop by remember { derivedStateOf {
+                state.firstVisibleItemIndex == 0
+                        && state.firstVisibleItemScrollOffset == 0
+            } }
+            val ime = LocalSoftwareKeyboardController.current
+            LaunchedEffect(isScrolledToTop) {
+                if (isScrolledToTop) ime?.show()
+                else ime?.hide()
+            }
             LazyColumn(
+                state = state,
                 modifier = Modifier.fillMaxWidth()
             ) { items(searchResults) { place ->
                 Text(
