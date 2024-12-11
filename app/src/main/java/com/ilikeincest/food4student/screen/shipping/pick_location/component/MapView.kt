@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.map.component
+package com.ilikeincest.food4student.screen.shipping.pick_location.component
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

@@ -1,7 +1,7 @@
 [versions]
 accompanistPermissions = "0.36.0"
 agp = "8.7.3"
-coilBom = "3.0.3"
+coilBom = "3.0.4"
 converterGson = "2.11.0"
 credentialsVersion = "1.3.0"
 firebaseBom = "33.7.0"
@@ -14,6 +14,7 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxDatetime = "0.6.1"
+kotlinxSerializationJson = "1.7.3"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.11.00"
@@ -59,6 +60,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }

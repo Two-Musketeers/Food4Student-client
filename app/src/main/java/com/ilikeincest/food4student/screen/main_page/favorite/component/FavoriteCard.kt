@@ -42,6 +42,7 @@ fun FavoriteCard(
     shopImageModel: Any?,
     isFavorite: Boolean,
     onFavoriteChange: (Boolean) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val height = 92.dp
@@ -111,6 +112,7 @@ private fun FavoriteCardPrev() { ComponentPreview {
         null,
         true,
         {},
+        {},
         Modifier.padding(16.dp).width(340.dp)
     )
 } }
@@ -125,6 +127,7 @@ private fun LongAssName() { ComponentPreview {
         "42 phút",
         null,
         true,
+        {},
         {},
         Modifier.padding(16.dp).width(340.dp)
     )

@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.shipping_location.component
+package com.ilikeincest.food4student.screen.shipping.shipping_location.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

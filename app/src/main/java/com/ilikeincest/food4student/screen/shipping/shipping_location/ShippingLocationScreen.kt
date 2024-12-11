@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.shipping_location
+package com.ilikeincest.food4student.screen.shipping.shipping_location
 
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
-import com.ilikeincest.food4student.screen.map.component.MapSearchBar
-import com.ilikeincest.food4student.screen.shipping_location.component.AddLocationCard
-import com.ilikeincest.food4student.screen.shipping_location.component.CurrentLocationCard
-import com.ilikeincest.food4student.screen.shipping_location.component.SavedLocationCard
+import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapSearchBar
+import com.ilikeincest.food4student.screen.shipping.shipping_location.component.AddLocationCard
+import com.ilikeincest.food4student.screen.shipping.shipping_location.component.CurrentLocationCard
+import com.ilikeincest.food4student.screen.shipping.shipping_location.component.SavedLocationCard
 import com.ilikeincest.food4student.model.SavedShippingLocation as Location
 import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationType
 
@@ -49,6 +49,7 @@ fun ShippingLocationScreen(
     locationList: List<Location>,
     onNavigateUp: () -> Unit,
     onPickFromMap: () -> Unit,
+    onEditLocation: (id: String) -> Unit
 ) {
     val currentLocation = "KTX Đại học Quốc gia TPHCM - Khu B"
     val currentAddress = "15/12/564/23 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương"
@@ -144,7 +145,7 @@ fun ShippingLocationScreen(
                         receiverName = location.receiverName,
                         receiverPhone = location.receiverPhone,
                         onSelected = {}, // TODO
-                        onEditLocation = {}, // TODO
+                        onEditLocation = { onEditLocation(location.location) }, // TODO: pass in actual card ID
                         buildingNote = location.buildingNote,
                         otherLocationTypeTitle = location.otherLocationTypeTitle
                     )
@@ -203,13 +204,13 @@ private fun Prev() { ScreenPreview {
             receiverName = "Hứa Văn Lý",
             receiverPhone = "0123456789",
         )
-    ), {}, {})
+    ), {}, {}, {})
 } }
 
 @Preview
 @Composable
 private fun PrevEmpty() { ScreenPreview {
-    ShippingLocationScreen(listOf(), {}, {})
+    ShippingLocationScreen(listOf(), {}, {}, {})
 } }
 
 @Preview
@@ -224,5 +225,5 @@ private fun PrevPartial() { ScreenPreview {
             receiverName = "Hồ Nguyên Minh",
             receiverPhone = "01234567879",
         ),
-    ), {}, {})
+    ), {}, {}, {})
 } }
