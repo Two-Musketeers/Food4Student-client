@@ -6,8 +6,7 @@ import com.google.gson.GsonBuilder
 import com.ilikeincest.food4student.BuildConfig
 import com.ilikeincest.food4student.admin.service.ModeratorApiService
 import com.ilikeincest.food4student.platform.retrofit.NetworkErrorInterceptor
-import com.ilikeincest.food4student.service.api.AccountApiService
-import com.ilikeincest.food4student.service.api.UserApiService
+import com.ilikeincest.food4student.service.api.*
 import com.ilikeincest.food4student.util.InstantDeserializer
 import dagger.Module
 import dagger.Provides
@@ -73,4 +72,34 @@ object RetrofitModule {
     @Singleton
     fun provideAccountApiService(retrofit: Retrofit): AccountApiService
         = retrofit.create(AccountApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOrderApiService(retrofit: Retrofit): OrderApiService
+        = retrofit.create(OrderApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideRestaurantApiService(retrofit: Retrofit): RestaurantApiService
+        = retrofit.create(RestaurantApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideVariationApiService(retrofit: Retrofit): VariationApiService
+        = retrofit.create(VariationApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun providePhotoApiService(retrofit: Retrofit): PhotoApiService
+        = retrofit.create(PhotoApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFoodCategoryApiService(retrofit: Retrofit): FoodCategoryApiService
+        = retrofit.create(FoodCategoryApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFoodItemApiService(retrofit: Retrofit): FoodItemApiService
+        = retrofit.create(FoodItemApiService::class.java)
 }
