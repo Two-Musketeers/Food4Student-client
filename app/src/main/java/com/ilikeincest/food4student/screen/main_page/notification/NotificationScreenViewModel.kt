@@ -51,28 +51,51 @@ class NotificationScreenViewModel @Inject constructor(
     }
 
     fun markAsRead(id: String) {
-        // TODO
-        val index = _notifications.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val newValue =  _notifications[index].copy(isUnread = false)
-            _notifications[index] = newValue
+        viewModelScope.launch {
+            val response = userApiService.readNotification(id)
+            if (response.isSuccessful) {
+                val index = _notifications.indexOfFirst { it.id == id }
+                if (index != -1) {
+                    val newValue =  _notifications[index].copy(isUnread = false)
+                    _notifications[index] = newValue
+                }
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu thông báo đã đọc~")
+            }
         }
     }
 
     // Do we need this?
     fun markAsUnread(id: String) {
-        val index = _notifications.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val newValue =  _notifications[index].copy(isUnread = true)
-            _notifications[index] = newValue
+        viewModelScope.launch {
+            val response = userApiService.unReadNotification(id)
+            if (response.isSuccessful){
+                val index = _notifications.indexOfFirst { it.id == id }
+                if (index != -1) {
+                    val newValue =  _notifications[index].copy(isUnread = true)
+                    _notifications[index] = newValue
+                }
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu thông báo chưa đọc~")
+            }
         }
     }
 
     fun markAllAsRead() {
-        _notifications.replaceAll {
-            it.copy(isUnread = false)
+        viewModelScope.launch {
+            val response = userApiService.readNotifications()
+            if (response.isSuccessful) {
+                _notifications.replaceAll {
+                    it.copy(isUnread = false)
+                }
+                _newNotificationAvailable.value = false
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu tất cả thông báo đã đọc~")
+            }
         }
-        _newNotificationAvailable.value = false
     }
 
     fun addNewNotification(it: Notification) {

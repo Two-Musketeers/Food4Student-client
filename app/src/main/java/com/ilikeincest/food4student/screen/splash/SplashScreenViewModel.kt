@@ -7,12 +7,14 @@ import com.google.firebase.messaging.ktx.messaging
 import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.service.api.AccountApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
+@HiltViewModel
 class SplashScreenViewModel @Inject constructor(
     private val accountApiService: AccountApiService,
     private val accountService: AccountService

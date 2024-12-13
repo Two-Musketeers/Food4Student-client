@@ -12,6 +12,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserApiService {
@@ -22,15 +23,19 @@ interface UserApiService {
     suspend fun getNotifications() : Response<List<Notification>>
     @POST("users/notifications")
     suspend fun readNotifications() : Response<Unit>
-    @POST("users/notifications")
+    @POST("users/notifications/{id}")
     suspend fun readNotification(
-        @Query("id") id: String
+        @Path("id") id: String
+    ) : Response<Unit>
+    @PUT("users/notifications/{id}")
+    suspend fun unReadNotification(
+        @Path("id") id: String
     ) : Response<Unit>
     @DELETE("users/notifications")
     suspend fun deleteNotifications() : Response<Unit>
-    @DELETE("users/notifications")
+    @DELETE("users/notifications/{id}")
     suspend fun deleteNotification(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<Unit>
     // Shipping Addresses
     @POST("users/shipping-addresses")
