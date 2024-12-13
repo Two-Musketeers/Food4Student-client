@@ -1,6 +1,5 @@
 package com.ilikeincest.food4student.screen.main_page.notification
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
@@ -8,12 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.service.api.UserApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,38 +28,30 @@ class NotificationScreenViewModel @Inject constructor(
     private val _newNotificationAvailable = MutableStateFlow(false)
     val newNotificationAvailable = _newNotificationAvailable.asStateFlow()
 
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
+
     fun refreshNotifications() {
         _alreadyInit.value = true
         _newNotificationAvailable.value = false
+        _isRefreshing.value = true
         viewModelScope.launch {
-            _isRefreshing.value = true
-            // TODO: connect api here
             val response = userApiService.getNotifications()
             if (response.isSuccessful) {
                 response.body()?.let { notificationsList ->
                     _notifications.clear()
                     _notifications.addAll(notificationsList)
                     _isRefreshing.value = false
-                } ?: run {
-                    // Handle null response body if necessary
-                    Log.e("NotificationViewModel", "Response body is null")
                 }
             }
-//            delay(1000) // mimic the api load
-//            val list = List(10) {
-//                Notification(
-//                    id = it.toString(),
-//                    image = "https://upload.wikimedia.org/wikipedia/vi/thumb/3/32/Logo_Ph%C3%BAc_Long.svg/2560px-Logo_Ph%C3%BAc_Long.svg.png",
-//                    title = "Phúc Long",
-//                    content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-//                    timestamp = Clock.System.now(),
-//                    isUnread = listOf(0, 2, 3, 8).contains(it)
-//                )
-//            }
+            else {
+                showErrorDialog("Không thể tải thông báo~")
+            }
         }
     }
 
     fun markAsRead(id: String) {
+        // TODO
         val index = _notifications.indexOfFirst { it.id == id }
         if (index != -1) {
             val newValue =  _notifications[index].copy(isUnread = false)
@@ -94,5 +82,12 @@ class NotificationScreenViewModel @Inject constructor(
 
     fun newNotificationAlreadySeen() {
         _newNotificationAvailable.value = false
+    }
+
+    fun showErrorDialog(message: String) {
+        _errorMessage.value = message
+    }
+    fun dismissErrorDialog() {
+        _errorMessage.value = ""
     }
 }
