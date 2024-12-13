@@ -8,31 +8,32 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface OrderApiService {
     // For restaurant owner
     @GET("orders")
     suspend fun getOrders() : Response<List<OrderDto>>
-    @GET("orders")
+    @GET("orders/{id}")
     suspend fun getOrder(
-        @Query("id") orderId : String
+        @Path("id") orderId : String
     ) : Response<OrderDto>
-    @DELETE("orders")
+    @DELETE("orders/{id}")
     suspend fun deleteOrder(
-        @Query("id") orderId : String
+        @Path("id") orderId : String
     ) : Response<Unit>
     @PUT("orders/{id}/approve-order")
     suspend fun approveOrder(
-        @Query("id") orderId : String
+        @Path("id") orderId : String
     ) : Response<Unit>
     @PUT("orders/{id}/reject-order")
     suspend fun rejectOrder(
-        @Query("id") orderId : String
+        @Path("id") orderId : String
     ) : Response<Unit>
     @PUT("orders/{id}/deliver-order")
     suspend fun deliverOrder(
-        @Query("id") orderId : String
+        @Path("id") orderId : String
     ) : Response<Unit>
     @POST("orders")
     suspend fun createOrder(

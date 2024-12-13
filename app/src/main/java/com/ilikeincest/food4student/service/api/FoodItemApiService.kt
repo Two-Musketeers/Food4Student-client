@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FoodItemApiService {
@@ -14,13 +15,13 @@ interface FoodItemApiService {
     suspend fun createFoodItem(
         @Body foodItem: FoodItemRegisterDto
     ) : Response<FoodItemDto>
-    @DELETE("restaurants/food-items")
+    @DELETE("restaurants/food-items/{id}")
     suspend fun deleteFoodItem(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<Unit>
-    @PUT("restaurants/food-items")
+    @PUT("restaurants/food-items/{id}")
     suspend fun updateFoodItem(
-        @Query("id") id: String,
+        @Path("id") id: String,
         @Body foodItem: FoodItemRegisterDto
     ) : Response<FoodItemDto>
 }

@@ -39,48 +39,52 @@ interface UserApiService {
     ) : Response<Unit>
     // Shipping Addresses
     @POST("users/shipping-addresses")
-    suspend fun addShippingAddress(@Body shippingAddress: CreateShippingAddressDto) : Response<ShippingAddressDto>
-    @PUT("users/shipping-addresses")
+    suspend fun addShippingAddress(
+        @Body shippingAddress: CreateShippingAddressDto
+    ) : Response<ShippingAddressDto>
+    @PUT("users/shipping-addresses/{id}")
     suspend fun updateShippingAddress(
-        @Query("id") id: String,
+        @Path("id") id: String,
         @Body shippingAddress: ShippingAddressDto
     ) : Response<ShippingAddressDto>
     @GET("users/shipping-addresses")
     suspend fun getShippingAddresses() : Response<List<ShippingAddressDto>>
-    @GET("users/shipping-addresses")
+    // Don't know if this is needed
+    @GET("users/shipping-addresses/{id}")
     suspend fun getShippingAddress(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<ShippingAddressDto>
-    @DELETE("users/shipping-addresses")
+    @DELETE("users/shipping-addresses/{id}")
     suspend fun deleteShippingAddress(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<Unit>
     // Like a restaurant
-    @POST("users/likes")
+    @POST("users/likes/{restaurantId}")
     suspend fun likeRestaurant(
-        @Query("restaurantId") restaurantId: String
+        @Path("restaurantId") restaurantId: String
     ) : Response<Unit>
     // Rating a restaurant
-    @POST("users/ratings")
+    @POST("users/ratings/{orderId}")
     suspend fun rateRestaurant(
-        @Query("orderId") orderId: String,
+        @Path("orderId") orderId: String,
         @Body createRatingDto: CreateRatingDto
     ) : Response<Unit>
     @GET("users/ratings")
     suspend fun getRatings() : Response<List<RatingDto>>
-    @GET("users/ratings")
+    // Don't know if this is needed
+    @GET("users/ratings/{id}")
     suspend fun getRating(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<RatingDto>
     // Orders
     @GET("users/orders")
     suspend fun getOrders() : Response<List<OrderDto>>
-    @GET("users/orders")
+    @GET("users/orders/{id}")
     suspend fun getOrder(
-        @Query("id") orderId: String
+        @Path("id") orderId: String
     ) : Response<OrderDto>
-    @DELETE("orders")
+    @DELETE("orders/{id}")
     suspend fun deleteOrder(
-        @Query("id") orderId: String
+        @Path("id") orderId: String
     ) : Response<Unit>
 }

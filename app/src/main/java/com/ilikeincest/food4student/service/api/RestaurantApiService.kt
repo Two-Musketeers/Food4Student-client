@@ -10,6 +10,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RestaurantApiService {
@@ -18,9 +19,9 @@ interface RestaurantApiService {
         @Query("PageNumber") pageNumber: Int,
         @Query("PageSize") pageSize: Int
     ) : Response<List<Restaurant>>
-    @GET("restaurants")
+    @GET("restaurants/{id}")
     suspend fun getRestaurantById(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<RestaurantDetailDto>
     @POST("restaurants")
     suspend fun addRestaurant(
@@ -35,7 +36,7 @@ interface RestaurantApiService {
     // Rating
     @GET("restaurants/{id}/ratings")
     suspend fun restaurantRating(
-        @Query("id") id: String
+        @Path("id") id: String
     ) : Response<List<RatingDto>>
     @GET("restaurants/owned")
     suspend fun getOwnedRestaurants() : Response<RestaurantDetailDto>
