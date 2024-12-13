@@ -5,17 +5,17 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.model.Notification
+import com.ilikeincest.food4student.service.api.UserApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
-class NotificationScreenViewModel @Inject constructor() : ViewModel() {
+class NotificationScreenViewModel @Inject constructor(
+    private val userApiService: UserApiService
+) : ViewModel() {
     private val _alreadyInit = MutableStateFlow(false)
     val alreadyInit = _alreadyInit.asStateFlow()
 
@@ -28,51 +28,74 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
     private val _newNotificationAvailable = MutableStateFlow(false)
     val newNotificationAvailable = _newNotificationAvailable.asStateFlow()
 
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
+
     fun refreshNotifications() {
         _alreadyInit.value = true
         _newNotificationAvailable.value = false
+        _isRefreshing.value = true
         viewModelScope.launch {
-            _isRefreshing.value = true
-            // TODO: connect api here
-            delay(1000) // mimic the api load
-            val list = List(10) {
-                Notification(
-                    id = it.toString(),
-                    image = "https://upload.wikimedia.org/wikipedia/vi/thumb/3/32/Logo_Ph%C3%BAc_Long.svg/2560px-Logo_Ph%C3%BAc_Long.svg.png",
-                    title = "Phúc Long",
-                    content = "Mời bạn tâm sự chuyện đặt món cùng ShopeeFood và nhận ngay Voucher",
-                    timestamp = Clock.System.now(),
-                    isUnread = listOf(0, 2, 3, 8).contains(it)
-                )
+            val response = userApiService.getNotifications()
+            if (response.isSuccessful) {
+                response.body()?.let { notificationsList ->
+                    _notifications.clear()
+                    _notifications.addAll(notificationsList)
+                    _isRefreshing.value = false
+                }
             }
-            _notifications.clear()
-            _notifications.addAll(list)
-            _isRefreshing.value = false
+            else {
+                showErrorDialog("Không thể tải thông báo~")
+            }
         }
     }
 
     fun markAsRead(id: String) {
-        val index = _notifications.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val newValue =  _notifications[index].copy(isUnread = false)
-            _notifications[index] = newValue
+        viewModelScope.launch {
+            val response = userApiService.readNotification(id)
+            if (response.isSuccessful) {
+                val index = _notifications.indexOfFirst { it.id == id }
+                if (index != -1) {
+                    val newValue =  _notifications[index].copy(isUnread = false)
+                    _notifications[index] = newValue
+                }
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu thông báo đã đọc~")
+            }
         }
     }
 
     // Do we need this?
     fun markAsUnread(id: String) {
-        val index = _notifications.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val newValue =  _notifications[index].copy(isUnread = true)
-            _notifications[index] = newValue
+        viewModelScope.launch {
+            val response = userApiService.unReadNotification(id)
+            if (response.isSuccessful){
+                val index = _notifications.indexOfFirst { it.id == id }
+                if (index != -1) {
+                    val newValue =  _notifications[index].copy(isUnread = true)
+                    _notifications[index] = newValue
+                }
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu thông báo chưa đọc~")
+            }
         }
     }
 
     fun markAllAsRead() {
-        _notifications.replaceAll {
-            it.copy(isUnread = false)
+        viewModelScope.launch {
+            val response = userApiService.readNotifications()
+            if (response.isSuccessful) {
+                _notifications.replaceAll {
+                    it.copy(isUnread = false)
+                }
+                _newNotificationAvailable.value = false
+            }
+            else {
+                showErrorDialog("Không thể đánh dấu tất cả thông báo đã đọc~")
+            }
         }
-        _newNotificationAvailable.value = false
     }
 
     fun addNewNotification(it: Notification) {
@@ -82,5 +105,12 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
 
     fun newNotificationAlreadySeen() {
         _newNotificationAvailable.value = false
+    }
+
+    fun showErrorDialog(message: String) {
+        _errorMessage.value = message
+    }
+    fun dismissErrorDialog() {
+        _errorMessage.value = ""
     }
 }

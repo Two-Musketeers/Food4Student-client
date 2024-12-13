@@ -6,9 +6,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.ilikeincest.food4student.MainActivity
+import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.model.Account
 import com.ilikeincest.food4student.service.AccountService
+import com.ilikeincest.food4student.service.api.AccountApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -16,11 +20,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountCenterViewModel @Inject constructor(
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val accountApiService: AccountApiService
 ) : ViewModel() {
     // Backing property to avoid state updates from other classes
     private val _user = MutableStateFlow(Account())
@@ -53,6 +59,8 @@ class AccountCenterViewModel @Inject constructor(
 
     fun onSignOutClick(navController: NavController, context: Context) {
         launchCatching {
+            val token = Firebase.messaging.token.await()
+            accountApiService.deleteDeviceToken(token)
             accountService.signOut()
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -62,6 +70,7 @@ class AccountCenterViewModel @Inject constructor(
 
     fun onDeleteAccountClick(navController: NavController, context: Context) {
         launchCatching {
+            accountApiService.deleteUser()
             accountService.deleteAccount()
             val intent = Intent(context, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

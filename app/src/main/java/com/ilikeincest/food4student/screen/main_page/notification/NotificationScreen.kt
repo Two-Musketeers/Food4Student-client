@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
+import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.notification.component.NotificationItem
@@ -51,6 +52,7 @@ fun NotificationScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val onRefresh = { viewModel.refreshNotifications() }
     val showNewNotification by viewModel.newNotificationAvailable.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     val alreadyInit by viewModel.alreadyInit.collectAsState()
     LaunchedEffect(Unit) {
@@ -64,11 +66,12 @@ fun NotificationScreen(
         onRefresh = onRefresh,
         nestedScrollConnection = nestedScrollConnection,
         showNewNotification = showNewNotification,
-        onSeenNewNotification = { viewModel.newNotificationAlreadySeen() }
+        onSeenNewNotification = { viewModel.newNotificationAlreadySeen() },
+        errorMessage = errorMessage,
+        onDismissError = { viewModel.dismissErrorDialog() }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NotificationScreenContent(
     notifications: List<Notification>,
@@ -77,12 +80,21 @@ private fun NotificationScreenContent(
     nestedScrollConnection: NestedScrollConnection,
     showNewNotification: Boolean,
     onSeenNewNotification: () -> Unit,
+    errorMessage: String,
+    onDismissError: () -> Unit,
 ) {
     val state = rememberLazyListState()
     val isScrolledToTop by remember { derivedStateOf {
         state.firstVisibleItemIndex == 0
                 && state.firstVisibleItemScrollOffset == 0
     } }
+
+    if (errorMessage.isNotEmpty()) {
+        ErrorDialog(
+            message = errorMessage,
+            onDismiss = onDismissError
+        )
+    }
 
     BetterPullToRefreshBox(
         lazyListState = state,
@@ -158,6 +170,8 @@ private fun Prev() { ScreenPreview {
         onRefresh = {},
         nestedScrollConnection = TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection,
         showNewNotification = true,
-        onSeenNewNotification = {}
+        onSeenNewNotification = {},
+        errorMessage = "",
+        onDismissError = {},
     )
 } }
