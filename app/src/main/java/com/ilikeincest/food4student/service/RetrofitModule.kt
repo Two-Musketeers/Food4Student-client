@@ -46,8 +46,9 @@ object RetrofitModule {
     @Provides
     @Singleton
     fun provideGson(): Gson {
+        // Register custom deserializers
         return GsonBuilder()
-            .registerTypeAdapter(Instant::class.java, InstantDeserializer()) // Register the custom deserializer
+            .registerTypeAdapter(Instant::class.java, InstantDeserializer())
             .create()
     }
 
@@ -55,7 +56,7 @@ object RetrofitModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BACKEND_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson)) // Now 'gson' is provided as a parameter
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .client(client)
         .build()
 
