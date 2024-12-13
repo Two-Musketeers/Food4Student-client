@@ -2,7 +2,7 @@ package com.ilikeincest.food4student.platform.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_DEFAULT
+import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
@@ -66,7 +66,7 @@ class NotificationService : FirebaseMessagingService() {
 
         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        val channel = NotificationChannel(channelId, channelName, IMPORTANCE_DEFAULT)
+        val channel = NotificationChannel(channelId, channelName, IMPORTANCE_HIGH)
         manager.createNotificationChannel(channel)
 
         manager.notify(Random.nextInt(), notificationBuilder.build())

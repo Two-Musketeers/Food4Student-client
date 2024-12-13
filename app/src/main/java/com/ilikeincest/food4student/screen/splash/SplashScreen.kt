@@ -15,6 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ilikeincest.food4student.viewmodel.SignInViewModel
+import kotlinx.coroutines.delay
+
+private const val SPLASH_TIMEOUT = 1000L
 
 @Composable
 fun SplashScreen(
