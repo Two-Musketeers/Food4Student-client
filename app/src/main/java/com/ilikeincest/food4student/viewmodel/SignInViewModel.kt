@@ -62,8 +62,4 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
-
-    fun getAccountService(): AccountService {
-        return accountService
-    }
 }
