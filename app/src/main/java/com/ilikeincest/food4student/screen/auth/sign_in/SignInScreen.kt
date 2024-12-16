@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
@@ -65,6 +66,10 @@ fun SignInScreen(
         PasswordField(
             label = "password",
             password = password,
+            imeAction = ImeAction.Done,
+            keyboardAction = KeyboardActions(onDone = {
+                viewModel.onSignIn(onSuccess = onSetRootSplash)
+            }),
             onPasswordChange = { viewModel.setPassword(it) }
         )
         Spacer(Modifier.height(4.dp))
