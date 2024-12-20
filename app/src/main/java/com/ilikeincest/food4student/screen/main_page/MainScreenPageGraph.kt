@@ -69,6 +69,7 @@ internal enum class MainRoutes(
 internal fun MainScreenPageGraph(
     currentRoute: MainRoutes,
     onNavigateToShippingLocation: () -> Unit,
+    onNavigateToRestaurant: (id: String) -> Unit,
     scrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier
 ) {
@@ -105,7 +106,10 @@ internal fun MainScreenPageGraph(
     ) {
         when (it) {
             MainRoutes.HOME ->
-                HomeScreen(onNavigateToShippingLocation)
+                HomeScreen(
+                    onNavigateToShippingLocation,
+                    onNavigateToRestaurant
+                )
             MainRoutes.ORDER ->
                 OrderScreen()
             MainRoutes.FAVORITE ->

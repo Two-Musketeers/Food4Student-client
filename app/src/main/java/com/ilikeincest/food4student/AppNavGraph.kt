@@ -1,23 +1,22 @@
 package com.ilikeincest.food4student
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleRestaurantScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
@@ -25,18 +24,26 @@ import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddE
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
 import com.ilikeincest.food4student.screen.splash.SplashScreen
-import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
+import com.ilikeincest.food4student.util.nav.*
 import kotlinx.serialization.Serializable
 
 object AppRoutes {
     @Serializable
     object Main
+
+    // Auth
     @Serializable
     object SignIn
     @Serializable
     object SignUp
     @Serializable
     object Profile
+    @Serializable
+    object SelectRole
+    @Serializable
+    object SignUpAsUser
+    @Serializable
+    object SignUpAsRestaurant
 
     @Serializable
     object ShippingLocation
@@ -67,7 +74,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
         exitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth }) + fadeOut() },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut() },
-        startDestination = AppRoutes.SplashScreen,
+        startDestination = AppRoutes.SignUpAsUser,
         modifier = Modifier.background(color = bgColor)
     ) {
         composable<AppRoutes.SplashScreen> {
@@ -80,7 +87,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable<AppRoutes.Main> {
             MainScreen(
                 onNavigateToAccountCenter = { navController.navigate(AppRoutes.Profile) },
-                onNavigateToShippingLocation = { navController.navigate(AppRoutes.ShippingLocation) }
+                onNavigateToShippingLocation = {
+                    navController.navigate(AppRoutes.ShippingLocation)
+                },
+                onNavigateToRestaurant = { /* TODO */ }
             )
         }
         composable<AppRoutes.Admin> {
@@ -97,6 +107,25 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
                 onNavigateToSignIn = { navController.navigate(AppRoutes.SignIn) }
             )
+        }
+        composable<AppRoutes.SelectRole> {
+            SelectRoleScreen(
+                onSignUpAsUser = { navController.navigate(AppRoutes.SignUpAsUser) },
+                onSignUpAsRestaurant = { navController.navigate(AppRoutes.SignUpAsRestaurant) }
+            )
+        }
+        composable<AppRoutes.SignUpAsUser> {
+            SelectRoleUserScreen(
+                onSuccessSignUp = { navController.navigateAsRootRoute(AppRoutes.SplashScreen) }
+            )
+        }
+        composable<AppRoutes.SignUpAsRestaurant> {
+            NavigateWithResult(it) { location: Location? ->
+                SelectRoleRestaurantScreen(
+                    selectedLocation = location,
+                    navToMap = { navController.navigate(AppRoutes.PickLocation) }
+                )
+            }
         }
         composable<AppRoutes.ShippingLocation> {
             ShippingLocationScreen(
@@ -129,11 +158,12 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onNavigateUp = { navController.navigateUp() },
                 onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
                 onEditLocation = {
-                    navController.navigate(AppRoutes.EditSavedLocation("")) // TODO
+                    navController.navigate(AppRoutes.EditSavedLocation(it))
                 }
             )
         }
         composable<AppRoutes.PickLocation> {
+            // TODO return data from pick location
             MapScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable<AppRoutes.AddSavedLocation> {

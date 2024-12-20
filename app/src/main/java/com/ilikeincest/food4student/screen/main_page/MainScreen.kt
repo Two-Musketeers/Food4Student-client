@@ -63,6 +63,7 @@ fun RequestNotificationPermissionDialog() {
 fun MainScreen(
     onNavigateToShippingLocation: () -> Unit,
     onNavigateToAccountCenter: () -> Unit,
+    onNavigateToRestaurant: (id: String) -> Unit,
     vm: MainScreenViewModel = hiltViewModel()
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -184,6 +185,7 @@ fun MainScreen(
             currentRoute = currentRoute,
             onNavigateToShippingLocation = onNavigateToShippingLocation,
             scrollConnection = scrollBehavior.nestedScrollConnection,
+            onNavigateToRestaurant = onNavigateToRestaurant,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)
