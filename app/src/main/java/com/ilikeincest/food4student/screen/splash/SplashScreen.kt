@@ -25,6 +25,7 @@ fun SplashScreen(
     onSetRootAdmin: () -> Unit,
     onSetRootMain: () -> Unit,
     onSetRootSignIn: () -> Unit,
+    onSetRootRestaurant: () -> Unit,
     vm: SplashScreenViewModel = hiltViewModel()
 ) {
     // setup toasts
@@ -55,7 +56,11 @@ fun SplashScreen(
             val role = vm.getAccountRole()
             if (role == "Admin" || role == "Moderator") {
                 onSetRootAdmin()
-            } else {
+            }
+            else if (role == "RestaurantOwner") {
+                onSetRootRestaurant()
+            }
+            else {
                 onSetRootMain()
             }
         } else {

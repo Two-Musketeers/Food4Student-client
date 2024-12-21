@@ -39,5 +39,5 @@ interface RestaurantApiService {
         @Path("id") id: String
     ) : Response<List<RatingDto>>
     @GET("restaurants/owned")
-    suspend fun getOwnedRestaurants() : Response<RestaurantDetailDto>
+    suspend fun getOwnedRestaurants() : Response<Restaurant>
 }

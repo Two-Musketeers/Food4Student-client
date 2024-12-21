@@ -21,6 +21,7 @@ import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant.RestaurantScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
@@ -50,6 +51,8 @@ object AppRoutes {
     @Serializable
     object Admin
     @Serializable
+    object Restaurant
+    @Serializable
     object SplashScreen
 }
 
@@ -75,6 +78,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootAdmin = { navController.navigateAsRootRoute(AppRoutes.Admin) },
                 onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
                 onSetRootSignIn = { navController.navigateAsRootRoute(AppRoutes.SignIn) },
+                onSetRootRestaurant = { navController.navigateAsRootRoute(AppRoutes.Restaurant) }
             )
         }
         composable<AppRoutes.Main> {
@@ -85,6 +89,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.Admin> {
             AdminScreen()
+        }
+        composable<AppRoutes.Restaurant> {
+            RestaurantScreen()
         }
         composable<AppRoutes.SignIn> {
             SignInScreen(
