@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -36,13 +35,12 @@ fun ImagePickerField(
     imageState: ImageState,
     onImageClick: () -> Unit,
     onDeleteImage: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     Row {
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
-                .defaultMinSize(125.dp, 125.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(colorScheme.surfaceVariant)
                 .clickable { onImageClick() }
@@ -113,5 +111,6 @@ private fun ImagePickerFieldPreview() {
         imageState = ImageState(),
         onImageClick = {},
         onDeleteImage = {},
+        modifier = Modifier.size(125.dp)
     )
 }

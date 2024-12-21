@@ -47,6 +47,13 @@ class RestaurantViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
+    // State to track if changes are being made to a food item
+    private var originalName = ""
+    private var originalDescription = ""
+    private var originalPrice = ""
+    private var originalImageUri: Uri? = null
+    private var originalVariations = emptyList<Variation>()
+
     // Temporary State for Unsaved Data
     private val _unsavedVariations = MutableStateFlow<List<Variation>>(emptyList())
     val unsavedVariations: StateFlow<List<Variation>> = _unsavedVariations
@@ -70,12 +77,6 @@ class RestaurantViewModel @Inject constructor(
     fun setFoodDescription(value: String?) { _foodDescription.value = value ?: "" }
     fun setFoodBasePrice(value: String) { _foodBasePrice.value = value }
 
-    fun initFoodFields(foodItem: FoodItem?) {
-        _foodName.value = foodItem?.name ?: ""
-        _foodDescription.value = foodItem?.description ?: ""
-        _foodBasePrice.value = foodItem?.basePrice?.toString().orEmpty()
-    }
-
     private val _selectedFoodCategory = MutableStateFlow<FoodCategory?>(null)
     val selectedFoodCategory: StateFlow<FoodCategory?> = _selectedFoodCategory
 
@@ -83,7 +84,6 @@ class RestaurantViewModel @Inject constructor(
     val categories: StateFlow<List<FoodCategory>> = _categories
 
     private val _isEditing = MutableStateFlow(false)
-    val isEditing: StateFlow<Boolean> = _isEditing
 
     init {
         fetchRestaurantData()
@@ -168,6 +168,13 @@ class RestaurantViewModel @Inject constructor(
         // First, set the selected item
         _selectedFoodItem.value = foodItem
 
+        // Save the original data for comparison
+        originalName = foodItem?.name ?: ""
+        originalDescription = foodItem?.description ?: ""
+        originalPrice = foodItem?.basePrice?.toString().orEmpty()
+        originalImageUri = foodItem?.foodItemPhotoUrl?.let { Uri.parse(it) }
+        originalVariations = foodItem?.variations ?: emptyList()
+
         // Then sync the states so they match the selected item's data
         if (foodItem != null) {
             setFoodName(foodItem.name)
@@ -188,6 +195,13 @@ class RestaurantViewModel @Inject constructor(
             category.foodItems.any { it.id == foodItem?.id }
         }
     }
+
+    val hasUnsavedChanges: Boolean
+        get() = _foodName.value != originalName ||
+                _foodDescription.value != originalDescription ||
+                _foodBasePrice.value != originalPrice ||
+                _unsavedImageUri.value != originalImageUri ||
+                _unsavedVariations.value != originalVariations
 
     fun addFoodCategorySelectionMode(isEditing: Boolean) {
         _isEditing.value = isEditing

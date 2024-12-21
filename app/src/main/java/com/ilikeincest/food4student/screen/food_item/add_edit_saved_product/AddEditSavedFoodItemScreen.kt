@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.ConfirmDiscardUnsavedDialog
 import com.ilikeincest.food4student.component.DividerWithSubhead
 import com.ilikeincest.food4student.model.FoodItem
@@ -50,7 +52,7 @@ fun AddEditSavedFoodItemScreen(
     onNavigateUp: () -> Unit,
     onNavigateToFoodCategory: () -> Unit,
     onNavigateToVariation: () -> Unit,
-    viewModel: RestaurantViewModel
+    viewModel: RestaurantViewModel = hiltViewModel()
 ) {
     val foodItem = viewModel.selectedFoodItem.collectAsState().value
 
@@ -73,7 +75,8 @@ fun AddEditSavedFoodItemScreen(
     }
 
     var showConfirmDiscardDialog by remember { mutableStateOf(false) }
-    val valueChanged = true
+
+    val valueChanged = viewModel.hasUnsavedChanges
     val onNavUp = {
         if (valueChanged) {
             showConfirmDiscardDialog = true
@@ -158,13 +161,15 @@ fun AddEditSavedFoodItemScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
             DividerWithSubhead(subhead = { Text("Hình ảnh đồ ăn, thức uống") })
             ImagePickerField(
                 imageState = ImageState(imageUri = unsavedImageUri),
                 onImageClick = { imagePickerLauncher.launch("image/*") },
                 onDeleteImage = { viewModel.setUnsavedImage(null) },
-                modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)
+                modifier = Modifier.size(125.dp)
             )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
             DividerWithSubhead(subhead = { Text("Thông tin đồ ăn, thức uống") })
             OutlinedTextField(
                 value = name,

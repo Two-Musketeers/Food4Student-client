@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.screen.restaurant.component.FoodItemCard
 

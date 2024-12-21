@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
 import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
@@ -53,13 +54,11 @@ import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
 @Composable
 fun AddCategoryScreen(
     onNavigateUp: () -> Unit,
-    onCategorySelected: (FoodCategory) -> Unit,
     viewModel: RestaurantViewModel
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val categories = viewModel.categories.collectAsState().value
     val selectedFoodCategory by viewModel.selectedFoodCategory.collectAsState()
-    val isEditing by viewModel.isEditing.collectAsState()
 
     var showCategoryDialog by remember { mutableStateOf(false) }
     var isEditingCategory by remember { mutableStateOf(false) }
@@ -160,7 +159,10 @@ fun AddCategoryScreen(
                         currentCategoryId = category.id
                         showDeleteConfirmation = true
                     },
-                    onClick = { onCategorySelected(category) },
+                    onClick = {
+                        viewModel.selectFoodCategory(category)
+                        onNavigateUp()
+                    },
                     isSelected = category.id == selectedFoodCategory?.id
                 )
             }
