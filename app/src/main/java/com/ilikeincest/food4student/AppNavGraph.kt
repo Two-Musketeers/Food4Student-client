@@ -1,43 +1,50 @@
 package com.ilikeincest.food4student
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleRestaurantScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
+import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
+import com.ilikeincest.food4student.screen.restaurant.RestaurantScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
-import com.ilikeincest.food4student.screen.restaurant.RestaurantScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
 import com.ilikeincest.food4student.screen.splash.SplashScreen
-import com.ilikeincest.food4student.util.nav.navigateAsRootRoute
+import com.ilikeincest.food4student.util.nav.*
 import kotlinx.serialization.Serializable
 
 object AppRoutes {
     @Serializable
     object Main
+
+    // Auth
     @Serializable
     object SignIn
     @Serializable
     object SignUp
     @Serializable
     object Profile
+    @Serializable
+    object SelectRole
+    @Serializable
+    object SignUpAsUser
+    @Serializable
+    object SignUpAsRestaurant
 
     @Serializable
     object ShippingLocation
@@ -78,7 +85,6 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootAdmin = { navController.navigateAsRootRoute(AppRoutes.Admin) },
                 onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
                 onSetRootSignIn = { navController.navigateAsRootRoute(AppRoutes.SignIn) },
-                onSetRootRestaurant = { navController.navigateAsRootRoute(AppRoutes.Restaurant) }
             )
         }
         composable<AppRoutes.Main> {
@@ -89,9 +95,6 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.Admin> {
             AdminScreen()
-        }
-        composable<AppRoutes.Restaurant> {
-            RestaurantScreen()
         }
         composable<AppRoutes.SignIn> {
             SignInScreen(

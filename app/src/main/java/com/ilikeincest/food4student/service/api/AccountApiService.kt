@@ -2,6 +2,7 @@ package com.ilikeincest.food4student.service.api
 
 import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.dto.RegisterAccountDto
+import com.ilikeincest.food4student.dto.RegisterRestaurantOwnerDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -19,7 +20,7 @@ interface AccountApiService {
     @POST("account/user-register")
     suspend fun registerUser(@Body userDto: RegisterAccountDto): Response<Unit>
     @POST("account/restaurantOwner-register")
-    suspend fun registerRestaurantOwner(@Body userDto: RegisterAccountDto): Response<Unit>
+    suspend fun registerRestaurantOwner(@Body restaurantOwnerDto: RegisterRestaurantOwnerDto): Response<Unit>
     @DELETE("account")
     suspend fun deleteUser(): Response<Unit>
     @PUT("account")

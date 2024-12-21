@@ -100,7 +100,15 @@ private fun NotificationScreenContent(
         lazyListState = state,
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
     ) {
+        if (notifications.isEmpty()) {
+            Text(
+                "Không có thông báo. Tạm thời là thế ( ͡° ͜ʖ ͡°)",
+                Modifier.align(Alignment.Center)
+            )
+            return@BetterPullToRefreshBox
+        }
         LazyColumn(
             state = state,
             modifier = Modifier
@@ -166,6 +174,22 @@ private fun Prev() { ScreenPreview {
                 isUnread = listOf(0, 2, 3, 8).contains(it)
             )
         },
+        isRefreshing = false,
+        onRefresh = {},
+        nestedScrollConnection = TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection,
+        showNewNotification = true,
+        onSeenNewNotification = {},
+        errorMessage = "",
+        onDismissError = {},
+    )
+} }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun PrevEmpty() { ScreenPreview {
+    NotificationScreenContent(
+        notifications = listOf(),
         isRefreshing = false,
         onRefresh = {},
         nestedScrollConnection = TopAppBarDefaults.pinnedScrollBehavior().nestedScrollConnection,

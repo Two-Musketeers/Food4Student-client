@@ -3,6 +3,7 @@ package com.ilikeincest.food4student.platform.retrofit
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -17,6 +18,7 @@ class NetworkErrorInterceptor(private val context: Context) : Interceptor {
         return try {
             chain.proceed(chain.request())
         } catch (e: SocketTimeoutException) {
+            Log.e("Network", e.message ?: "")
             val error = "Connection timed out. Please try again."
             val code = 408  // HTTP 408 Request Timeout
             showError(error)

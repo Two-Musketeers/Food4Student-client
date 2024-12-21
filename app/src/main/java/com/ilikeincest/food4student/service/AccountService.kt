@@ -5,10 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountService {
     val currentUser: Flow<Account?>
-    val currentUserId: String
-    suspend fun getUserToken(): String
+    val currentUserId: String?
+    suspend fun getUserToken(): String?
     fun hasUser(): Boolean
     fun getUserProfile(): Account
+    suspend fun reloadToken()
     suspend fun createAccountWithEmail(email: String, password: String)
     suspend fun updateDisplayName(newDisplayName: String)
     suspend fun linkAccountWithGoogle(idToken: String)

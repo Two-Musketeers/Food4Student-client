@@ -15,10 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ilikeincest.food4student.viewmodel.SignInViewModel
-import kotlinx.coroutines.delay
-
-private const val SPLASH_TIMEOUT = 1000L
 
 @Composable
 fun SplashScreen(
@@ -26,6 +22,7 @@ fun SplashScreen(
     onSetRootMain: () -> Unit,
     onSetRootSignIn: () -> Unit,
     onSetRootRestaurant: () -> Unit,
+    onSetRootSelectRole: () -> Unit,
     vm: SplashScreenViewModel = hiltViewModel()
 ) {
     // setup toasts
@@ -36,10 +33,6 @@ fun SplashScreen(
         Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
         vm.clearToast() // toast is run by system, not by current LaunchedEffect coroutine
         // so wont be cancelled
-    }
-    // register device token to fcm
-    LaunchedEffect(Unit) {
-        vm.registerNotificationDeviceToken()
     }
     Column(
         modifier = Modifier
@@ -52,19 +45,23 @@ fun SplashScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (vm.isSignedIn()) {
-            val role = vm.getAccountRole()
-            if (role == "Admin" || role == "Moderator") {
-                onSetRootAdmin()
-            }
-            else if (role == "RestaurantOwner") {
-                onSetRootRestaurant()
-            }
-            else {
-                onSetRootMain()
-            }
-        } else {
+        if (!vm.isSignedIn()) {
             onSetRootSignIn()
+            return@LaunchedEffect
+        }
+        // register device token to fcm
+        vm.registerNotificationDeviceToken()
+        val role = vm.getAccountRole()
+        when (role) {
+            in listOf("Admin", "Moderator") ->
+                onSetRootAdmin()
+            "RestaurantOwner" ->
+                onSetRootRestaurant()
+            "User" ->
+                onSetRootMain()
+            null ->
+                onSetRootSelectRole()
+            else -> throw NotImplementedError("What role is that???")
         }
     }
 }

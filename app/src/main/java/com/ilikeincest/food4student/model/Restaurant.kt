@@ -4,7 +4,7 @@ data class Restaurant(
     val id: String,
     val isApproved: Boolean,
     val name: String,
-    val description: String,
+    val description: String?,
     val address: String,
     val latitude: Double,
     val longitude: Double,
@@ -12,5 +12,6 @@ data class Restaurant(
     val bannerUrl: String?,
     val totalRatings: Int,
     val averageRating: Double,
+    val isLiked: Boolean,
     val foodCategories: List<FoodCategory>
 )

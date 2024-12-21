@@ -2,13 +2,12 @@ package com.ilikeincest.food4student.service.api
 
 import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.dto.RestaurantDetailDto
-import com.ilikeincest.food4student.dto.RestaurantRegisterDto
+import com.ilikeincest.food4student.dto.RegisterRestaurantOwnerDto
 import com.ilikeincest.food4student.model.Restaurant
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -23,13 +22,10 @@ interface RestaurantApiService {
     suspend fun getRestaurantById(
         @Path("id") id: String
     ) : Response<RestaurantDetailDto>
-    @POST("restaurants")
-    suspend fun addRestaurant(
-        @Body restaurant : RestaurantRegisterDto
-    ) : Response<Restaurant>
+    @Deprecated("TODO: update this shit")
     @PUT("restaurants")
     suspend fun updateRestaurant(
-        @Body restaurant : RestaurantRegisterDto
+        @Body restaurant : RegisterRestaurantOwnerDto
     ) : Response<Restaurant>
     @DELETE("restaurants")
     suspend fun deleteRestaurant() : Response<Unit>

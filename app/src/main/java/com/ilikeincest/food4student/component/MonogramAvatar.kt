@@ -6,6 +6,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -35,22 +40,32 @@ fun AsyncImageOrMonogram(
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var forceRefresh by remember { mutableStateOf(false) }
+    LaunchedEffect(name) {
+        forceRefresh = true
+    }
     val fallbackMonogram = monogramAvatarPainter(
         name = name,
         size = size,
         textStyle = textStyle
     )
-    AsyncImage(
-        model = model,
-        placeholder = fallbackMonogram, // TODO
-        fallback = fallbackMonogram,
-        error = fallbackMonogram,
-        contentDescription = contentDescription,
-        modifier = modifier
-            .size(size)
-            .clip(CircleShape)
-            .clickable(onClick = onClick)
-    )
+
+    if (!forceRefresh) {
+        AsyncImage(
+            model = model,
+            placeholder = fallbackMonogram, // TODO
+            fallback = fallbackMonogram,
+            error = fallbackMonogram,
+            contentDescription = contentDescription,
+            modifier = modifier
+                .size(size)
+                .clip(CircleShape)
+                .clickable(onClick = onClick)
+        )
+    }
+    else {
+        forceRefresh = false
+    }
 }
 
 /**
