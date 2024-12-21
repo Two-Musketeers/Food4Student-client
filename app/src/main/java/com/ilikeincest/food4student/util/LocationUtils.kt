@@ -47,7 +47,7 @@ class LocationUtils( val context: @RawValue Context) : Parcelable {
         _fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val currentLocation = GeoCoordinates(it.latitude, it.longitude)
-                viewModel.updateCurrentLocation(currentLocation)
+                viewModel.focusOnPlaceWithMarker(currentLocation)
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absoluteOffset
@@ -16,11 +17,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -44,31 +48,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapSearchBar
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapViewContainer
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.viewmodel.MapViewModel
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onNavigateUp: () -> Unit,
+    onSelectLocation: (Location) -> Unit,
     mapViewModel: MapViewModel = viewModel(),
 ) {
     //Request permission for location
     val context = LocalContext.current
     // TODO: refactor this shit lmao
     val locationUtils = rememberSaveable { LocationUtils(context) }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            locationUtils.stopLocationUpdates()
-        }
-    }
 
     var hasLocationPermission by remember { mutableStateOf(false) }
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -83,29 +81,25 @@ fun MapScreen(
         }
     )
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         if (!locationUtils.hasLocationPermission(context)) {
             locationUtils.requestLocationPermissions(requestPermissionLauncher)
         } else {
             hasLocationPermission = true
-            locationUtils.requestLocationUpdates(mapViewModel)
-            locationUtils.requestLocationOnce(mapViewModel)
+        }
+        onDispose {
+            locationUtils.stopLocationUpdates()
         }
     }
 
     //The actual mapScreen
     val mapViewInitialized by mapViewModel.mapViewInitialized
     val nearbyPlaces by mapViewModel.nearbyPlaces.collectAsState()
-    val location = mapViewModel.currentLocation.value
 
-    // Focus on the location if available
-    LaunchedEffect(location) {
+    LaunchedEffect(mapViewInitialized, hasLocationPermission) {
         if (!mapViewInitialized) return@LaunchedEffect
-        delay(200)
-        location?.let {
-            val geoCoordinates = GeoCoordinates(it.latitude, it.longitude)
-            mapViewModel.focusOnPlaceWithMarker(geoCoordinates)
-        }
+        if (!hasLocationPermission) return@LaunchedEffect
+        locationUtils.requestLocationOnce(mapViewModel)
     }
 
     var expanded by remember { mutableStateOf(false) }
@@ -125,6 +119,26 @@ fun MapScreen(
             navigationIcon = { IconButton(onNavigateUp) {
                 Icon(Icons.AutoMirrored.Default.ArrowBack, "back")
             } },
+            actions = {
+                FilledTonalButton(
+                    contentPadding = PaddingValues(start = 16.dp, top = 10.dp, end = 24.dp, bottom = 10.dp),
+                    onClick = {
+                        val coord = mapViewModel.mapCenterCoord() ?: return@FilledTonalButton
+                        onSelectLocation(
+                            Location(
+                                latitude = coord.latitude,
+                                longitude = coord.longitude,
+                                address = nearbyPlaces[0].address.addressText
+                            )
+                        )
+                    }
+                ) {
+                    Icon(Icons.Default.Check, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Chọn")
+                }
+                Spacer(Modifier.width(12.dp))
+            },
             modifier = Modifier.absoluteOffset { animateTopBarOffset }
         ) }
     ) { Box(Modifier.fillMaxSize()) {

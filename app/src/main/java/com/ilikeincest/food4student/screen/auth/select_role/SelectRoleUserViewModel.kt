@@ -3,6 +3,7 @@ package com.ilikeincest.food4student.screen.auth.select_role
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.dto.RegisterAccountDto
+import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.service.api.AccountApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectRoleUserViewModel @Inject constructor(
-    private val accountApi: AccountApiService
+    private val accountApi: AccountApiService,
+    private val accountService: AccountService
 ): ViewModel() {
     private val _error = MutableStateFlow("")
     val error = _error.asStateFlow()
@@ -27,6 +29,7 @@ class SelectRoleUserViewModel @Inject constructor(
             val res = accountApi.registerUser(RegisterAccountDto(phoneNumber))
             _showLoading.value = false
             if (res.isSuccessful) {
+                accountService.reloadToken()
                 onSuccess()
                 return@launch
             }

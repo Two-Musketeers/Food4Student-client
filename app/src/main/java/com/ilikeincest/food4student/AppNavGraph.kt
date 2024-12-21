@@ -123,7 +123,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             NavigateWithResult(it) { location: Location? ->
                 SelectRoleRestaurantScreen(
                     selectedLocation = location,
-                    navToMap = { navController.navigate(AppRoutes.PickLocation) }
+                    onNavigateToLocationPicker = { navController.navigate(AppRoutes.PickLocation) }
                 )
             }
         }
@@ -163,8 +163,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable<AppRoutes.PickLocation> {
-            // TODO return data from pick location
-            MapScreen(onNavigateUp = { navController.navigateUp() })
+            MapScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onSelectLocation = { navController.popBackWithResult(it) }
+            )
         }
         composable<AppRoutes.AddSavedLocation> {
             AddEditSavedLocationScreen(onNavigateUp = {})
