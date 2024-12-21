@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,7 +46,9 @@ fun AccountCenterScreen(
     val context = LocalContext.current
 
     // Log the user token to the LogCat
-    viewModel.logUserToken()
+    LaunchedEffect(Unit) {
+        viewModel.logUserToken()
+    }
 
     Scaffold {
         Column(
@@ -111,6 +114,7 @@ fun AccountCenterScreen(
             ExitAppCard(
                 navController,
             ) { navController -> viewModel.onSignOutClick(navController, context) }
+            // TODO: reauth before delete (yes its needed)
             RemoveAccountCard(
                 navController,
             ) { navController -> viewModel.onDeleteAccountClick(navController, context) }

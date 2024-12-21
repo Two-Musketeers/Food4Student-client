@@ -74,7 +74,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
         exitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth }) + fadeOut() },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut() },
-        startDestination = AppRoutes.SignUpAsUser,
+        startDestination = AppRoutes.SplashScreen,
         modifier = Modifier.background(color = bgColor)
     ) {
         composable<AppRoutes.SplashScreen> {
@@ -82,6 +82,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootAdmin = { navController.navigateAsRootRoute(AppRoutes.Admin) },
                 onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
                 onSetRootSignIn = { navController.navigateAsRootRoute(AppRoutes.SignIn) },
+                onSetRootSelectRole = { navController.navigateAsRootRoute(AppRoutes.SelectRole) }
             )
         }
         composable<AppRoutes.Main> {
@@ -104,8 +105,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.SignUp> {
             SignUpScreen(
-                onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
-                onNavigateToSignIn = { navController.navigate(AppRoutes.SignIn) }
+                onSetRootSplash = { navController.navigateAsRootRoute(AppRoutes.SplashScreen) },
+                onNavigateToSignIn = { navController.popBackStack(AppRoutes.SignIn, false) }
             )
         }
         composable<AppRoutes.SelectRole> {

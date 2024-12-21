@@ -97,7 +97,7 @@ class AccountServiceImpl @Inject constructor() : AccountService {
         )
     }
 
-    override fun reloadToken() {
-        Firebase.auth.currentUser?.reload()
+    override suspend fun reloadToken() {
+        Firebase.auth.currentUser?.getIdToken(true)?.await()
     }
 }

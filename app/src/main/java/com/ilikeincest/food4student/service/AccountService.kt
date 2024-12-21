@@ -9,7 +9,7 @@ interface AccountService {
     suspend fun getUserToken(): String?
     fun hasUser(): Boolean
     fun getUserProfile(): Account
-    fun reloadToken()
+    suspend fun reloadToken()
     suspend fun createAccountWithEmail(email: String, password: String)
     suspend fun updateDisplayName(newDisplayName: String)
     suspend fun linkAccountWithGoogle(idToken: String)

@@ -27,12 +27,13 @@ class SelectRoleUserViewModel @Inject constructor(
         _showLoading.value = true
         viewModelScope.launch {
             val res = accountApi.registerUser(RegisterAccountDto(phoneNumber))
-            _showLoading.value = false
             if (res.isSuccessful) {
                 accountService.reloadToken()
+                _showLoading.value = false
                 onSuccess()
                 return@launch
             }
+            _showLoading.value = false
             _error.value = res.errorBody()?.string() ?: ""
         }
     }

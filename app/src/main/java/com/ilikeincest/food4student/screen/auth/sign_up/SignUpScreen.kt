@@ -22,14 +22,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.ilikeincest.food4student.component.PasswordField
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
 import com.ilikeincest.food4student.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(
-    onSetRootMain: () -> Unit,
+    onSetRootSplash: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     signUpViewModel: SignUpViewModel = hiltViewModel()
@@ -87,7 +86,7 @@ fun SignUpScreen(
         // buttons
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
-                onClick = { signUpViewModel.onSignUp(onSuccess = onSetRootMain) },
+                onClick = { signUpViewModel.onSignUp(onSuccess = onSetRootSplash) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Let's eat!")
@@ -95,7 +94,7 @@ fun SignUpScreen(
             AuthenticationButton(
                 buttonText = "Đăng nhập với Google",
                 onGetCredentialResponse = { credential ->
-                    signUpViewModel.onGoogleSignIn(credential, onSuccess = onSetRootMain)
+                    signUpViewModel.onGoogleSignIn(credential, onSuccess = onSetRootSplash)
                 }
             )
             OutlinedButton(
