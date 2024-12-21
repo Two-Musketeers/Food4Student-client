@@ -1,9 +1,10 @@
-package com.ilikeincest.food4student.screen.restaurant
+package com.ilikeincest.food4student.screen.restaurant.restaurant_content
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,10 +19,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.ErrorDialog
+import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
 import com.ilikeincest.food4student.screen.restaurant.component.FoodItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +59,7 @@ fun RestaurantScreenContent(
             if (foodItems.isNotEmpty()) {
                 LazyColumn(
                     contentPadding = innerPadding,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.Companion.fillMaxSize()
                 ) {
                     items(foodItems) { foodItem ->
                         FoodItemCard(
@@ -74,20 +73,20 @@ fun RestaurantScreenContent(
                 }
             } else {
                 Box(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Companion.Center
                 ) {
                     Text("Chưa có món ăn nào. Hãy thêm món mới!")
                 }
             }
         } ?: run {
             Box(
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Companion.Center
             ) {
                 CircularProgressIndicator()
             }

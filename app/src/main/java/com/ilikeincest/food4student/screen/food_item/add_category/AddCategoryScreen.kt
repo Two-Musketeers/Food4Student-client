@@ -1,6 +1,5 @@
 package com.ilikeincest.food4student.screen.food_item.add_category
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,22 +14,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -45,9 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
+import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryDialog
+import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryItem
 import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -201,98 +192,3 @@ fun AddCategoryScreen(
     }
 }
 
-// Dialog for adding/editing a category
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CategoryDialog(
-    isEditingCategory: Boolean,
-    categoryName: String,
-    onCategoryNameChange: (String) -> Unit,
-    onSaveCategory: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {
-            Text(if (isEditingCategory) "Sửa danh mục" else "Thêm danh mục")
-        },
-        text = {
-            OutlinedTextField(
-                value = categoryName,
-                onValueChange = onCategoryNameChange,
-                label = { Text("Tên danh mục") },
-                singleLine = true,
-                trailingIcon = {
-                    if (categoryName.isNotEmpty()) {
-                        IconButton(onClick = { onCategoryNameChange("") }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Clear Text"
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onSaveCategory,
-                enabled = categoryName.isNotBlank()
-            ) {
-                Text("Lưu")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text("Hủy")
-            }
-        },
-        modifier = Modifier.padding(16.dp)
-    )
-}
-
-// Category item with edit and delete options
-@Composable
-fun CategoryItem(
-    category: FoodCategory,
-    onEditCategory: () -> Unit,
-    onDeleteCategory: () -> Unit,
-    onClick: () -> Unit,
-    isSelected: Boolean
-) {
-    Card(
-        colors = if (isSelected) CardDefaults.cardColors(containerColor = colorScheme.primary.copy(alpha = 0.4f))
-            else CardDefaults.cardColors(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable( onClick = onClick )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = category.name,
-                style = typography.bodyLarge
-            )
-            Row {
-                IconButton(onClick = onEditCategory) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Chỉnh sửa"
-                    )
-                }
-                IconButton(onClick = onDeleteCategory) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Xóa"
-                    )
-                }
-            }
-        }
-    }
-}

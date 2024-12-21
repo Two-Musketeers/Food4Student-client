@@ -6,10 +6,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.dto.FoodCategoryCreateDto
-import com.ilikeincest.food4student.dto.FoodItemRegisterDto
-import com.ilikeincest.food4student.dto.VariationDto
-import com.ilikeincest.food4student.dto.VariationOptionCreateDto
-import com.ilikeincest.food4student.dto.VariationOptionDto
 import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Restaurant
@@ -19,12 +15,10 @@ import com.ilikeincest.food4student.service.api.FoodCategoryApiService
 import com.ilikeincest.food4student.service.api.FoodItemApiService
 import com.ilikeincest.food4student.service.api.PhotoApiService
 import com.ilikeincest.food4student.service.api.RestaurantApiService
-import com.ilikeincest.food4student.service.api.VariationApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -102,7 +96,7 @@ class RestaurantViewModel @Inject constructor(
                     showErrorDialog("${response.message()}")
                 }
             } catch (e: Exception) {
-                showErrorDialog("Không thể tải thông tin nhà hàng")
+                showErrorDialog(e.message.toString())
             }
         }
     }
@@ -335,13 +329,13 @@ class RestaurantViewModel @Inject constructor(
                         basePrice = createdFoodItemDto.basePrice,
                         variations = createdFoodItemDto.variations.map { varDto ->
                             Variation(
-                                id = varDto.id ?: "",
+                                id = varDto.id,
                                 name = varDto.name,
                                 minSelect = varDto.minSelect,
                                 maxSelect = varDto.maxSelect,
                                 variationOptions = varDto.variationOptions.map { optDto ->
                                     VariationOption(
-                                        id = optDto.id ?: "",
+                                        id = optDto.id,
                                         name = optDto.name,
                                         priceAdjustment = optDto.priceAdjustment
                                     )
@@ -377,13 +371,13 @@ class RestaurantViewModel @Inject constructor(
                         basePrice = updatedFoodItemDto.basePrice,
                         variations = updatedFoodItemDto.variations.map { varDto ->
                             Variation(
-                                id = varDto.id ?: "",
+                                id = varDto.id,
                                 name = varDto.name,
                                 minSelect = varDto.minSelect,
                                 maxSelect = varDto.maxSelect,
                                 variationOptions = varDto.variationOptions.map { optDto ->
                                     VariationOption(
-                                        id = optDto.id ?: "",
+                                        id = optDto.id,
                                         name = optDto.name,
                                         priceAdjustment = optDto.priceAdjustment
                                     )
@@ -434,7 +428,7 @@ class RestaurantViewModel @Inject constructor(
                     showErrorDialog("Failed to remove food item")
                 }
             } catch (e: Exception) {
-                showErrorDialog("Failed to remove food item")
+                showErrorDialog(e.message.toString())
             }
         }
     }
@@ -442,26 +436,24 @@ class RestaurantViewModel @Inject constructor(
     // Upload a photo to the server
     private suspend fun uploadFoodItemPhoto(foodItemId: String, uri: Uri) {
         try {
-            val photoPart = uriToMultipartBody(uri, "File")
+            val photoPart = uriToMultipartBody(uri)
             if (photoPart != null) {
                 val response = photoApiService.uploadFoodItem(photoPart, foodItemId)
-                if (response.isSuccessful) {
-                    Log.d("RestaurantViewModel", "Photo upload success")
-                } else {
+                if (!response.isSuccessful)
                     showErrorDialog("Photo upload failed")
-                }
+
             }
         } catch (e: Exception) {
-            showErrorDialog("Photo upload failed")
+            showErrorDialog(e.message.toString())
         }
     }
 
     // Helper functions
-    private fun uriToMultipartBody(uri: Uri, partName: String): MultipartBody.Part? {
+    private fun uriToMultipartBody(uri: Uri): MultipartBody.Part? {
         val filePath = getRealPathFromURI(uri) ?: return null
         val file = File(filePath)
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData(partName, file.name, requestFile)
+        return MultipartBody.Part.createFormData("File", file.name, requestFile)
     }
 
     private fun getRealPathFromURI(uri: Uri): String? {

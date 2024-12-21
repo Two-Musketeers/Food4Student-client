@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.screen.restaurant.restaurant_content.RestaurantScreenContent
 
 internal val defaultRoute = MainRestaurantRoutes.Home
 
