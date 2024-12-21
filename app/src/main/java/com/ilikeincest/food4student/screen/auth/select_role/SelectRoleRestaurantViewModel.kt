@@ -55,12 +55,13 @@ class SelectRoleRestaurantViewModel @Inject constructor(
                 latitude = latitude.doubleValue,
                 longitude = longitude.doubleValue
             ))
-            _showLoading.value = false
             if (res.isSuccessful) {
                 accountService.reloadToken()
+                _showLoading.value = false
                 onSuccess()
                 return@launch
             }
+            _showLoading.value = false
             val error = res.errorBody()?.string() ?: ""
             _error.value = "${res.code()}: ${res.message()}\n$error"
         }
