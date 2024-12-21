@@ -30,12 +30,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.ConfirmDiscardUnsavedDialog
 import com.ilikeincest.food4student.component.DividerWithSubhead
-import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.component.AddressField
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.component.AddEditSavedTopBar
+import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.component.AddressField
 import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +42,6 @@ import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationT
 fun AddEditSavedLocationScreen(
     onNavigateUp: () -> Unit,
     id: String? = null,
-    vm: TestVm = hiltViewModel()
 ) {
     val isEditScreen = id != null
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -85,7 +83,7 @@ fun AddEditSavedLocationScreen(
             isEdit = isEditScreen,
             onNavigateUp = onNavUp,
             onDelete = {}, // TODO
-            onSave = { vm.test() }, // TODO
+            onSave = {}, // TODO
             scrollBehavior = scrollBehavior,
         ) },
         modifier = Modifier.imePadding()

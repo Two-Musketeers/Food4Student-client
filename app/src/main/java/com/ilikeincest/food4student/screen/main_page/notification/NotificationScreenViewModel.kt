@@ -46,6 +46,7 @@ class NotificationScreenViewModel @Inject constructor(
             }
             else {
                 showErrorDialog("Không thể tải thông báo~")
+                _isRefreshing.value = false
             }
         }
     }

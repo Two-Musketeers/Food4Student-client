@@ -35,12 +35,12 @@ import com.ilikeincest.food4student.R
 // TODO: clean up this fucking mess
 //class MapUtils {}
 class SearchExample(private val context: Context, private val mapView: MapView) {
-    private val camera = mapView.camera
+    val camera = mapView.camera
     private val mapMarkerList: MutableList<MapMarker> = ArrayList()
     private var searchEngine: SearchEngine? = null
     val searchResults = mutableStateListOf<Place>()
     var onNearbyPlacesFetched: ((List<Place>) -> Unit)? = null
-    private var centerMarker: MapMarker? = null
+    var centerMarker: MapMarker? = null
     private val handler = Handler(Looper.getMainLooper())
     private var isDragging = false
 

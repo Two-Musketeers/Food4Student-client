@@ -24,6 +24,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,11 +63,19 @@ fun RequestNotificationPermissionDialog() {
 fun MainScreen(
     onNavigateToShippingLocation: () -> Unit,
     onNavigateToAccountCenter: () -> Unit,
+    onNavigateToRestaurant: (id: String) -> Unit,
+    vm: MainScreenViewModel = hiltViewModel()
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         RequestNotificationPermissionDialog()
     }
 
+    val profile by vm.profile.collectAsState()
+    // refresh profile data to ensure it's up to date on navigated (back) to
+    // (i.e. after avatar change and navigated back)
+    LaunchedEffect(Unit) {
+        vm.refreshUserProfile()
+    }
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
 
     // TODO: add logic to populate this on load and maybe move to viewmodel
@@ -76,9 +85,12 @@ fun MainScreen(
     ) }
 
     val routesWithoutSearchBar = listOf(MainRoutes.NOTIFICATION)
-    val isRouteWithSearchBar = !routesWithoutSearchBar.contains(currentRoute)
+    val isRouteWithSearchBar by remember { derivedStateOf {
+        !routesWithoutSearchBar.contains(currentRoute)
+    } }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    // go back to default page first, then let user exit
     BackHandler(enabled = currentRoute != defaultRoute) {
         currentRoute = defaultRoute
     }
@@ -123,8 +135,8 @@ fun MainScreen(
                 title = { Text("Notification") },
                 modifier = Modifier.alpha(topBarAlpha),
                 actions = {
-                    val vm: NotificationScreenViewModel = hiltViewModel()
-                    IconButton(onClick = { vm.markAllAsRead() }) {
+                    val notiVm: NotificationScreenViewModel = hiltViewModel()
+                    IconButton(onClick = { notiVm.markAllAsRead() }) {
                         Icon(Icons.Filled.Checklist, "Mark all as read")
                     }
                 },
@@ -158,15 +170,14 @@ fun MainScreen(
 
         // Search bar on top
         GlobalSearchBar(
-            // TODO: replace with actual data
-            userName = "Hồ Nguyên Minh",
-            userAvatarUrl = "",
+            userName = profile.displayName,
+            userAvatarModel = profile.photoUrl,
             onAvatarClicked = onNavigateToAccountCenter,
             modifier = Modifier
                 .offset { animatedSearchBarOffset }
                 .alpha(animatedSearchBarAlpha),
             onExpandedChange = { expanded = it },
-            isVisible = animatedSearchBarOffset != IntOffset(0, 0)
+            isVisible = animatedSearchBarOffset != IntOffset(0, -100)
         )
 
         // Main screen content
@@ -174,16 +185,11 @@ fun MainScreen(
             currentRoute = currentRoute,
             onNavigateToShippingLocation = onNavigateToShippingLocation,
             scrollConnection = scrollBehavior.nestedScrollConnection,
+            onNavigateToRestaurant = onNavigateToRestaurant,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)
                 .offset { animatedContentOffset }
         )
     }
-}
-
-@Preview
-@Composable
-private fun MainScreenPrev() {
-    MainScreen({}, {})
 }

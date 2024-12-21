@@ -11,5 +11,6 @@ data class Restaurant(
     val logoUrl: String?,
     val bannerUrl: String?,
     val totalRatings: Int,
-    val averageRating: Double
+    val averageRating: Double,
+    val isLiked: Boolean
 )

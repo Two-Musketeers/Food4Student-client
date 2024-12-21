@@ -34,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 
+/**
+ * @param isFavorite Set this to null to hide the favorite icon
+ */
 @Composable
 fun ShopListingCard(
     shopName: String,
@@ -41,7 +44,7 @@ fun ShopListingCard(
     distance: String,
     timeAway: String,
     shopImageModel: Any?,
-    isFavorite: Boolean,
+    isFavorite: Boolean?,
     onFavoriteChange: (Boolean) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -93,14 +96,16 @@ fun ShopListingCard(
                     )
                 }
             }
-            IconToggleButton(
-                checked = isFavorite,
-                onCheckedChange = onFavoriteChange,
-                modifier = Modifier.align(Alignment.BottomEnd)
-            ) {
-                val icon = if (isFavorite) Icons.Rounded.Favorite
-                    else Icons.Rounded.FavoriteBorder
-                Icon(icon, null)
+            if (isFavorite != null) {
+                IconToggleButton(
+                    checked = isFavorite,
+                    onCheckedChange = onFavoriteChange,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
+                    val icon = if (isFavorite) Icons.Rounded.Favorite
+                        else Icons.Rounded.FavoriteBorder
+                    Icon(icon, null)
+                }
             }
         }
     }

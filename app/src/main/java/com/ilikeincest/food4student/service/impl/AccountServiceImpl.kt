@@ -27,11 +27,12 @@ class AccountServiceImpl @Inject constructor() : AccountService {
             awaitClose { Firebase.auth.removeAuthStateListener(listener) }
         }
 
-    override val currentUserId: String
-        get() = Firebase.auth.currentUser!!.uid
+    override val currentUserId: String?
+        get() = Firebase.auth.currentUser?.uid
 
-    override suspend fun getUserToken(): String {
-        return Firebase.auth.currentUser!!.getIdToken(false).await().token ?: ""
+    override suspend fun getUserToken(): String? {
+        val currentUser = Firebase.auth.currentUser ?: return null
+        return currentUser.getIdToken(false).await().token
     }
 
     override fun hasUser(): Boolean {
@@ -39,7 +40,7 @@ class AccountServiceImpl @Inject constructor() : AccountService {
     }
 
     override fun getUserProfile(): Account {
-        return Firebase.auth.currentUser!!.toAppUser()
+        return Firebase.auth.currentUser?.toAppUser() ?: Account()
     }
 
     override suspend fun createAccountWithEmail(email: String, password: String) {
@@ -51,17 +52,17 @@ class AccountServiceImpl @Inject constructor() : AccountService {
             displayName = newDisplayName
         }
 
-        Firebase.auth.currentUser!!.updateProfile(profileUpdates).await()
+        Firebase.auth.currentUser?.updateProfile(profileUpdates)?.await()
     }
 
     override suspend fun linkAccountWithGoogle(idToken: String) {
         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-        Firebase.auth.currentUser!!.linkWithCredential(firebaseCredential).await()
+        Firebase.auth.currentUser?.linkWithCredential(firebaseCredential)?.await()
     }
 
     override suspend fun linkAccountWithEmail(email: String, password: String) {
         val credential = EmailAuthProvider.getCredential(email, password)
-        Firebase.auth.currentUser!!.linkWithCredential(credential).await()
+        Firebase.auth.currentUser?.linkWithCredential(credential)?.await()
     }
 
     override suspend fun signInWithGoogle(idToken: String) {
@@ -78,11 +79,12 @@ class AccountServiceImpl @Inject constructor() : AccountService {
     }
 
     override suspend fun deleteAccount() {
-        Firebase.auth.currentUser!!.delete().await()
+        Firebase.auth.currentUser?.delete()?.await()
     }
 
-    override suspend fun getUserRole(): String? {
-        return Firebase.auth.currentUser!!.getIdToken(false).await().claims["role"] as String?
+    override suspend fun getUserRole(): String? { // TODO: move to enum return type
+        val currentUser = Firebase.auth.currentUser ?: return null
+        return currentUser.getIdToken(false).await().claims["role"] as String?
     }
 
     private fun FirebaseUser.toAppUser(): Account {
@@ -93,5 +95,9 @@ class AccountServiceImpl @Inject constructor() : AccountService {
             displayName = this.displayName ?: "",
             photoUrl = this.photoUrl,
         )
+    }
+
+    override suspend fun reloadToken() {
+        Firebase.auth.currentUser?.getIdToken(true)?.await()
     }
 }

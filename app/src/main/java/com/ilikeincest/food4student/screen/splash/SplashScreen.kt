@@ -15,18 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ilikeincest.food4student.viewmodel.SignInViewModel
-import kotlinx.coroutines.delay
-
-private const val SPLASH_TIMEOUT = 1000L
 
 @Composable
 fun SplashScreen(
     onSetRootAdmin: () -> Unit,
     onSetRootMain: () -> Unit,
     onSetRootSignIn: () -> Unit,
+    onSetRootSelectRole: () -> Unit,
     vm: SplashScreenViewModel = hiltViewModel()
 ) {
+    // TODO: swap to dialog for better UI
     // setup toasts
     val toastMessage by vm.toastMessage.collectAsState()
     val context = LocalContext.current
@@ -36,10 +34,7 @@ fun SplashScreen(
         vm.clearToast() // toast is run by system, not by current LaunchedEffect coroutine
         // so wont be cancelled
     }
-    // register device token to fcm
-    LaunchedEffect(Unit) {
-        vm.registerNotificationDeviceToken()
-    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,15 +46,24 @@ fun SplashScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (vm.isSignedIn()) {
-            val role = vm.getAccountRole()
-            if (role == "Admin" || role == "Moderator") {
-                onSetRootAdmin()
-            } else {
-                onSetRootMain()
-            }
-        } else {
+        if (!vm.isSignedIn()) {
             onSetRootSignIn()
+            return@LaunchedEffect
+        }
+        // register device token to fcm
+        vm.registerNotificationDeviceToken()
+        val role = vm.getAccountRole()
+        when (role) {
+            in listOf("Admin", "Moderator") ->
+                onSetRootAdmin()
+            "RestaurantOwner" ->
+                // TODO
+                onSetRootMain()
+            "User" ->
+                onSetRootMain()
+            null ->
+                onSetRootSelectRole()
+            else -> throw NotImplementedError("What role is that???")
         }
     }
 }

@@ -55,13 +55,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun GlobalSearchBar(
     userName: String,
-    userAvatarUrl: String,
+    userAvatarModel: Any?,
     modifier: Modifier = Modifier,
     onAvatarClicked: () -> Unit = {},
     onExpandedChange: (Boolean) -> Unit = {},
     isVisible: Boolean = true,
 ) {
-    if (isVisible) return
+    if (!isVisible) return
     var query by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -131,7 +131,7 @@ fun GlobalSearchBar(
                     )
                 }
                 else AsyncImageOrMonogram(
-                    model = userAvatarUrl,
+                    model = userAvatarModel,
                     name = userName,
                     contentDescription = "User avatar",
                     size = 38.dp,
@@ -174,7 +174,7 @@ private fun SearchPrev() {
         Box(Modifier.fillMaxSize()) {
             GlobalSearchBar(
                 userName = "Ho Nguyen",
-                userAvatarUrl = "",
+                userAvatarModel = "",
                 modifier = Modifier.align(Alignment.TopCenter)
             )
             LazyColumn(
