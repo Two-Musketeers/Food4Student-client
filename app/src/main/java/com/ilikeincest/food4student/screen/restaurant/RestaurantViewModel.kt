@@ -26,248 +26,250 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 
-@HiltViewModel
-class RestaurantViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val restaurantApiService: RestaurantApiService,
-    private val foodItemApiService: FoodItemApiService,
-    private val photoApiService: PhotoApiService,
-    private val foodCategoryApiService: FoodCategoryApiService
-) : ViewModel() {
-
-    private val _restaurant = MutableStateFlow<Restaurant?>(null)
-    val restaurant: StateFlow<Restaurant?> = _restaurant
-
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> = _errorMessage
-
-    // State to track if changes are being made to a food item
-    private var originalName = ""
-    private var originalDescription = ""
-    private var originalPrice = ""
-    private var originalImageUri: Uri? = null
-    private var originalVariations = emptyList<Variation>()
-
-    // Temporary State for Unsaved Data
-    private val _unsavedVariations = MutableStateFlow<List<Variation>>(emptyList())
-    val unsavedVariations: StateFlow<List<Variation>> = _unsavedVariations
-
-    private val _unsavedImageUri = MutableStateFlow<Uri?>(null)
-    val unsavedImageUri: StateFlow<Uri?> = _unsavedImageUri
-
-    private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
-    val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem
-
-    private val _foodName = MutableStateFlow("")
-    val foodName: StateFlow<String> = _foodName
-
-    private val _foodDescription = MutableStateFlow("")
-    val foodDescription: StateFlow<String> = _foodDescription
-
-    private val _foodBasePrice = MutableStateFlow("")
-    val foodBasePrice: StateFlow<String> = _foodBasePrice
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    fun setFoodName(value: String) {
-        _foodName.value = value
-    }
-
-    fun setFoodDescription(value: String?) {
-        _foodDescription.value = value ?: ""
-    }
-
-    fun setFoodBasePrice(value: String) {
-        _foodBasePrice.value = value
-    }
-
-    private val _selectedFoodCategory = MutableStateFlow<FoodCategory?>(null)
-    val selectedFoodCategory: StateFlow<FoodCategory?> = _selectedFoodCategory
-
-    private val _categories = MutableStateFlow<List<FoodCategory>>(emptyList())
-    val categories: StateFlow<List<FoodCategory>> = _categories
-
-    private val _isEditing = MutableStateFlow(false)
-
-    init {
-        fetchRestaurantData()
-    }
-
-    private fun fetchRestaurantData() {
-        viewModelScope.launch {
-            try {
-                val response = restaurantApiService.getOwnedRestaurants()
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        _restaurant.value = it
-                        _categories.value = it.foodCategories
+    @HiltViewModel
+    class RestaurantViewModel @Inject constructor(
+        @ApplicationContext private val context: Context,
+        private val restaurantApiService: RestaurantApiService,
+        private val foodItemApiService: FoodItemApiService,
+        private val photoApiService: PhotoApiService,
+        private val foodCategoryApiService: FoodCategoryApiService
+    ) : ViewModel() {
+    
+        private val _restaurant = MutableStateFlow<Restaurant?>(null)
+        val restaurant: StateFlow<Restaurant?> = _restaurant
+    
+        private val _errorMessage = MutableStateFlow("")
+        val errorMessage: StateFlow<String> = _errorMessage
+    
+        // State to track if changes are being made to a food item
+        private var originalName = ""
+        private var originalDescription = ""
+        private var originalPrice = ""
+        private var originalImageUri: Uri? = null
+        private var originalVariations = emptyList<Variation>()
+    
+        // Temporary State for Unsaved Data
+        private val _unsavedVariations = MutableStateFlow<List<Variation>>(emptyList())
+        val unsavedVariations: StateFlow<List<Variation>> = _unsavedVariations
+    
+        private val _unsavedImageUri = MutableStateFlow<Uri?>(null)
+        val unsavedImageUri: StateFlow<Uri?> = _unsavedImageUri
+    
+        private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+        val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem
+    
+        private val _foodName = MutableStateFlow("")
+        val foodName: StateFlow<String> = _foodName
+    
+        private val _foodDescription = MutableStateFlow("")
+        val foodDescription: StateFlow<String> = _foodDescription
+    
+        private val _foodBasePrice = MutableStateFlow("")
+        val foodBasePrice: StateFlow<String> = _foodBasePrice
+    
+        private val _isLoading = MutableStateFlow(false)
+        val isLoading: StateFlow<Boolean> = _isLoading
+    
+        fun setFoodName(value: String) {
+            _foodName.value = value
+        }
+    
+        fun setFoodDescription(value: String?) {
+            _foodDescription.value = value ?: ""
+        }
+    
+        fun setFoodBasePrice(value: String) {
+            _foodBasePrice.value = value
+        }
+    
+        private val _selectedFoodCategory = MutableStateFlow<FoodCategory?>(null)
+        val selectedFoodCategory: StateFlow<FoodCategory?> = _selectedFoodCategory
+    
+        private val _categories = MutableStateFlow<List<FoodCategory>>(emptyList())
+        val categories: StateFlow<List<FoodCategory>> = _categories
+    
+        private val _isEditing = MutableStateFlow(false)
+    
+        init {
+            fetchRestaurantData()
+        }
+    
+        private fun fetchRestaurantData() {
+            viewModelScope.launch {
+                try {
+                    val response = restaurantApiService.getOwnedRestaurants()
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            _restaurant.value = it
+                            _categories.value = it.foodCategories
+                        }
+                    } else {
+                        showErrorDialog("${response.message()}")
                     }
-                } else {
-                    showErrorDialog("${response.message()}")
+                } catch (e: Exception) {
+                    showErrorDialog(e.message.toString())
                 }
-            } catch (e: Exception) {
-                showErrorDialog(e.message.toString())
             }
         }
-    }
-
-    fun showErrorDialog(message: String) {
-        _errorMessage.value = message
-    }
-
-    fun dismissErrorDialog() {
-        _errorMessage.value = ""
-    }
-
-    fun addCategory(categoryName: String) {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                val createDto = FoodCategoryCreateDto(name = categoryName)
-                val response = foodCategoryApiService.addFoodCategory(createDto)
-                if (response.isSuccessful) {
-                    response.body()?.let { dto ->
-                        val newCategory = FoodCategory(
-                            id = dto.id,
-                            name = dto.name,
-                            foodItems = emptyList(),
-                            restaurantId = dto.restaurantId
-                        )
-                        _categories.value = _categories.value + newCategory
+    
+        fun showErrorDialog(message: String) {
+            _errorMessage.value = message
+        }
+    
+        fun dismissErrorDialog() {
+            _errorMessage.value = ""
+        }
+    
+        fun addCategory(categoryName: String) {
+            viewModelScope.launch {
+                try {
+                    _isLoading.value = true
+                    val createDto = FoodCategoryCreateDto(name = categoryName)
+                    val response = foodCategoryApiService.addFoodCategory(createDto)
+                    if (response.isSuccessful) {
+                        response.body()?.let { dto ->
+                            val newCategory = FoodCategory(
+                                id = dto.id,
+                                name = dto.name,
+                                foodItems = emptyList(),
+                                restaurantId = dto.restaurantId
+                            )
+                            _categories.value = _categories.value + newCategory
+                        }
                     }
+                } catch (e: Exception) {
+                    showErrorDialog(e.message.toString())
+                } finally {
+                    _isLoading.value = false
                 }
-            } catch (e: Exception) {
-                showErrorDialog(e.message.toString())
-            } finally {
-                _isLoading.value = false
             }
         }
-    }
+    
+        fun updateCategory(categoryId: String, newName: String) {
+            viewModelScope.launch {
+                try {
+                    _isLoading.value = true
+                    val updateDto = FoodCategoryCreateDto(name = newName)
+                    val response = foodCategoryApiService.updateFoodCategory(categoryId, updateDto)
+                    if (response.isSuccessful) {
+                        _categories.value = _categories.value.map { category ->
+                            if (category.id == categoryId) {
+                                category.copy(name = newName)
+                            } else {
+                                category
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    showErrorDialog(e.message.toString())
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        }
+    
+        fun removeCategory(categoryId: String) {
+            viewModelScope.launch {
+                try {
+                    _isLoading.value = true
+                    val response = foodCategoryApiService.deleteFoodCategory(categoryId)
+                    if (response.isSuccessful) {
+                        _categories.value = _categories.value.filter { it.id != categoryId }
+                    }
+                } catch (e: Exception) {
+                    showErrorDialog(e.message.toString())
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        }
+    
+        fun setSelectedFoodItem(foodItem: FoodItem?) {
+            // First, set the selected item
+            _selectedFoodItem.value = foodItem
+    
+            // Save the original data for comparison
+            originalName = foodItem?.name ?: ""
+            originalDescription = foodItem?.description ?: ""
+            originalPrice = foodItem?.basePrice?.toString().orEmpty()
+            originalImageUri = foodItem?.foodItemPhotoUrl?.let { Uri.parse(it) }
+            originalVariations = foodItem?.variations ?: emptyList()
+    
+            // Then sync the states so they match the selected item's data
+            if (foodItem != null) {
+                setFoodName(foodItem.name)
+                setFoodDescription(foodItem.description)
+                setFoodBasePrice(foodItem.basePrice.toString())
+                _unsavedVariations.value = foodItem.variations
+                _unsavedImageUri.value = foodItem.foodItemPhotoUrl?.let { Uri.parse(it) }
+            } else {
+                // If no item is selected, clear states
+                setFoodName("")
+                setFoodDescription("")
+                setFoodBasePrice("")
+                _unsavedVariations.value = emptyList()
+                _unsavedImageUri.value = null
+            }
+    
+            _selectedFoodCategory.value = _categories.value.find { category ->
+                category.foodItems.any { it.id == foodItem?.id }
+            }
+        }
+    
+        val hasUnsavedChanges: Boolean
+            get() = _foodName.value != originalName ||
+                    _foodDescription.value != originalDescription ||
+                    _foodBasePrice.value != originalPrice ||
+                    _unsavedImageUri.value != originalImageUri ||
+                    _unsavedVariations.value != originalVariations
 
-    fun updateCategory(categoryId: String, newName: String) {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                val updateDto = FoodCategoryCreateDto(name = newName)
-                val response = foodCategoryApiService.updateFoodCategory(categoryId, updateDto)
-                if (response.isSuccessful) {
-                    _categories.value = _categories.value.map { category ->
-                        if (category.id == categoryId) {
-                            category.copy(name = newName)
-                        } else {
-                            category
+        fun addFoodCategorySelectionMode(isEditing: Boolean) {
+            _isEditing.value = isEditing
+        }
+    
+        fun selectFoodCategory(foodCategory: FoodCategory?) {
+                foodCategory?.let { newCategory ->
+                    _selectedFoodCategory.value = newCategory
+                    if (_isEditing.value && _selectedFoodItem.value != null) {
+                        viewModelScope.launch {
+                            _isLoading.value = true
+                            val response = foodCategoryApiService.migrateFoodItem(
+                                newCategory.id,
+                                _selectedFoodItem.value!!.id
+                            )
+                            if (response.isSuccessful) {
+                                // Remove from old category
+                                _restaurant.value = _restaurant.value?.copy(
+                                    foodCategories = _restaurant.value!!.foodCategories.map { category ->
+                                        if (category.foodItems.any { it.id == _selectedFoodItem.value!!.id }) {
+                                            category.copy(
+                                                foodItems = category.foodItems.filter { it.id != _selectedFoodItem.value!!.id }
+                                            )
+                                        } else {
+                                            category
+                                        }
+                                    }
+                                )
+                                // Add to new category
+                                _restaurant.value = _restaurant.value?.copy(
+                                    foodCategories = _restaurant.value!!.foodCategories.map { category ->
+                                        if (category.id == newCategory.id) {
+                                            category.copy(
+                                                foodItems = category.foodItems + _selectedFoodItem.value!!
+                                            )
+                                        } else {
+                                            category
+                                        }
+                                    }
+                                )
+                                _isLoading.value = false
+                            } else {
+                                showErrorDialog("Failed to migrate food item")
+                            }
                         }
                     }
                 }
-            } catch (e: Exception) {
-                showErrorDialog(e.message.toString())
-            } finally {
-                _isLoading.value = false
-            }
         }
-    }
-
-    fun removeCategory(categoryId: String) {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                val response = foodCategoryApiService.deleteFoodCategory(categoryId)
-                if (response.isSuccessful) {
-                    _categories.value = _categories.value.filter { it.id != categoryId }
-                }
-            } catch (e: Exception) {
-                showErrorDialog(e.message.toString())
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun setSelectedFoodItem(foodItem: FoodItem?) {
-        // First, set the selected item
-        _selectedFoodItem.value = foodItem
-
-        // Save the original data for comparison
-        originalName = foodItem?.name ?: ""
-        originalDescription = foodItem?.description ?: ""
-        originalPrice = foodItem?.basePrice?.toString().orEmpty()
-        originalImageUri = foodItem?.foodItemPhotoUrl?.let { Uri.parse(it) }
-        originalVariations = foodItem?.variations ?: emptyList()
-
-        // Then sync the states so they match the selected item's data
-        if (foodItem != null) {
-            setFoodName(foodItem.name)
-            setFoodDescription(foodItem.description)
-            setFoodBasePrice(foodItem.basePrice.toString())
-            _unsavedVariations.value = foodItem.variations
-            _unsavedImageUri.value = foodItem.foodItemPhotoUrl?.let { Uri.parse(it) }
-        } else {
-            // If no item is selected, clear states
-            setFoodName("")
-            setFoodDescription("")
-            setFoodBasePrice("")
-            _unsavedVariations.value = emptyList()
-            _unsavedImageUri.value = null
-        }
-
-        _selectedFoodCategory.value = _categories.value.find { category ->
-            category.foodItems.any { it.id == foodItem?.id }
-        }
-    }
-
-    val hasUnsavedChanges: Boolean
-        get() = _foodName.value != originalName ||
-                _foodDescription.value != originalDescription ||
-                _foodBasePrice.value != originalPrice ||
-                _unsavedImageUri.value != originalImageUri ||
-                _unsavedVariations.value != originalVariations
-
-    fun addFoodCategorySelectionMode(isEditing: Boolean) {
-        _isEditing.value = isEditing
-    }
-
-    fun selectFoodCategory(foodCategory: FoodCategory?) {
-        foodCategory?.let { newCategory ->
-            _selectedFoodCategory.value = newCategory
-            if (_isEditing.value && _selectedFoodItem.value != null) {
-                viewModelScope.launch {
-                    val response = foodCategoryApiService.migrateFoodItem(
-                        newCategory.id,
-                        _selectedFoodItem.value!!.id
-                    )
-                    if (response.isSuccessful) {
-                        // Remove from old category
-                        _restaurant.value = _restaurant.value?.copy(
-                            foodCategories = _restaurant.value!!.foodCategories.map { category ->
-                                if (category.foodItems.any { it.id == _selectedFoodItem.value!!.id }) {
-                                    category.copy(
-                                        foodItems = category.foodItems.filter { it.id != _selectedFoodItem.value!!.id }
-                                    )
-                                } else {
-                                    category
-                                }
-                            }
-                        )
-                        // Add to new category
-                        _restaurant.value = _restaurant.value?.copy(
-                            foodCategories = _restaurant.value!!.foodCategories.map { category ->
-                                if (category.id == newCategory.id) {
-                                    category.copy(
-                                        foodItems = category.foodItems + _selectedFoodItem.value!!
-                                    )
-                                } else {
-                                    category
-                                }
-                            }
-                        )
-                    } else {
-                        showErrorDialog("Failed to migrate food item")
-                    }
-                }
-            }
-        }
-    }
 
     // Functions to manage unsaved variations
     fun addVariation(variation: Variation) {

@@ -121,7 +121,7 @@ fun AddCategoryScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Thêm danh mục đồ ăn") },
+                    title = { Text("Danh mục đồ ăn") },
                     navigationIcon = {
                         IconButton(onClick = onNavigateUp) {
                             Icon(
@@ -160,8 +160,9 @@ fun AddCategoryScreen(
                             showDeleteConfirmation = true
                         },
                         onClick = {
-                            viewModel.selectFoodCategory(category)
-                            onNavigateUp()
+                            if (selectedFoodCategory?.id != category.id){
+                                viewModel.selectFoodCategory(category)
+                            }
                         },
                         isSelected = category.id == selectedFoodCategory?.id
                     )

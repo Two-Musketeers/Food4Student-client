@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
 import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
@@ -80,14 +79,7 @@ fun AddEditSavedVariationScreen(
             onMaxChange = { maxSelect = it },
             onSaveVariation = {
                 val min = minSelect.toIntOrNull() ?: 0
-                val max = maxSelect.toIntOrNull() ?: 1
-                val newVariation = Variation(
-                    id = "", // server generates
-                    name = variationName,
-                    minSelect = min,
-                    maxSelect = max,
-                    variationOptions = emptyList()
-                )
+                val max = if (maxSelect.isBlank()) null else maxSelect.toIntOrNull()
                 if (isEditingVariation && currentVariationIndex >= 0) {
                     val oldVariation = variations[currentVariationIndex]
                     val updatedVariation = oldVariation.copy(

@@ -91,11 +91,15 @@ fun VariationBottomSheet(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = maxSelect,
+                value = when {
+                    isEditingVariation && maxSelect == "null" -> "Không có giới hạn"
+                    else -> maxSelect
+                },
                 onValueChange = onMaxChange,
-                label = { Text(text = "Số chọn tối đa") },
+                label = { Text(text = "Số chọn tối đa (không bắt buộc)") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                supportingText = { Text("Để trống nếu không có giới hạn về chọn tối đa") },
                 trailingIcon = {
                     if (maxSelect.isNotEmpty()) {
                         IconButton(onClick = { onMaxChange("") }) {
