@@ -9,9 +9,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
@@ -37,7 +35,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,17 +45,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
@@ -67,11 +63,9 @@ import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
-import com.ilikeincest.food4student.screen.restaurant.component.CollapsableDescriptionCard
+import com.ilikeincest.food4student.screen.restaurant.component.AddToCartSheet
 import com.ilikeincest.food4student.screen.restaurant.component.FoodItemCard
-import com.ilikeincest.food4student.screen.restaurant.component.RatingChip
 import com.ilikeincest.food4student.screen.restaurant.component.RestaurantHeader
-import com.ilikeincest.food4student.screen.restaurant.component.TonalFavoriteButton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -87,13 +81,17 @@ fun RestaurantScreen(
     description: String,
     onNavigateUp: () -> Unit,
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-
-    val foodList = seedList() // TODO: replace with vm
-    val lazyListState = rememberLazyListState()
+    // vm states
+    val foodList = remember { seedList() } // TODO: replace with vm
     var isRefreshing by remember { mutableStateOf(false) }
+    var addToCartItem by remember { mutableStateOf<FoodItem?>(null) }
+//    val cart = remember { mutableStateListOf<>() } // TODO
+
+    // TODO handle the status bar
+    // view states
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val lazyListState = rememberLazyListState()
 
     val firstIndex by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
     val showTitle by remember { derivedStateOf { firstIndex >= 1 } }
@@ -108,18 +106,17 @@ fun RestaurantScreen(
                 return@LaunchedEffect
             }
             for (i in foodList.indices) {
+                if (firstIndex > current) {
+                    current += foodList[i].foodItems.size + 1
+                    continue
+                }
                 if (firstIndex == current) {
                     selectedTab = i
-                    return@LaunchedEffect
                 }
                 if (firstIndex == current - 1) {
                     selectedTab = i - 1
-                    return@LaunchedEffect
                 }
-                if (firstIndex < current) {
-                    return@LaunchedEffect
-                }
-                current += foodList[i].foodItems.size + 1
+                return@LaunchedEffect
             }
         }
     }
@@ -136,8 +133,15 @@ fun RestaurantScreen(
                 containerColor = Color.Transparent
             ),
             navigationIcon = {
-                IconButton(onClick = onNavigateUp) {
-                    Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                Row {
+                    AnimatedVisibility(!showTitle) { Spacer(Modifier.width(8.dp)) }
+                    IconButton(onClick = onNavigateUp,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = colorScheme.surfaceContainer
+                        )
+                    ) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    }
                 }
             },
             scrollBehavior = scrollBehavior
@@ -194,30 +198,24 @@ fun RestaurantScreen(
                 if (foodList.isNotEmpty()) {
                     stickyHeader(contentType = "category tabs") {
                         val coroutineScope = rememberCoroutineScope()
-                        SecondaryScrollableTabRow(
-                            selectedTabIndex = selectedTab
-                        ) {
-                            foodList.forEachIndexed { i, category ->
-                                Tab(
-                                    selected = selectedTab == i,
-                                    text = { Text(category.name) },
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            selectedTab = i
-                                            var target = categoryInitialIndex
-                                            // each category has 1 header
-                                            // and n food item
-                                            for (cate in 0..<i) {
-                                                target += foodList[cate].foodItems.size + 1
-                                            }
-                                            lazyListState.animateScrollToItem(
-                                                target,
-                                                -tabBarHeightPx.roundToInt()
-                                            )
-                                        }
-                                    },
-                                )
-                            }
+                        SecondaryScrollableTabRow(selectedTabIndex = selectedTab) {
+                            foodList.forEachIndexed { i, category -> Tab(
+                                selected = selectedTab == i,
+                                text = { Text(category.name) },
+                                onClick = { coroutineScope.launch {
+                                    selectedTab = i
+                                    var target = categoryInitialIndex
+                                    // each category has 1 header
+                                    // and n food item
+                                    for (cate in 0..<i) {
+                                        target += foodList[cate].foodItems.size + 1
+                                    }
+                                    lazyListState.animateScrollToItem(
+                                        target,
+                                        -tabBarHeightPx.roundToInt()
+                                    )
+                                } },
+                            ) }
                         }
                     }
                 }
@@ -229,7 +227,9 @@ fun RestaurantScreen(
                     ) {
                         Text(
                             "${category.name} (${category.foodItems.size})",
-                            style = typography.titleLarge,
+                            style = typography.titleLarge.copy(
+                                fontSize = 22.sp,
+                            ),
                             modifier = bgModifier
                                 .padding(horizontal = 16.dp)
                                 .padding(top = 16.dp)
@@ -243,16 +243,30 @@ fun RestaurantScreen(
                         FoodItemCard(
                             item = it,
                             modifier = bgModifier.padding(16.dp),
+                            // TODO: add proper edit layout if have time
+                            onDecreaseInCart = null, // disable the button
+                            onIncreaseInCart = { addToCartItem = it },
                             inCartCount = 0 // TODO
                         )
                         HorizontalDivider(
                             thickness = 1.dp,
-                            modifier = bgModifier.padding(horizontal = 16.dp)
+                            color = colorScheme.outlineVariant.copy(
+                                alpha = 0.4f
+                            ),
+                            modifier = bgModifier.padding(horizontal = 24.dp)
                         )
                     }
                 }
             }
         }
+    }
+
+    if (addToCartItem != null) {
+        AddToCartSheet(
+            item = addToCartItem!!,
+            onDismiss = { addToCartItem = null },
+            onAddItemToCart = {}, // TODO
+        )
     }
 }
 
@@ -289,9 +303,9 @@ private fun seedFood(seed: Int): List<FoodItem> {
             id = id.toString(),
             name = "Hồng Trà Kem Tươi",
             description =
-            if (id.mod(2) == 0)
-                "Est sed takimata consetetur enim ipsum eos quis diam gubergren. Clita placerat nobis invidunt dolore et dolor amet erat accusam ea accusam sed justo erat autem praesent. Qui rebum sit velit vel dolore stet et nulla placerat dolore gubergren stet laoreet option lorem autem invidunt invidunt. Kasd elit enim consectetuer dolor tempor diam takimata ea elitr esse eros odio esse velit ut stet. Sanctus nonumy eos et et sanctus possim feugiat. Takimata at vero hendrerit sadipscing nulla doming ea nonumy duis ipsum. Dolore consequat magna justo dolore dolor justo doming sit tempor et invidunt aliquyam magna sit. Amet takimata accumsan dolor dignissim te dolor et dolor erat imperdiet duo kasd et eleifend dolore. Diam mazim eirmod et feugiat labore ipsum et invidunt magna et ut. Diam clita exerci clita. Dolore at est soluta aliquam ipsum nulla feugiat dolores at sit ut at suscipit duo consetetur. Tation tincidunt lorem ea aliquip et te wisi ad dolore sed clita. Sit at dolore sit duo nulla tempor at. Labore feugait lorem lobortis consequat. Ut aliquyam ea eos wisi vero ut et stet sanctus duis est sit. No labore eu duo."
-            else "Kem có tan chảy",
+                if (id.mod(2) == 0)
+                    "Est sed takimata consetetur enim ipsum eos quis diam gubergren. Clita placerat nobis invidunt dolore et dolor amet erat accusam ea accusam sed justo erat autem praesent. Qui rebum sit velit vel dolore stet et nulla placerat dolore gubergren stet laoreet option lorem autem invidunt invidunt. Kasd elit enim consectetuer dolor tempor diam takimata ea elitr esse eros odio esse velit ut stet. Sanctus nonumy eos et et sanctus possim feugiat. Takimata at vero hendrerit sadipscing nulla doming ea nonumy duis ipsum. Dolore consequat magna justo dolore dolor justo doming sit tempor et invidunt aliquyam magna sit. Amet takimata accumsan dolor dignissim te dolor et dolor erat imperdiet duo kasd et eleifend dolore. Diam mazim eirmod et feugiat labore ipsum et invidunt magna et ut. Diam clita exerci clita. Dolore at est soluta aliquam ipsum nulla feugiat dolores at sit ut at suscipit duo consetetur. Tation tincidunt lorem ea aliquip et te wisi ad dolore sed clita. Sit at dolore sit duo nulla tempor at. Labore feugait lorem lobortis consequat. Ut aliquyam ea eos wisi vero ut et stet sanctus duis est sit. No labore eu duo."
+                else "Kem có tan chảy",
             foodItemPhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR58QY4pAtehHlOZtYU0gDSbTABNIsxy2z_gQ&s",
             basePrice = 23000,
             variations = listOf(Variation(
@@ -321,7 +335,7 @@ private fun seedFood(seed: Int): List<FoodItem> {
     }
 }
 private fun seedList(): List<FoodCategory> {
-    val r = Random(20)
+    val r = Random(21)
     val cats = listOf("THỨC UỐNG HOT", "TRÀ TRÁI CÂY", "THUẦN TRÀ", "TRÀ LATTE", "TRÀ SỮA", "TRÀ CHANH")
     return List(cats.size) {
         FoodCategory(
