@@ -67,9 +67,20 @@ class RestaurantViewModel @Inject constructor(
     private val _foodBasePrice = MutableStateFlow("")
     val foodBasePrice: StateFlow<String> = _foodBasePrice
 
-    fun setFoodName(value: String) { _foodName.value = value }
-    fun setFoodDescription(value: String?) { _foodDescription.value = value ?: "" }
-    fun setFoodBasePrice(value: String) { _foodBasePrice.value = value }
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun setFoodName(value: String) {
+        _foodName.value = value
+    }
+
+    fun setFoodDescription(value: String?) {
+        _foodDescription.value = value ?: ""
+    }
+
+    fun setFoodBasePrice(value: String) {
+        _foodBasePrice.value = value
+    }
 
     private val _selectedFoodCategory = MutableStateFlow<FoodCategory?>(null)
     val selectedFoodCategory: StateFlow<FoodCategory?> = _selectedFoodCategory
@@ -111,49 +122,64 @@ class RestaurantViewModel @Inject constructor(
 
     fun addCategory(categoryName: String) {
         viewModelScope.launch {
-            val createDto = FoodCategoryCreateDto(name = categoryName)
-            val response = foodCategoryApiService.addFoodCategory(createDto)
-            if (response.isSuccessful) {
-                response.body()?.let { dto ->
-                    val newCategory = FoodCategory(
-                        id = dto.id,
-                        name = dto.name,
-                        foodItems = emptyList(),
-                        restaurantId = dto.restaurantId
-                    )
-                    _categories.value = _categories.value + newCategory
+            try {
+                _isLoading.value = true
+                val createDto = FoodCategoryCreateDto(name = categoryName)
+                val response = foodCategoryApiService.addFoodCategory(createDto)
+                if (response.isSuccessful) {
+                    response.body()?.let { dto ->
+                        val newCategory = FoodCategory(
+                            id = dto.id,
+                            name = dto.name,
+                            foodItems = emptyList(),
+                            restaurantId = dto.restaurantId
+                        )
+                        _categories.value = _categories.value + newCategory
+                    }
                 }
-            } else {
-                showErrorDialog("Failed to add category")
+            } catch (e: Exception) {
+                showErrorDialog(e.message.toString())
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun updateCategory(categoryId: String, newName: String) {
         viewModelScope.launch {
-            val updateDto = FoodCategoryCreateDto(name = newName)
-            val response = foodCategoryApiService.updateFoodCategory(categoryId, updateDto)
-            if (response.isSuccessful) {
-                _categories.value = _categories.value.map { category ->
-                    if (category.id == categoryId) {
-                        category.copy(name = newName)
-                    } else {
-                        category
+            try {
+                _isLoading.value = true
+                val updateDto = FoodCategoryCreateDto(name = newName)
+                val response = foodCategoryApiService.updateFoodCategory(categoryId, updateDto)
+                if (response.isSuccessful) {
+                    _categories.value = _categories.value.map { category ->
+                        if (category.id == categoryId) {
+                            category.copy(name = newName)
+                        } else {
+                            category
+                        }
                     }
                 }
-            } else {
-                showErrorDialog("Failed to update category")
+            } catch (e: Exception) {
+                showErrorDialog(e.message.toString())
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun removeCategory(categoryId: String) {
         viewModelScope.launch {
-            val response = foodCategoryApiService.deleteFoodCategory(categoryId)
-            if (response.isSuccessful) {
-                _categories.value = _categories.value.filter { it.id != categoryId }
-            } else {
-                showErrorDialog("Failed to remove category")
+            try {
+                _isLoading.value = true
+                val response = foodCategoryApiService.deleteFoodCategory(categoryId)
+                if (response.isSuccessful) {
+                    _categories.value = _categories.value.filter { it.id != categoryId }
+                }
+            } catch (e: Exception) {
+                showErrorDialog(e.message.toString())
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -206,7 +232,10 @@ class RestaurantViewModel @Inject constructor(
             _selectedFoodCategory.value = newCategory
             if (_isEditing.value && _selectedFoodItem.value != null) {
                 viewModelScope.launch {
-                    val response = foodCategoryApiService.migrateFoodItem(newCategory.id, _selectedFoodItem.value!!.id)
+                    val response = foodCategoryApiService.migrateFoodItem(
+                        newCategory.id,
+                        _selectedFoodItem.value!!.id
+                    )
                     if (response.isSuccessful) {
                         // Remove from old category
                         _restaurant.value = _restaurant.value?.copy(
@@ -263,8 +292,6 @@ class RestaurantViewModel @Inject constructor(
                 variationOptions = variation.variationOptions + option
             )
             updateVariation(variationIndex, updatedVariation)
-        } else {
-            Log.e("ViewModel", "addOptionToVariation: invalid index $variationIndex")
         }
     }
 
@@ -274,8 +301,6 @@ class RestaurantViewModel @Inject constructor(
             val updatedList = currentList.toMutableList()
             updatedList[index] = updatedVariation
             _unsavedVariations.value = updatedList
-        } else {
-            Log.e("ViewModel", "updateVariation: invalid index $index")
         }
     }
 
@@ -311,100 +336,109 @@ class RestaurantViewModel @Inject constructor(
         foodItemCreateDto: FoodItem,
         foodCategoryId: String
     ) {
-        viewModelScope.launch {
-            try {
-                if (foodItemCreateDto.id.isEmpty()) {
-                    // Create new food item
-                    val createResponse = foodItemApiService.createFoodItem(foodItemCreateDto, foodCategoryId)
-                    if (!createResponse.isSuccessful) throw Exception("Create failed")
-                    val createdFoodItemDto = createResponse.body()!!
+        if (!hasUnsavedChanges) return
+        else {
+            viewModelScope.launch {
+                try {
+                    _isLoading.value = true
+                    if (foodItemCreateDto.id.isEmpty()) {
+                        // Create new food item
+                        val createResponse =
+                            foodItemApiService.createFoodItem(foodItemCreateDto, foodCategoryId)
+                        if (!createResponse.isSuccessful) throw Exception("Create failed")
+                        val createdFoodItemDto = createResponse.body()!!
 
-                    _unsavedImageUri.value?.let { uploadFoodItemPhoto(createdFoodItemDto.id, it) }
+                        _unsavedImageUri.value?.let { uploadFoodItemPhoto(createdFoodItemDto.id, it) }
 
-                    val newFoodItem = FoodItem(
-                        id = createdFoodItemDto.id,
-                        name = createdFoodItemDto.name,
-                        description = createdFoodItemDto.description,
-                        foodItemPhotoUrl = createdFoodItemDto.foodItemPhotoUrl,
-                        basePrice = createdFoodItemDto.basePrice,
-                        variations = createdFoodItemDto.variations.map { varDto ->
-                            Variation(
-                                id = varDto.id,
-                                name = varDto.name,
-                                minSelect = varDto.minSelect,
-                                maxSelect = varDto.maxSelect,
-                                variationOptions = varDto.variationOptions.map { optDto ->
-                                    VariationOption(
-                                        id = optDto.id,
-                                        name = optDto.name,
-                                        priceAdjustment = optDto.priceAdjustment
-                                    )
-                                }
-                            )
-                        }
-                    )
+                        val newFoodItem = FoodItem(
+                            id = createdFoodItemDto.id,
+                            name = createdFoodItemDto.name,
+                            description = createdFoodItemDto.description,
+                            foodItemPhotoUrl = createdFoodItemDto.foodItemPhotoUrl,
+                            basePrice = createdFoodItemDto.basePrice,
+                            variations = createdFoodItemDto.variations.map { varDto ->
+                                Variation(
+                                    id = varDto.id,
+                                    name = varDto.name,
+                                    minSelect = varDto.minSelect,
+                                    maxSelect = varDto.maxSelect,
+                                    variationOptions = varDto.variationOptions.map { optDto ->
+                                        VariationOption(
+                                            id = optDto.id,
+                                            name = optDto.name,
+                                            priceAdjustment = optDto.priceAdjustment
+                                        )
+                                    }
+                                )
+                            }
+                        )
 
-                    _restaurant.value = _restaurant.value?.copy(
-                        foodCategories = _restaurant.value!!.foodCategories.map { cat ->
-                            if (cat.id == foodCategoryId) cat.copy(
-                                foodItems = cat.foodItems + newFoodItem
-                            ) else cat
-                        }
-                    )
+                        _restaurant.value = _restaurant.value?.copy(
+                            foodCategories = _restaurant.value!!.foodCategories.map { cat ->
+                                if (cat.id == foodCategoryId) cat.copy(
+                                    foodItems = cat.foodItems + newFoodItem
+                                ) else cat
+                            }
+                        )
 
-                    _selectedFoodItem.value = newFoodItem
-                    setFoodName(newFoodItem.name)
-                    setFoodDescription(newFoodItem.description)
-                    setFoodBasePrice(newFoodItem.basePrice.toString())
+                        _selectedFoodItem.value = newFoodItem
+                        setFoodName(newFoodItem.name)
+                        setFoodDescription(newFoodItem.description)
+                        setFoodBasePrice(newFoodItem.basePrice.toString())
+                    } else {
+                        val updateResponse = foodItemApiService.updateFoodItem(
+                            foodItemCreateDto.id,
+                            foodCategoryId,
+                            foodItemCreateDto
+                        )
+                        val updatedFoodItemDto = updateResponse.body()!!
 
-                } else {
-                    val updateResponse = foodItemApiService.updateFoodItem(foodItemCreateDto.id, foodCategoryId, foodItemCreateDto)
-                    val updatedFoodItemDto = updateResponse.body()!!
+                        _unsavedImageUri.value?.let { uploadFoodItemPhoto(updatedFoodItemDto.id, it) }
 
-                    _unsavedImageUri.value?.let { uploadFoodItemPhoto(updatedFoodItemDto.id, it) }
+                        val updatedFoodItem = FoodItem(
+                            id = updatedFoodItemDto.id,
+                            name = updatedFoodItemDto.name,
+                            description = updatedFoodItemDto.description,
+                            foodItemPhotoUrl = updatedFoodItemDto.foodItemPhotoUrl,
+                            basePrice = updatedFoodItemDto.basePrice,
+                            variations = updatedFoodItemDto.variations.map { varDto ->
+                                Variation(
+                                    id = varDto.id,
+                                    name = varDto.name,
+                                    minSelect = varDto.minSelect,
+                                    maxSelect = varDto.maxSelect,
+                                    variationOptions = varDto.variationOptions.map { optDto ->
+                                        VariationOption(
+                                            id = optDto.id,
+                                            name = optDto.name,
+                                            priceAdjustment = optDto.priceAdjustment
+                                        )
+                                    }
+                                )
+                            }
+                        )
 
-                    val updatedFoodItem = FoodItem(
-                        id = updatedFoodItemDto.id,
-                        name = updatedFoodItemDto.name,
-                        description = updatedFoodItemDto.description,
-                        foodItemPhotoUrl = updatedFoodItemDto.foodItemPhotoUrl,
-                        basePrice = updatedFoodItemDto.basePrice,
-                        variations = updatedFoodItemDto.variations.map { varDto ->
-                            Variation(
-                                id = varDto.id,
-                                name = varDto.name,
-                                minSelect = varDto.minSelect,
-                                maxSelect = varDto.maxSelect,
-                                variationOptions = varDto.variationOptions.map { optDto ->
-                                    VariationOption(
-                                        id = optDto.id,
-                                        name = optDto.name,
-                                        priceAdjustment = optDto.priceAdjustment
-                                    )
-                                }
-                            )
-                        }
-                    )
+                        _restaurant.value = _restaurant.value?.copy(
+                            foodCategories = _restaurant.value!!.foodCategories.map { cat ->
+                                if (cat.id == foodCategoryId) cat.copy(
+                                    foodItems = cat.foodItems.map { item ->
+                                        if (item.id == updatedFoodItem.id) updatedFoodItem else item
+                                    }
+                                ) else cat
+                            }
+                        )
 
-                    _restaurant.value = _restaurant.value?.copy(
-                        foodCategories = _restaurant.value!!.foodCategories.map { cat ->
-                            if (cat.id == foodCategoryId) cat.copy(
-                                foodItems = cat.foodItems.map { item ->
-                                    if (item.id == updatedFoodItem.id) updatedFoodItem else item
-                                }
-                            ) else cat
-                        }
-                    )
-
-                    _selectedFoodItem.value = updatedFoodItem
-                    setFoodName(updatedFoodItem.name)
-                    setFoodDescription(updatedFoodItem.description)
-                    setFoodBasePrice(updatedFoodItem.basePrice.toString())
+                        _selectedFoodItem.value = updatedFoodItem
+                        setFoodName(updatedFoodItem.name)
+                        setFoodDescription(updatedFoodItem.description)
+                        setFoodBasePrice(updatedFoodItem.basePrice.toString())
+                    }
+                    clearUnsavedData()
+                } catch (e: Exception) {
+                    showErrorDialog(e.message ?: "Save failed")
+                } finally {
+                    _isLoading.value = false
                 }
-
-                clearUnsavedData()
-            } catch (e: Exception) {
-                showErrorDialog(e.message ?: "Save failed")
             }
         }
     }
@@ -415,6 +449,7 @@ class RestaurantViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
+                _isLoading.value = true
                 val response = foodItemApiService.deleteFoodItem(foodItemId, foodCategoryId)
                 if (response.isSuccessful) {
                     _restaurant.value = _restaurant.value?.copy(
@@ -429,6 +464,8 @@ class RestaurantViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 showErrorDialog(e.message.toString())
+            } finally {
+                _isLoading.value = false
             }
         }
     }

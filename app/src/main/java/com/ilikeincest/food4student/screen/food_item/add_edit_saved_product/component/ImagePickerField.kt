@@ -88,7 +88,7 @@ fun ImagePickerField(
                     .offset(x = (-12).dp, y = (-8).dp)
                     .size(20.dp) // Adjust the size of the entire button here
                     .background(
-                        color = colorScheme.inverseSurface.copy(alpha = 0.7f),
+                        color = colorScheme.inverseSurface,
                         shape = CircleShape
                     )
                     .clickable { onDeleteImage() }

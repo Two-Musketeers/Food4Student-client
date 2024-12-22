@@ -4,9 +4,12 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -19,6 +22,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -31,7 +35,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,10 +74,21 @@ fun AddEditSavedFoodItemScreen(
 
     val unsavedVariations by viewModel.unsavedVariations.collectAsState()
     val unsavedImageUri by viewModel.unsavedImageUri.collectAsState()
+    // For the loading indicator to know when to load
+    val isLoading = viewModel.isLoading.collectAsState().value
 
     // Sync the category display text with selectedCategory
     LaunchedEffect(selectedCategory) {
         currentCategory = selectedCategory?.name ?: ""
+    }
+
+    var navigateAfterSave by remember { mutableStateOf(false) }
+    LaunchedEffect(isLoading) {
+        // If saving was requested and loading is done, navigate back
+        if (!isLoading && navigateAfterSave) {
+            onNavigateUp()
+            navigateAfterSave = false
+        }
     }
 
     var showConfirmDiscardDialog by remember { mutableStateOf(false) }
@@ -127,96 +144,107 @@ fun AddEditSavedFoodItemScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            AddEditSavedTopBarProduct(
-                isEdit = isEditScreen,
-                onNavigateUp = { onNavUp() },
-                onDelete = {
-                    showDeleteDialog = true
-                },
-                onSave = {
-                    val foodItemCreateDto = FoodItem(
-                        id = if (isEditScreen) foodItem?.id ?: "" else "",
-                        name = name,
-                        description = description,
-                        basePrice = basePrice.toIntOrNull() ?: 0,
-                        foodItemPhotoUrl = unsavedImageUri.toString(),
-                        variations = unsavedVariations
-                    )
-                    val categoryId = selectedCategory?.id ?: ""
-                    viewModel.saveFoodItem(foodItemCreateDto, foodCategoryId = categoryId)
-                    onNavigateUp()
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        modifier = Modifier.imePadding()
-    ) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            DividerWithSubhead(subhead = { Text("Hình ảnh đồ ăn, thức uống") })
-            ImagePickerField(
-                imageState = ImageState(imageUri = unsavedImageUri),
-                onImageClick = { imagePickerLauncher.launch("image/*") },
-                onDeleteImage = { viewModel.setUnsavedImage(null) },
-                modifier = Modifier.size(125.dp)
-            )
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-            DividerWithSubhead(subhead = { Text("Thông tin đồ ăn, thức uống") })
-            OutlinedTextField(
-                value = name,
-                onValueChange = { viewModel.setFoodName(it) },
-                singleLine = true,
-                label = { Text("Tên") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = description,
-                onValueChange = { viewModel.setFoodDescription(it) },
-                supportingText = { Text("Không bắt buộc") },
-                singleLine = true,
-                label = { Text("Mô tả") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            CategoryAndVariationField(
-                startIcon = Icons.Default.Sell,
-                endIcon = Icons.Default.ChevronRight,
-                value = basePrice,
-                title = "Giá",
-                placeholder = "Đặt",
-                modifier = Modifier.padding(top = 8.dp),
-                onClick = { showBottomSheet = true }
-            )
+    Box (modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                AddEditSavedTopBarProduct(
+                    isEdit = isEditScreen,
+                    onNavigateUp = { onNavUp() },
+                    onDelete = {
+                        showDeleteDialog = true
+                    },
+                    onSave = {
+                        navigateAfterSave = true
+                        val foodItemCreateDto = FoodItem(
+                            id = if (isEditScreen) foodItem.id else "",
+                            name = name,
+                            description = description,
+                            basePrice = basePrice.toIntOrNull() ?: 0,
+                            foodItemPhotoUrl = unsavedImageUri.toString(),
+                            variations = unsavedVariations
+                        )
+                        val categoryId = selectedCategory?.id ?: ""
+                        viewModel.saveFoodItem(foodItemCreateDto, foodCategoryId = categoryId)
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            modifier = Modifier.imePadding()
+        ) { innerPadding ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                DividerWithSubhead(subhead = { Text("Hình ảnh đồ ăn, thức uống") })
+                ImagePickerField(
+                    imageState = ImageState(imageUri = unsavedImageUri),
+                    onImageClick = { imagePickerLauncher.launch("image/*") },
+                    onDeleteImage = { viewModel.setUnsavedImage(null) },
+                    modifier = Modifier.size(125.dp)
+                )
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+                DividerWithSubhead(subhead = { Text("Thông tin đồ ăn, thức uống") })
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { viewModel.setFoodName(it) },
+                    singleLine = true,
+                    label = { Text("Tên") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { viewModel.setFoodDescription(it) },
+                    supportingText = { Text("Không bắt buộc") },
+                    singleLine = true,
+                    label = { Text("Mô tả") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                CategoryAndVariationField(
+                    startIcon = Icons.Default.Sell,
+                    endIcon = Icons.Default.ChevronRight,
+                    value = basePrice,
+                    title = "Giá",
+                    placeholder = "Đặt",
+                    modifier = Modifier.padding(top = 8.dp),
+                    onClick = { showBottomSheet = true }
+                )
 
-            DividerWithSubhead(
-                subhead = { Text("Danh mục và phân loại") },
-                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-            )
-            CategoryAndVariationField(
-                startIcon = Icons.Default.Fastfood,
-                endIcon = Icons.Default.ChevronRight,
-                value = currentCategory,
-                title = "Danh mục",
-                placeholder = "Trà sữa",
-                onClick = { onNavigateToFoodCategory() }
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            CategoryAndVariationField(
-                title = "Phân loại",
-                value = unsavedVariations.joinToString(", ") { it.name },
-                startIcon = Icons.Default.Category,
-                endIcon = Icons.Default.ChevronRight,
-                placeholder = "Topping, size",
-                onClick = { onNavigateToVariation() }
-            )
+                DividerWithSubhead(
+                    subhead = { Text("Danh mục và phân loại") },
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                )
+                CategoryAndVariationField(
+                    startIcon = Icons.Default.Fastfood,
+                    endIcon = Icons.Default.ChevronRight,
+                    value = currentCategory,
+                    title = "Danh mục",
+                    placeholder = "Trà sữa",
+                    onClick = { onNavigateToFoodCategory() }
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                CategoryAndVariationField(
+                    title = "Phân loại",
+                    value = unsavedVariations.joinToString(", ") { it.name },
+                    startIcon = Icons.Default.Category,
+                    endIcon = Icons.Default.ChevronRight,
+                    placeholder = "Topping, size",
+                    onClick = { onNavigateToVariation() }
+                )
+            }
+        }
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
         }
     }
 }

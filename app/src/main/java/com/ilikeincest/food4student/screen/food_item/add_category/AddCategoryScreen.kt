@@ -1,10 +1,12 @@
 package com.ilikeincest.food4student.screen.food_item.add_category
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
@@ -50,6 +54,7 @@ fun AddCategoryScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val categories = viewModel.categories.collectAsState().value
     val selectedFoodCategory by viewModel.selectedFoodCategory.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var showCategoryDialog by remember { mutableStateOf(false) }
     var isEditingCategory by remember { mutableStateOf(false) }
@@ -112,83 +117,97 @@ fun AddCategoryScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Thêm danh mục đồ ăn") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Trở về")
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        modifier = Modifier.imePadding()
-    ) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // List of categories
-            categories.forEachIndexed { index, category ->
-                CategoryItem(
-                    category = category,
-                    onEditCategory = {
-                        isEditingCategory = true
-                        currentCategoryIndex = index
-                        currentCategoryId = category.id
-                        categoryName = category.name
+    Box (modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Thêm danh mục đồ ăn") },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateUp) {
+                            Icon(
+                                Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = "Trở về"
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            },
+            modifier = Modifier.imePadding()
+        ) { innerPadding ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // List of categories
+                categories.forEachIndexed { index, category ->
+                    CategoryItem(
+                        category = category,
+                        onEditCategory = {
+                            isEditingCategory = true
+                            currentCategoryIndex = index
+                            currentCategoryId = category.id
+                            categoryName = category.name
+                            showCategoryDialog = true
+                        },
+                        onDeleteCategory = {
+                            currentCategoryIndex = index
+                            currentCategoryId = category.id
+                            showDeleteConfirmation = true
+                        },
+                        onClick = {
+                            viewModel.selectFoodCategory(category)
+                            onNavigateUp()
+                        },
+                        isSelected = category.id == selectedFoodCategory?.id
+                    )
+                }
+                // "Thêm danh mục đồ ăn" button
+                ElevatedCard(
+                    onClick = {
+                        isEditingCategory = false
+                        categoryName = ""
                         showCategoryDialog = true
                     },
-                    onDeleteCategory = {
-                        currentCategoryIndex = index
-                        currentCategoryId = category.id
-                        showDeleteConfirmation = true
-                    },
-                    onClick = {
-                        viewModel.selectFoodCategory(category)
-                        onNavigateUp()
-                    },
-                    isSelected = category.id == selectedFoodCategory?.id
-                )
-            }
-            // "Thêm danh mục đồ ăn" button
-            ElevatedCard(
-                onClick = {
-                    isEditingCategory = false
-                    categoryName = ""
-                    showCategoryDialog = true
-                },
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = colorScheme.primary,
-                    contentColor = colorScheme.onPrimary
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircleOutline,
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Thêm danh mục đồ ăn")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AddCircleOutline,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Thêm danh mục đồ ăn")
+                        }
                     }
                 }
             }
         }
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
     }
 }
-
