@@ -123,7 +123,7 @@ fun MapScreen(
                 FilledTonalButton(
                     contentPadding = PaddingValues(start = 16.dp, top = 10.dp, end = 24.dp, bottom = 10.dp),
                     onClick = {
-                        val coord = mapViewModel.mapCenterCoord() ?: return@FilledTonalButton
+                        val coord = mapViewModel.mapCenterCoord()
                         onSelectLocation(
                             Location(
                                 latitude = coord.latitude,
