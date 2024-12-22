@@ -70,9 +70,28 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RestaurantScreen(
+    onNavigateUp: () -> Unit,
+    // TODO: add nav to order screen
+    // TODO: add vm
+) {
+    // for now.
+    RestaurantScreenContent(
+        bannerModel = R.drawable.ic_launcher_background,
+        name = "Hồng Trà Ngô Gia",
+        starRating = "4.3",
+        distance = "2.0km",
+        timeAway = "25 phút",
+        description = "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
+                " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
+        onNavigateUp = onNavigateUp
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun RestaurantScreenContent(
     bannerModel: Any?,
     name: String,
     starRating: String,
@@ -273,7 +292,7 @@ fun RestaurantScreen(
 @Preview(showSystemUi = true)
 @Composable
 private fun Prev() { ScreenPreview {
-    RestaurantScreen(
+    RestaurantScreenContent(
         R.drawable.ic_launcher_background,
         "Hồng Trà Ngô Gia",
         "4.3",

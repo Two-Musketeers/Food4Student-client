@@ -20,6 +20,7 @@ import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant.RestaurantScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
@@ -44,6 +45,9 @@ object AppRoutes {
     object SignUpAsUser
     @Serializable
     object SignUpAsRestaurant
+
+    @Serializable
+    data class RestaurantDetail(val id: String)
 
     @Serializable
     object ShippingLocation
@@ -91,7 +95,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onNavigateToShippingLocation = {
                     navController.navigate(AppRoutes.ShippingLocation)
                 },
-                onNavigateToRestaurant = { /* TODO */ }
+                onNavigateToRestaurant = { navController.navigate(AppRoutes.RestaurantDetail(it)) }
             )
         }
         composable<AppRoutes.Admin> {
@@ -181,6 +185,11 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.Profile> {
             AccountCenterScreen(navController = navController)
+        }
+        composable<AppRoutes.RestaurantDetail> {
+            RestaurantScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
     }
 }
