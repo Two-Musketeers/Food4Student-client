@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
     fun updateCurrentLocation(location: GeoCoordinates) {
         _currentLocation.value = location
         viewModelScope.launch {
-            refreshRestaurantList()
+//            refreshRestaurantList()
         }
     }
 

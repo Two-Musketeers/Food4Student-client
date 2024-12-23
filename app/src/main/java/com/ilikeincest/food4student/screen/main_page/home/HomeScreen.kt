@@ -120,14 +120,6 @@ fun HomeScreen(
             }
         }
 
-        // on select another tab
-        LaunchedEffect(selectedTab, currentLocation) {
-            if (state.firstVisibleItemIndex > 0)
-                state.animateScrollToItem(1)
-            if (currentLocation != null)
-                vm.refreshRestaurantList()
-        }
-
         val coroutineScope = rememberCoroutineScope()
         BetterPullToRefreshBox(
             lazyListState = state,
@@ -158,7 +150,13 @@ fun HomeScreen(
                         HomeTabTypes.entries.forEach {
                             Tab(
                                 selected = selectedTab == it,
-                                onClick = { vm.selectTab(it) },
+                                onClick = {
+                                    vm.selectTab(it)
+                                    coroutineScope.launch {
+                                        if (state.firstVisibleItemIndex > 0)
+                                            state.animateScrollToItem(1)
+                                    }
+                                },
                                 text = { Text(it.tabTitle) }
                             )
                         }
