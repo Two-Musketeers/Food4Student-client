@@ -437,7 +437,7 @@ import javax.inject.Inject
                     }
                     clearUnsavedData()
                 } catch (e: Exception) {
-                    showErrorDialog(e.message ?: "Save failed")
+                    showErrorDialog(e.message.toString())
                 } finally {
                     _isLoading.value = false
                 }

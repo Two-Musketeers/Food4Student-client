@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.service.api
 
+import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.dto.RestaurantDetailDto
 import com.ilikeincest.food4student.dto.RegisterRestaurantOwnerDto
@@ -15,6 +16,8 @@ import retrofit2.http.Query
 interface RestaurantApiService {
     @GET("restaurants")
     suspend fun getRestaurants(
+        @Query("Latitude") latitude: Double,
+        @Query("Longitude") longitude: Double,
         @Query("PageNumber") pageNumber: Int,
         @Query("PageSize") pageSize: Int
     ) : Response<List<Restaurant>>
