@@ -155,6 +155,9 @@ fun HomeScreen(
                                     coroutineScope.launch {
                                         if (state.firstVisibleItemIndex > 0)
                                             state.animateScrollToItem(1)
+                                        coroutineScope.launch {
+                                            vm.refreshRestaurantList()
+                                        }
                                     }
                                 },
                                 text = { Text(it.tabTitle) }
@@ -185,9 +188,7 @@ fun HomeScreen(
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect
-                        currentLocation?.let {
-                            vm.loadMoreRestaurants(currentLocation!!)
-                        }
+                        vm.loadMoreRestaurants()
                     }
                     if (noMoreRestaurant) {
                         Text(

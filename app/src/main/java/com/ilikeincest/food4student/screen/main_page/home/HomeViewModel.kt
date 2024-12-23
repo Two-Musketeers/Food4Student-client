@@ -17,6 +17,7 @@ import com.ilikeincest.food4student.service.api.RestaurantApiService
 import com.ilikeincest.food4student.service.api.UserApiService
 import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -140,10 +141,14 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.value = false
     }
 
-    fun loadMoreRestaurants(currentLocation: GeoCoordinates) {
+    fun loadMoreRestaurants() {
         _isLoadingMore.value = true
         _currentPage++
         viewModelScope.launch {
+            while (_currentLocation.value == null) {
+                delay(1000)
+            }
+            val currentLocation = _currentLocation.value!!
             val res = restaurantApi.getRestaurants(currentLocation.latitude, currentLocation.longitude, _currentPage, pageSize)
 
             if (!res.isSuccessful) {
