@@ -1,8 +1,10 @@
 package com.ilikeincest.food4student.screen.restaurant.rating
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,18 +46,15 @@ private fun RestaurantRatingScreenContent(
     perStarRatings: List<Int>,
     ratings: List<RatingDto>
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = { TopAppBar(
             title = { Text("Review & Đánh giá") },
             navigationIcon = { IconButton(onClick = onNavigateUp) {
                 Icon(Icons.AutoMirrored.Default.ArrowBack, null)
             } },
-            scrollBehavior = scrollBehavior,
         ) }
     ) { innerPadding ->
         LazyColumn(Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .fillMaxSize()
             .padding(innerPadding)
         ) {
@@ -70,7 +69,7 @@ private fun RestaurantRatingScreenContent(
                 )
             }
             item {
-                Text("What people say",
+                Text("Thực khách nói gì?",
                     style = typography.titleMedium.copy(
                         fontSize = 20.sp
                     ),
@@ -84,7 +83,15 @@ private fun RestaurantRatingScreenContent(
                 RatingCard(it, Modifier
                     .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 26.dp)
+                )
+            }
+            item {
+                Spacer(Modifier
+                    .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
+                    .fillParentMaxWidth()
+                    .height(8.dp)
                 )
             }
         }
@@ -108,7 +115,22 @@ private fun Prev() { ScreenPreview {
                 id = "2",
                 stars = 5,
                 comment = "Consetetur aliquyam voluptua et tempor sit. Et in aliquyam sanctus dolores tincidunt tempor invidunt nobis vel ipsum justo kasd. Mazim "
-            )
+            ),
+            RatingDto(
+                id = "2",
+                stars = 5,
+                comment = "Consetetur aliquyam voluptua et tempor sit. Et in aliquyam sanctus dolores tincidunt tempor invidunt nobis vel ipsum justo kasd. Mazim "
+            ),
+            RatingDto(
+                id = "2",
+                stars = 5,
+                comment = "Consetetur aliquyam voluptua et tempor sit. Et in aliquyam sanctus dolores tincidunt tempor invidunt nobis vel ipsum justo kasd. Mazim "
+            ),
+            RatingDto(
+                id = "2",
+                stars = 5,
+                comment = "Consetetur aliquyam voluptua et tempor sit. Et in aliquyam sanctus dolores tincidunt tempor invidunt nobis vel ipsum justo kasd. Mazim "
+            ),
         )
     )
 } }
