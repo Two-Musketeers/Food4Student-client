@@ -9,7 +9,9 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -44,7 +46,11 @@ class LocationUtils(val context: @RawValue Context) : Parcelable {
 
     @SuppressLint("MissingPermission")
     fun requestLocationOnce(viewModel: MapViewModel) {
-        _fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        val req = CurrentLocationRequest.Builder()
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
+            .build()
+        _fusedLocationClient.getCurrentLocation(req, null).addOnSuccessListener { location ->
             location?.let {
                 val currentLocation = GeoCoordinates(it.latitude, it.longitude)
                 viewModel.focusOnPlaceWithMarker(currentLocation)
