@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -25,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,20 +60,35 @@ fun SelectRoleUserScreen(
             .padding(horizontal = 32.dp),
     ) {
         Text("Suýt thì quên...", style = typography.displayMedium)
+        var name by rememberSaveable { mutableStateOf("") }
         var phone by rememberSaveable { mutableStateOf("") }
         TextField(
-            value = phone, onValueChange = { phone = it },
+            value = name, onValueChange = { name = it },
+            label = { Text("Họ tên") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        TextField(
+            value = phone, onValueChange = { phone = it.filter { it.isDigit() } },
             label = { Text("Số điện thoại") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Phone
+                keyboardType = KeyboardType.Phone,
             ),
+            keyboardActions = KeyboardActions {
+                vm.registerUser(phone, name, onSuccessSignUp)
+            },
             modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = {
-                vm.registerUser(phone, onSuccessSignUp)
+                vm.registerUser(phone, name, onSuccessSignUp)
             },
+            enabled = name.isNotBlank() && phone.isNotBlank(),
             contentPadding = PaddingValues(28.dp, 12.dp, 18.dp, 12.dp),
             modifier = Modifier.align(Alignment.End)
         ) {

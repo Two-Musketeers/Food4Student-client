@@ -22,10 +22,11 @@ class SelectRoleUserViewModel @Inject constructor(
     private val _showLoading = MutableStateFlow(false)
     val showLoading = _showLoading.asStateFlow()
 
-    fun registerUser(phoneNumber: String, onSuccess: () -> Unit) {
+    fun registerUser(phoneNumber: String, name: String, onSuccess: () -> Unit) {
         // TODO: add validation
         _showLoading.value = true
         viewModelScope.launch {
+            accountService.updateDisplayName(name)
             val res = accountApi.registerUser(RegisterAccountDto(phoneNumber))
             if (res.isSuccessful) {
                 accountService.reloadToken()
