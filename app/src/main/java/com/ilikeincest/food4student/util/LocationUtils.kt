@@ -22,7 +22,7 @@ import kotlinx.parcelize.RawValue
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class LocationUtils( val context: @RawValue Context) : Parcelable {
+class LocationUtils(val context: @RawValue Context) : Parcelable {
     @IgnoredOnParcel
     private val _fusedLocationClient: FusedLocationProviderClient
             = LocationServices.getFusedLocationProviderClient(context)

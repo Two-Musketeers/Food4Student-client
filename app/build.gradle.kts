@@ -73,6 +73,9 @@ android {
 }
 
 dependencies {
+    // color things
+    implementation(libs.material.kolor)
+
     // clock things
     implementation(libs.human.readable)
     implementation(libs.kotlinx.datetime)
