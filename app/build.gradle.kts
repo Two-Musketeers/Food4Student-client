@@ -73,6 +73,9 @@ android {
 }
 
 dependencies {
+    // data store for saving stuff
+    implementation(libs.androidx.datastore.preferences)
+
     // color things
     implementation(libs.material.kolor)
 

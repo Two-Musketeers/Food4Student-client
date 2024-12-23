@@ -42,6 +42,7 @@ import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationT
 fun AddEditSavedLocationScreen(
     onNavigateUp: () -> Unit,
     id: String? = null,
+    defaultType: LocationType = LocationType.Home,
 ) {
     val isEditScreen = id != null
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -155,7 +156,7 @@ fun AddEditSavedLocationScreen(
                 modifier = Modifier.padding(top = 10.dp, bottom = 4.dp)
             )
 
-            var selectedLocation by remember { mutableIntStateOf(0) }
+            var selectedLocation by remember { mutableIntStateOf(defaultType.ordinal) }
 
             // This has by default 4dp vertical padding for some reason
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {

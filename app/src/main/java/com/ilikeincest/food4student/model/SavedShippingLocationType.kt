@@ -1,6 +1,8 @@
 package com.ilikeincest.food4student.model
 
-// TODO: move this somewhere more fitting
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class SavedShippingLocationType {
     Home, Work, Other
 }

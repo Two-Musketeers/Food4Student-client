@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +59,7 @@ fun HomeScreen(
     val errorMessage by vm.errorMessage.collectAsState()
     val isLoadingMore by vm.isLoadingMore.collectAsState()
     val isRefreshing by vm.isRefreshing.collectAsState()
+    val shippingLocation by vm.shippingLocation.collectAsState()
     if (errorMessage.isNotEmpty()) {
         ErrorDialog(
             message = errorMessage,
@@ -67,10 +67,16 @@ fun HomeScreen(
         )
     }
 
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        vm.fetchCurrentFromDStore(context)
+    }
+
     Column(Modifier.padding(top = 12.dp)) {
         CurrentShippingLocationCard(
             onClick = onNavigateToShippingLocation,
-            currentLocation = "24 Lý Thường Kiệt, Quận 69, Tp. Thủ Đức", // TODO
+            currentLocation = shippingLocation,
             modifier = Modifier
                 .padding(bottom = 12.dp)
                 .padding(horizontal = 16.dp)
@@ -81,9 +87,8 @@ fun HomeScreen(
         val noMoreRestaurant by vm.noMoreRestaurant.collectAsState()
         val state = rememberLazyListState()
         val currentLocation by vm.currentLocation.collectAsState()
-        val localContext = LocalContext.current
 
-        val locationUtils = remember { LocationUtils(localContext) }
+        val locationUtils = remember { LocationUtils(context) }
 
         var hasLocationPermission by remember { mutableStateOf(false) }
         val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -102,7 +107,7 @@ fun HomeScreen(
         )
 
         DisposableEffect(Unit) {
-            if (!locationUtils.hasLocationPermission(localContext)) {
+            if (!locationUtils.hasLocationPermission(context)) {
                 locationUtils.requestLocationPermissions(requestPermissionLauncher)
             } else {
                 hasLocationPermission = true

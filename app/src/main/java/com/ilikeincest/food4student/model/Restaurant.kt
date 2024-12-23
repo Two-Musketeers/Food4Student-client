@@ -15,6 +15,6 @@ data class Restaurant(
     val isLiked: Boolean,
     val foodCategories: List<FoodCategory>,
     var distanceInKm: Double = 0.0,
-    var estimatedTimeInMinutes: Int = 0
+    var estimatedTimeInMinutes: Int = 0,
     val perStarRating: List<Int>, // TODO backend
 )

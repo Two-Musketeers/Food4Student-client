@@ -28,6 +28,7 @@ import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_catego
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
 import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
+import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
@@ -63,7 +64,7 @@ object AppRoutes {
     @Serializable
     object PickLocation
     @Serializable
-    object AddSavedLocation
+    data class AddSavedLocation(val type: SavedShippingLocationType)
     @Serializable
     data class EditSavedLocation(val id: String)
 
@@ -200,37 +201,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.ShippingLocation> {
             ShippingLocationScreen(
-                locationList = listOf(
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Home,
-                        buildingNote = "Cổng trước",
-                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                        receiverName = "Hồ Nguyên Minh",
-                        receiverPhone = "01234567879",
-                    ),
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Work,
-                        buildingNote = "Cổng trước",
-                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                        receiverName = "Hồ Nguyên Minh",
-                        receiverPhone = "01234567879",
-                    ),
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Other,
-                        otherLocationTypeTitle = "Dating location",
-                        location = "Trường mẫu giáo Tư thục Sao Mai",
-                        address = "Lmao u believe me fr?",
-                        receiverName = "Hứa Văn Lý",
-                        receiverPhone = "0123456789",
-                    )
-                ), // TODO: move to vm
                 onNavigateUp = { navController.navigateUp() },
                 onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
-                onEditLocation = {
-                    navController.navigate(AppRoutes.EditSavedLocation("")) // TODO
-                }
+                onAddLocation = { navController.navigate(AppRoutes.AddSavedLocation(it)) },
+                onEditLocation = { navController.navigate(AppRoutes.EditSavedLocation(it)) }
             )
         }
         composable<AppRoutes.PickLocation> {
@@ -240,7 +214,11 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable<AppRoutes.AddSavedLocation> {
-            AddEditSavedLocationScreen(onNavigateUp = {})
+            val route = it.toRoute<AppRoutes.AddSavedLocation>()
+            AddEditSavedLocationScreen(
+                onNavigateUp = { navController.navigateUp() },
+                defaultType = route.type
+            )
         }
         composable<AppRoutes.EditSavedLocation> {
             val route = it.toRoute<AppRoutes.EditSavedLocation>()
@@ -260,7 +238,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable<AppRoutes.RestaurantRating> {
-            
+            RestaurantRatingScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
     }
 }
