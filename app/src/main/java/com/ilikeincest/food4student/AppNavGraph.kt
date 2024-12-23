@@ -4,8 +4,10 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
@@ -20,6 +22,11 @@ import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.AddCategoryScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
 import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
@@ -63,6 +70,14 @@ object AppRoutes {
     @Serializable
     object Admin
     @Serializable
+    object Restaurant
+    @Serializable
+    object AddEditFoodItem
+    @Serializable
+    object AddCategory
+    @Serializable
+    object AddEditVariation
+    @Serializable
     object SplashScreen
 }
 
@@ -88,7 +103,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootAdmin = { navController.navigateAsRootRoute(AppRoutes.Admin) },
                 onSetRootMain = { navController.navigateAsRootRoute(AppRoutes.Main) },
                 onSetRootSignIn = { navController.navigateAsRootRoute(AppRoutes.SignIn) },
-                onSetRootSelectRole = { navController.navigateAsRootRoute(AppRoutes.SelectRole) }
+                onSetRootSelectRole = { navController.navigateAsRootRoute(AppRoutes.SelectRole) },
+                onSetRootRestaurant = { navController.navigateAsRootRoute(AppRoutes.Restaurant) }
             )
         }
         composable<AppRoutes.Main> {
@@ -102,6 +118,54 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<AppRoutes.Admin> {
             AdminScreen()
+        }
+        navigation(
+            route = "RestaurantFlow",
+            startDestination = "${AppRoutes.Restaurant}"
+        ) {
+            composable<AppRoutes.Restaurant> {
+                val parentEntry = remember(navController) {
+                    navController.getBackStackEntry("RestaurantFlow")
+                }
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
+                RestaurantOwnerScreen(
+                    viewModel = sharedViewModel,
+                    onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
+                    navController = navController
+                )
+            }
+            composable<AppRoutes.AddEditFoodItem> {
+                val parentEntry = remember(navController) {
+                    navController.getBackStackEntry("RestaurantFlow")
+                }
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
+                AddEditSavedFoodItemScreen(
+                    viewModel = sharedViewModel,
+                    onNavigateUp = { navController.navigateUp() },
+                    onNavigateToFoodCategory = { navController.navigate(AppRoutes.AddCategory) },
+                    onNavigateToVariation = { navController.navigate(AppRoutes.AddEditVariation) }
+                )
+            }
+            composable<AppRoutes.AddCategory> {
+                val parentEntry = remember(navController) {
+                    navController.getBackStackEntry("RestaurantFlow")
+                }
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
+                AddCategoryScreen(
+                    viewModel = sharedViewModel,
+                    onNavigateUp = { navController.navigateUp() }
+                )
+            }
+            composable<AppRoutes.AddEditVariation> {
+                val parentEntry = remember(navController) {
+                    navController.getBackStackEntry("RestaurantFlow")
+                }
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
+                AddEditSavedVariationScreen(
+                    viewModel = sharedViewModel,
+                    onNavigateUp = { navController.navigateUp() }
+                )
+            }
         }
         composable<AppRoutes.SignIn> {
             SignInScreen(
@@ -165,7 +229,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onNavigateUp = { navController.navigateUp() },
                 onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
                 onEditLocation = {
-                    navController.navigate(AppRoutes.EditSavedLocation(it))
+                    navController.navigate(AppRoutes.EditSavedLocation("")) // TODO
                 }
             )
         }

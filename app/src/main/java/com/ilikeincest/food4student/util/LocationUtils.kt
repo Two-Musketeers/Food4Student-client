@@ -30,7 +30,7 @@ class LocationUtils(val context: @RawValue Context) : Parcelable {
     @IgnoredOnParcel
     private val _locationCallback = object : LocationCallback() {}
     @SuppressLint("MissingPermission")
-    fun requestLocationUpdates(viewModel: MapViewModel) {
+    fun requestLocationUpdates() {
         val locationRequest = LocationRequest
             .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
             .build()
@@ -48,6 +48,16 @@ class LocationUtils(val context: @RawValue Context) : Parcelable {
             location?.let {
                 val currentLocation = GeoCoordinates(it.latitude, it.longitude)
                 viewModel.focusOnPlaceWithMarker(currentLocation)
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun requestLocationForLatLong(onLocationReceived: (GeoCoordinates) -> Unit) {
+        _fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            location?.let {
+                val currentLocation = GeoCoordinates(it.latitude, it.longitude)
+                onLocationReceived(currentLocation)
             }
         }
     }
@@ -76,12 +86,11 @@ class LocationUtils(val context: @RawValue Context) : Parcelable {
 
     fun handlePermissionResult(
         permissions: Map<String, Boolean>,
-        mapViewModel: MapViewModel
     ) {
         // TODO refactor and switch to dialog
         if (permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-            requestLocationUpdates(mapViewModel)
+            requestLocationUpdates()
         } else {
             val rationaleRequired = ActivityCompat.shouldShowRequestPermissionRationale(
                 context as MainActivity,

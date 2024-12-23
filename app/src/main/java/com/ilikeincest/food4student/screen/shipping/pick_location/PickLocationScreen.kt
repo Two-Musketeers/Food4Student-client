@@ -76,7 +76,7 @@ fun MapScreen(
                 && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                 hasLocationPermission = true
             }
-            locationUtils.handlePermissionResult(permissions, mapViewModel)
+            locationUtils.handlePermissionResult(permissions)
             locationUtils.requestLocationOnce(mapViewModel)
         }
     )

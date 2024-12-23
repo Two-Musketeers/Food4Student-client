@@ -6,6 +6,7 @@
     <string name="order_screen_label">Đơn hàng</string>
     <string name="favorite_screen_label">Yêu thích</string>
     <string name="notification_screen_label">Thông báo</string>
+    <string name="account_center_label">Tài khoản</string>
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="sign_out">Sign out</string>

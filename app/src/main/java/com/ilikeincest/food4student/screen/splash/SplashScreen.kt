@@ -21,10 +21,10 @@ fun SplashScreen(
     onSetRootAdmin: () -> Unit,
     onSetRootMain: () -> Unit,
     onSetRootSignIn: () -> Unit,
+    onSetRootRestaurant: () -> Unit,
     onSetRootSelectRole: () -> Unit,
     vm: SplashScreenViewModel = hiltViewModel()
 ) {
-    // TODO: swap to dialog for better UI
     // setup toasts
     val toastMessage by vm.toastMessage.collectAsState()
     val context = LocalContext.current
@@ -34,7 +34,6 @@ fun SplashScreen(
         vm.clearToast() // toast is run by system, not by current LaunchedEffect coroutine
         // so wont be cancelled
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,8 +56,7 @@ fun SplashScreen(
             in listOf("Admin", "Moderator") ->
                 onSetRootAdmin()
             "RestaurantOwner" ->
-                // TODO
-                onSetRootMain()
+                onSetRootRestaurant()
             "User" ->
                 onSetRootMain()
             null ->
