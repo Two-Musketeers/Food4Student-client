@@ -37,11 +37,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
-import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
-import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationBottomSheet
-import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationCard
-import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationOptionBottomSheet
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.ConfirmDeleteDialog
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.component.VariationBottomSheet
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.component.VariationCard
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.component.VariationOptionBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

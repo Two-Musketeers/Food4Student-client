@@ -40,10 +40,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
-import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryDialog
-import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryItem
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.ConfirmDeleteDialog
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.component.CategoryDialog
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.component.CategoryItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

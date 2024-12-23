@@ -9,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ilikeincest.food4student.platform.initializer.initializeHERESDK
-import com.ilikeincest.food4student.screen.food_item.add_category.AddCategoryScreen
 import com.ilikeincest.food4student.ui.theme.Food4StudentTheme
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -28,7 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.model.ImageState
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.model.ImageState
 
 @Composable
 fun ImagePickerField(
