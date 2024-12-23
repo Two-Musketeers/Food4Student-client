@@ -5,5 +5,5 @@ data class Variation(
     val name: String,
     val minSelect: Int,
     val maxSelect: Int?,
-    var variationOptions: List<VariationOption>
+    val variationOptions: List<VariationOption>
 )

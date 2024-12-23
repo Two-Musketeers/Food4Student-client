@@ -158,7 +158,7 @@ fun MainScreen(
                 if (isRouteWithSearchBar) IntOffset(0, 0) else IntOffset(0, -100),
             label = "Search bar animated offset"
         )
-        val searchBarHeight = 64.dp
+        val searchBarHeight = 36.dp // old value 64, breaks at 1.4.0 alpha
         val animatedContentPaddingSearchBar by animateDpAsState(
             targetValue = if (isRouteWithSearchBar) searchBarHeight else 0.dp,
             label = "Search bar animated content padding"
