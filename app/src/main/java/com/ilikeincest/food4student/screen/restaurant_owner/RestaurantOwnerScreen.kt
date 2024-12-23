@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant
+package com.ilikeincest.food4student.screen.restaurant_owner
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -35,8 +35,8 @@ import com.ilikeincest.food4student.screen.main_page.notification.NotificationSc
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantMainScreen(
-    viewModel: RestaurantViewModel,
+fun RestaurantOwnerScreen(
+    viewModel: RestaurantOwnerViewModel,
     onNavigateToAddEditFoodItem: () -> Unit,
     navController: NavController,
 ) {
@@ -49,7 +49,7 @@ fun RestaurantMainScreen(
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
     Scaffold(
         bottomBar = { NavigationBar {
-            for (route in MainRestaurantRoutes.entries) {
+            for (route in RestaurantOwnerRoutes.entries) {
                 val isSelected = route == currentRoute
                 val iconRes = if (isSelected) route.selectedIcon
                     else route.unselectedIcon
@@ -70,17 +70,17 @@ fun RestaurantMainScreen(
         // show top bar if route is notification and orders (why the heck don't we give these 2 screen a freaking topAppBar you ADHD piece of *
         topBar = {
             val topBarAlpha by animateFloatAsState(
-                targetValue = if (currentRoute == MainRestaurantRoutes.Notifications || currentRoute == MainRestaurantRoutes.Orders) 1f else 0f,
+                targetValue = if (currentRoute == RestaurantOwnerRoutes.Notifications || currentRoute == RestaurantOwnerRoutes.Orders) 1f else 0f,
                 label = "Top bar alpha"
             )
             val topBarHeight by animateDpAsState(
-                targetValue = if (currentRoute == MainRestaurantRoutes.Notifications || currentRoute == MainRestaurantRoutes.Orders)
+                targetValue = if (currentRoute == RestaurantOwnerRoutes.Notifications || currentRoute == RestaurantOwnerRoutes.Orders)
                     TopAppBarDefaults.TopAppBarExpandedHeight else 0.dp,
                 label = "Top bar height"
             )
             TopAppBar(
                 title = {
-                    if (currentRoute == MainRestaurantRoutes.Orders) {
+                    if (currentRoute == RestaurantOwnerRoutes.Orders) {
                         Text("Orders")
                     } else {
                         Text("Notification")
@@ -88,7 +88,7 @@ fun RestaurantMainScreen(
                 },
                 modifier = Modifier.alpha(topBarAlpha),
                 actions = {
-                    if (currentRoute == MainRestaurantRoutes.Notifications) {
+                    if (currentRoute == RestaurantOwnerRoutes.Notifications) {
                         val notiVm: NotificationScreenViewModel = hiltViewModel()
                         IconButton(onClick = { notiVm.markAllAsRead() }) {
                             Icon(Icons.Filled.Checklist, "Mark all as read")
@@ -100,13 +100,13 @@ fun RestaurantMainScreen(
             )
         },
     ) { innerPadding ->
-        val finalPadding = if (currentRoute == MainRestaurantRoutes.Notifications) {
+        val finalPadding = if (currentRoute == RestaurantOwnerRoutes.Notifications) {
             Modifier.padding(innerPadding)
         } else {
             Modifier.fillMaxSize()
         }
         Box (modifier = finalPadding) {
-            RestaurantPageNavGraph(
+            RestaurantOwnerPageNavGraph(
                 currentRoute = currentRoute,
                 scrollConnection = scrollBehavior.nestedScrollConnection,
                 onNavigateToAddEditFoodItem = { onNavigateToAddEditFoodItem() },

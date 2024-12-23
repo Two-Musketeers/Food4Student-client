@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_category
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,13 +43,13 @@ import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
 import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryDialog
 import com.ilikeincest.food4student.screen.food_item.add_category.component.CategoryItem
-import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCategoryScreen(
     onNavigateUp: () -> Unit,
-    viewModel: RestaurantViewModel
+    viewModel: RestaurantOwnerViewModel
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val categories = viewModel.categories.collectAsState().value

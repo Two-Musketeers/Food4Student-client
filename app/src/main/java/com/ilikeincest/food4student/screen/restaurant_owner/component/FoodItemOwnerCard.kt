@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant.component
+package com.ilikeincest.food4student.screen.restaurant_owner.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +24,7 @@ import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.model.FoodItem
 
 @Composable
-fun FoodItemMainCard(
+fun FoodItemOwnerCard(
     foodItem: FoodItem,
     onClick: () -> Unit
 ) {

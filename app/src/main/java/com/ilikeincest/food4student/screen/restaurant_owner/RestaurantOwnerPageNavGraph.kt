@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant
+package com.ilikeincest.food4student.screen.restaurant_owner
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -33,11 +33,11 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
-import com.ilikeincest.food4student.screen.restaurant.restaurant_content.RestaurantScreenContent
+import com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content.RestaurantOwnerScreenContent
 
-internal val defaultRoute = MainRestaurantRoutes.Home
+internal val defaultRoute = RestaurantOwnerRoutes.Home
 
-internal enum class MainRestaurantRoutes(
+internal enum class RestaurantOwnerRoutes(
     @StringRes val labelResId: Int,
     val unselectedIcon: ImageVector,
     val selectedIcon: ImageVector
@@ -65,13 +65,13 @@ internal enum class MainRestaurantRoutes(
 }
 
 @Composable
-internal fun RestaurantPageNavGraph(
-    currentRoute: MainRestaurantRoutes,
+internal fun RestaurantOwnerPageNavGraph(
+    currentRoute: RestaurantOwnerRoutes,
     scrollConnection: NestedScrollConnection,
     onNavigateToAddEditFoodItem: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: RestaurantViewModel
+    viewModel: RestaurantOwnerViewModel
 ) {
     val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
     BroadcastReceiver("com.ilikeincest.food4student.NEW_MESSAGE") {
@@ -103,18 +103,18 @@ internal fun RestaurantPageNavGraph(
         label = "Main screen swap page"
     ) {
         when (it) {
-            MainRestaurantRoutes.Home ->
-                RestaurantScreenContent(
+            RestaurantOwnerRoutes.Home ->
+                RestaurantOwnerScreenContent(
                     onNavigateToAddEditFoodItem = {
                         onNavigateToAddEditFoodItem()
                     },
                     viewModel = viewModel
                 )
-            MainRestaurantRoutes.Orders ->
+            RestaurantOwnerRoutes.Orders ->
                 OrderScreen()
-            MainRestaurantRoutes.Account ->
+            RestaurantOwnerRoutes.Account ->
                 AccountCenterScreen(navController = navController)
-            MainRestaurantRoutes.Notifications ->
+            RestaurantOwnerRoutes.Notifications ->
                 NotificationScreen(scrollConnection)
         }
     }

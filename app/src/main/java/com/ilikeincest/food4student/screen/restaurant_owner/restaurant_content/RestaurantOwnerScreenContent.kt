@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant.restaurant_content
+package com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,14 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.ilikeincest.food4student.component.ErrorDialog
-import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
-import com.ilikeincest.food4student.screen.restaurant.component.FoodItemMainCard
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.component.FoodItemOwnerCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantScreenContent(
+fun RestaurantOwnerScreenContent(
     onNavigateToAddEditFoodItem: () -> Unit,
-    viewModel: RestaurantViewModel
+    viewModel: RestaurantOwnerViewModel
 ) {
     val restaurant by viewModel.restaurant.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -62,7 +62,7 @@ fun RestaurantScreenContent(
                     modifier = Modifier.Companion.fillMaxSize()
                 ) {
                     items(foodItems) { foodItem ->
-                        FoodItemMainCard(
+                        FoodItemOwnerCard(
                             foodItem = foodItem,
                             onClick = {
                                 viewModel.setSelectedFoodItem(foodItem)

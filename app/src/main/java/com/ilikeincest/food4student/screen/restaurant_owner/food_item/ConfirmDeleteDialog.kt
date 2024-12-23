@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning

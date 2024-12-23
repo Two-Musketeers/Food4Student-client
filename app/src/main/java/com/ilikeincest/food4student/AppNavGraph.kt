@@ -19,14 +19,14 @@ import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleRestaurantScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
-import com.ilikeincest.food4student.screen.restaurant.RestaurantMainScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.food_item.add_category.AddCategoryScreen
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
-import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 import com.ilikeincest.food4student.screen.restaurant.RestaurantScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
@@ -125,8 +125,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 val parentEntry = remember(navController) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
-                val sharedViewModel = hiltViewModel<RestaurantViewModel>(parentEntry)
-                RestaurantMainScreen(
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
+                RestaurantOwnerScreen(
                     viewModel = sharedViewModel,
                     onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
                     navController = navController
@@ -136,7 +136,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 val parentEntry = remember(navController) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
-                val sharedViewModel = hiltViewModel<RestaurantViewModel>(parentEntry)
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
                 AddEditSavedFoodItemScreen(
                     viewModel = sharedViewModel,
                     onNavigateUp = { navController.navigateUp() },
@@ -148,7 +148,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 val parentEntry = remember(navController) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
-                val sharedViewModel = hiltViewModel<RestaurantViewModel>(parentEntry)
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
                 AddCategoryScreen(
                     viewModel = sharedViewModel,
                     onNavigateUp = { navController.navigateUp() }
@@ -158,7 +158,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 val parentEntry = remember(navController) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
-                val sharedViewModel = hiltViewModel<RestaurantViewModel>(parentEntry)
+                val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
                 AddEditSavedVariationScreen(
                     viewModel = sharedViewModel,
                     onNavigateUp = { navController.navigateUp() }

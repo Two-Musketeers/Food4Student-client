@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.model
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.model
 
 import android.net.Uri
 

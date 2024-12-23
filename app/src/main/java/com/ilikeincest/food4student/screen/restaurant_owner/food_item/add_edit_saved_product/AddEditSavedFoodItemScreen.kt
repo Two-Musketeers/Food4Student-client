@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_edit_saved_product
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -50,7 +50,7 @@ import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.comp
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.component.ImagePickerField
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.component.PriceBottomSheet
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_product.model.ImageState
-import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +58,7 @@ fun AddEditSavedFoodItemScreen(
     onNavigateUp: () -> Unit,
     onNavigateToFoodCategory: () -> Unit,
     onNavigateToVariation: () -> Unit,
-    viewModel: RestaurantViewModel = hiltViewModel()
+    viewModel: RestaurantOwnerViewModel = hiltViewModel()
 ) {
     val foodItem = viewModel.selectedFoodItem.collectAsState().value
 

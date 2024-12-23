@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,13 +41,13 @@ import com.ilikeincest.food4student.screen.food_item.ConfirmDeleteDialog
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationBottomSheet
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationCard
 import com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component.VariationOptionBottomSheet
-import com.ilikeincest.food4student.screen.restaurant.RestaurantViewModel
+import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditSavedVariationScreen(
     onNavigateUp: () -> Unit,
-    viewModel: RestaurantViewModel
+    viewModel: RestaurantOwnerViewModel
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val variations by viewModel.unsavedVariations.collectAsState()

@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_category.component
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

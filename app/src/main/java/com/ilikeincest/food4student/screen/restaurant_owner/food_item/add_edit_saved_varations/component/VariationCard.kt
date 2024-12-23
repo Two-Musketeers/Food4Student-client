@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.food_item.add_edit_saved_varations.component
+package com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
