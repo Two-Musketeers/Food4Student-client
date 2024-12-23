@@ -1,5 +1,8 @@
 package com.ilikeincest.food4student.screen.main_page.home
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,12 +21,18 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +41,7 @@ import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.screen.main_page.component.ShopListingCard
 import com.ilikeincest.food4student.screen.main_page.home.component.AdsBanner
 import com.ilikeincest.food4student.screen.main_page.home.component.CurrentShippingLocationCard
+import com.ilikeincest.food4student.util.LocationUtils
 import kotlinx.coroutines.launch
 
 enum class HomeTabTypes(val tabTitle: String) {
@@ -70,12 +80,47 @@ fun HomeScreen(
         val selectedTab by vm.selectedTab.collectAsState()
         val noMoreRestaurant by vm.noMoreRestaurant.collectAsState()
         val state = rememberLazyListState()
+        val currentLocation by vm.currentLocation.collectAsState()
+        val localContext = LocalContext.current
+
+        val locationUtils = remember { LocationUtils(localContext) }
+
+        var hasLocationPermission by remember { mutableStateOf(false) }
+        val requestPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+            onResult = { permissions ->
+                if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                ) {
+                    hasLocationPermission = true
+                    locationUtils.requestLocationForLatLong { location ->
+                        vm.updateCurrentLocation(location)
+                    }
+                }
+                locationUtils.handlePermissionResult(permissions)
+            }
+        )
+
+        DisposableEffect(Unit) {
+            if (!locationUtils.hasLocationPermission(localContext)) {
+                locationUtils.requestLocationPermissions(requestPermissionLauncher)
+            } else {
+                hasLocationPermission = true
+                locationUtils.requestLocationForLatLong { location ->
+                    vm.updateCurrentLocation(location)
+                }
+            }
+            onDispose {
+                locationUtils.stopLocationUpdates()
+            }
+        }
 
         // on select another tab
-        LaunchedEffect(selectedTab) {
+        LaunchedEffect(selectedTab, currentLocation) {
             if (state.firstVisibleItemIndex > 0)
                 state.animateScrollToItem(1)
-            vm.refreshRestaurantList()
+            if (currentLocation != null)
+                vm.refreshRestaurantList()
         }
 
         val coroutineScope = rememberCoroutineScope()
@@ -83,8 +128,10 @@ fun HomeScreen(
             lazyListState = state,
             isRefreshing = isRefreshing,
             onRefresh = {
-                coroutineScope.launch {
-                    vm.refreshRestaurantList()
+                if (currentLocation != null) {
+                    coroutineScope.launch {
+                        vm.refreshRestaurantList()
+                    }
                 }
             },
             modifier = Modifier.fillMaxHeight()
@@ -102,40 +149,46 @@ fun HomeScreen(
                 stickyHeader {
                     SecondaryTabRow(
                         selectedTabIndex = HomeTabTypes.entries.indexOf(selectedTab)
-                    ) { HomeTabTypes.entries.forEach {
-                        Tab(
-                            selected = selectedTab == it,
-                            onClick = { vm.selectTab(it) },
-                            text = { Text(it.tabTitle) }
-                        )
-                    } }
+                    ) {
+                        HomeTabTypes.entries.forEach {
+                            Tab(
+                                selected = selectedTab == it,
+                                onClick = { vm.selectTab(it) },
+                                text = { Text(it.tabTitle) }
+                            )
+                        }
+                    }
                 }
 
-                items(restaurantList, key = { it.id }) { restaurant -> Column {
-                    ShopListingCard(
-                        shopName = restaurant.name,
-                        starRating = restaurant.averageRating.toString(),
-                        distance = "1km", // TODO
-                        timeAway = "10 phút", // TODO
-                        shopImageModel = restaurant.bannerUrl, // TODO
-                        isFavorite = null, // disable favorite on home page
-                        onFavoriteChange = { vm.toggleLike(restaurant.id) },
-                        onClick = { onNavigateToRestaurant(restaurant.id) }, // TODO
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
-                    HorizontalDivider()
-                } }
+                items(restaurantList, key = { it.id }) { restaurant ->
+                    Column {
+                        ShopListingCard(
+                            shopName = restaurant.name,
+                            starRating = restaurant.averageRating.toString(),
+                            distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
+                            timeAway = "${restaurant.estimatedTimeInMinutes} phút",
+                            shopImageModel = restaurant.logoUrl, // TODO
+                            isFavorite = restaurant.isLiked, // disable favorite on home page
+                            onFavoriteChange = { vm.toggleLike(restaurant.id) },
+                            onClick = { onNavigateToRestaurant(restaurant.id) }, // TODO
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                        HorizontalDivider()
+                    }
+                }
                 item {
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect
-
-                        vm.loadMoreRestaurants()
+                        currentLocation?.let {
+                            vm.loadMoreRestaurants(currentLocation!!)
+                        }
                     }
                     if (noMoreRestaurant) {
-                        Text("Hết nhà hàng rồi bạn ơi (┬┬﹏┬┬)",
+                        Text(
+                            "Hết nhà hàng rồi bạn ơi (┬┬﹏┬┬)",
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -147,9 +200,10 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            CircularProgressIndicator(Modifier
-                                .padding(16.dp)
-                                .size(32.dp),
+                            CircularProgressIndicator(
+                                Modifier
+                                    .padding(16.dp)
+                                    .size(32.dp),
                             )
                             Text("Đang tải thêm nhà hàng (*/ω＼*)")
                         }
