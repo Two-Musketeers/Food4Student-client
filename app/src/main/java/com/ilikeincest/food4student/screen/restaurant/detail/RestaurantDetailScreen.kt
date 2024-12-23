@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant
+package com.ilikeincest.food4student.screen.restaurant.detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -63,9 +63,9 @@ import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
-import com.ilikeincest.food4student.screen.restaurant.component.AddToCartSheet
-import com.ilikeincest.food4student.screen.restaurant.component.FoodItemCard
-import com.ilikeincest.food4student.screen.restaurant.component.RestaurantHeader
+import com.ilikeincest.food4student.screen.restaurant.detail.component.AddToCartSheet
+import com.ilikeincest.food4student.screen.restaurant.detail.component.FoodItemCard
+import com.ilikeincest.food4student.screen.restaurant.detail.component.RestaurantHeader
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random

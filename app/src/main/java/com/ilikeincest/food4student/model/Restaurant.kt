@@ -12,5 +12,6 @@ data class Restaurant(
     val bannerUrl: String?,
     val totalRatings: Int,
     val averageRating: Double,
+    val perStarRating: List<Int>, // TODO backend
     val isLiked: Boolean
 )

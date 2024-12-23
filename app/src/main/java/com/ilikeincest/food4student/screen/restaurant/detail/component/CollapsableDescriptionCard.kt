@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant.component
+package com.ilikeincest.food4student.screen.restaurant.detail.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn

@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant.component
+package com.ilikeincest.food4student.screen.restaurant.detail.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
