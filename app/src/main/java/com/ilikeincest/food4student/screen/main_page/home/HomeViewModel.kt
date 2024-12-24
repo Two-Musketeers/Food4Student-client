@@ -2,18 +2,15 @@ package com.ilikeincest.food4student.screen.main_page.home
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.SavedShippingLocation
+import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.api.RestaurantApiService
-import com.ilikeincest.food4student.service.api.UserApiService
 import com.ilikeincest.food4student.util.RestaurantRepository
 import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +25,6 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 private const val pageSize = 10
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "current_shipping")
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
