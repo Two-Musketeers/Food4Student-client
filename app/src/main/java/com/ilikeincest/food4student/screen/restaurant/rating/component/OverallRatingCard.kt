@@ -74,7 +74,11 @@ fun OverallRatingCard(
                     Text(i.toString(), style = typography.bodyMedium)
                     Spacer(Modifier.width(12.dp))
                     LinearProgressIndicator(
-                        progress = { perStarRatings[i-1].toFloat() / totalRatings },
+                        progress = {
+                            if (perStarRatings.size < i || totalRatings == 0)
+                                return@LinearProgressIndicator 0f
+                            perStarRatings[i-1].toFloat() / totalRatings
+                        },
                         color = starColor,
                         trackColor = colorScheme.surfaceContainerHighest,
                         modifier = Modifier.height(6.dp).fillMaxWidth()

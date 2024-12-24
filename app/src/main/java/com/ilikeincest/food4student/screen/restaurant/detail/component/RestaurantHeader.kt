@@ -27,8 +27,8 @@ fun RestaurantHeader(
     description: String?,
     isFavorite: Boolean,
     onFavoriteToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-    onNavigateToRating: () -> Unit
+    onNavigateToRating: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(16.dp).padding(top = 8.dp)
@@ -42,7 +42,7 @@ fun RestaurantHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            RatingChip(starRating, onClick = { onNavigateToRating() })
+            RatingChip(starRating, onClick = onNavigateToRating)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.height(IntrinsicSize.Min)

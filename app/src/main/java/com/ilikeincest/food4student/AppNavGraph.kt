@@ -267,7 +267,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable<AppRoutes.RestaurantDetail> {
             RestaurantScreen(
                 onNavigateUp = { navController.navigateUp() },
-                onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) }
+                onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
             )
         }
         composable<AppRoutes.RestaurantRating> {

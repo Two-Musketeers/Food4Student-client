@@ -3,33 +3,25 @@ package com.ilikeincest.food4student.screen.main_page.order
 import android.content.Context
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.model.Order
 import com.ilikeincest.food4student.model.OrderStatus
 import com.ilikeincest.food4student.model.SavedShippingLocation
-import com.ilikeincest.food4student.screen.main_page.home.dataStore
+import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.api.OrderApiService
 import com.ilikeincest.food4student.service.api.RestaurantApiService
-import com.ilikeincest.food4student.util.LocationUtils
 import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import retrofit2.Response
 import javax.inject.Inject
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "current_shipping")
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
