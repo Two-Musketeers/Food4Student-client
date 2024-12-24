@@ -13,12 +13,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,6 +82,7 @@ import com.ilikeincest.food4student.screen.restaurant.detail.component.AddToCart
 import com.ilikeincest.food4student.screen.restaurant.detail.component.CartBottomSheet
 import com.ilikeincest.food4student.screen.restaurant.detail.component.FoodItemCard
 import com.ilikeincest.food4student.screen.restaurant.detail.component.RestaurantHeader
+import com.ilikeincest.food4student.screen.restaurant.detail.component.ShoppingCartBottomBar
 import com.ilikeincest.food4student.util.formatPrice
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -215,6 +220,7 @@ private fun RestaurantScreenContent(
                 scrollBehavior = scrollBehavior
             )
         },
+        contentWindowInsets = WindowInsets.statusBars,
         bottomBar = {
             if (cartItems.isNotEmpty()) {
                 ShoppingCartBottomBar(
@@ -349,6 +355,8 @@ private fun RestaurantScreenContent(
                         )
                     }
                 }
+
+                item { Spacer(Modifier.height(32.dp)) } // some space to breath
             }
         }
     }
@@ -359,42 +367,6 @@ private fun RestaurantScreenContent(
             onDismiss = { addToCartItem = null },
             viewModel = viewModel
             // TODO
-        )
-    }
-}
-
-@Composable
-fun ShoppingCartBottomBar(
-    viewModel: RestaurantDetailViewModel,
-    onCartClick: () -> Unit
-) {
-    val totalPrice by viewModel.totalPrice.collectAsState()
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(colorScheme.primaryContainer)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .fillMaxWidth()
-    ) {
-        IconButton(
-            onClick = onCartClick,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = "View Cart",
-                tint = colorScheme.onPrimaryContainer
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = "Total: ${formatPrice(totalPrice)}",
-            style = typography.titleLarge.copy(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            color = colorScheme.onPrimaryContainer
         )
     }
 }
