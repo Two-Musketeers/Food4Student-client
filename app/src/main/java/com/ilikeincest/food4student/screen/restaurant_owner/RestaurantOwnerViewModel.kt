@@ -100,7 +100,24 @@ class RestaurantOwnerViewModel @Inject constructor(
                 val response = restaurantApiService.getOwnedRestaurants()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _restaurant.value = it
+                        _restaurant.value = Restaurant(
+                            id = it.id,
+                            name = it.name,
+                            foodCategories = it.foodCategories,
+                            address = it.address,
+                            latitude = it.latitude,
+                            longitude = it.longitude,
+                            logoUrl = it.logoUrl,
+                            bannerUrl = it.bannerUrl,
+                            totalRatings = it.totalRatings,
+                            averageRating = it.averageRating,
+                            isFavorited = it.isFavorited,
+                            isApproved = it.isApproved,
+                            distanceInKm = 0.0,
+                            estimatedTimeInMinutes = 0,
+                            perStarRating = emptyList(),
+                            description = it.description
+                        )
                         _categories.value = it.foodCategories
                     }
                 } else {

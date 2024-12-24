@@ -1,4 +1,6 @@
-package com.ilikeincest.food4student.dto
+package com.ilikeincest.food4student.dto.order
+
+import com.ilikeincest.food4student.dto.VariationSelectionDto
 
 data class CreateOrderItemDto(
     val foodItemId: String,

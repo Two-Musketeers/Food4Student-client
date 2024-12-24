@@ -125,8 +125,8 @@ fun CartBottomSheet(
                 )
                 Text(
                     text = formatPrice(totalPrice),
-                    style = typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
+                    style = typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
                         color = colorScheme.primary
                     )
                 )

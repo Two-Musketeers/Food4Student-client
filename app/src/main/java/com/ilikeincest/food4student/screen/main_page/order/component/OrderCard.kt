@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.main_page.order.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -26,17 +28,19 @@ import com.ilikeincest.food4student.component.AsyncImageOrMonogram
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.util.formatPrice
-import java.time.LocalDate
-import java.util.Locale
+import com.ilikeincest.food4student.util.timeFrom
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.days
 
 @Composable
 fun OrderCard(
-    id: String, // To be configured with db apis
-    shopName: String,
-    shopId: String, // For extra lookup
+    id: String,
+    restaurantName: String,
     shopImageUrl: String,
-    date: LocalDate,
+    createdAt: Instant,
     orderItems: List<OrderItem>,
+    onNavigateToRestaurant: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -55,7 +59,7 @@ fun OrderCard(
                 modifier = Modifier.alignByBaseline()
             )
             Spacer(Modifier.width(6.dp))
-            Text("#${id}",
+            Text("#${id.substringBefore('-')}",
                 style = typography.bodyLarge,
                 color = colorScheme.onSurfaceVariant,
                 modifier = Modifier.alignByBaseline()
@@ -63,11 +67,8 @@ fun OrderCard(
 
             Spacer(Modifier.weight(1f))
 
-            val locale = Locale.forLanguageTag("vi-VN")
-            // format month as fixed 2digits
-            val monthAsStr = String.format(locale, "%02d", date.monthValue)
-            val dateStr = "${date.dayOfMonth}/${monthAsStr}/${date.year}"
-            Text(dateStr,
+            val now = remember { Clock.System.now() }
+            Text(createdAt.timeFrom(now),
                 style = typography.bodyMedium,
                 modifier = Modifier.alignByBaseline()
             )
@@ -77,19 +78,20 @@ fun OrderCard(
             modifier = Modifier
                 .height(48.dp)
                 .fillMaxWidth()
+                .clickable { onNavigateToRestaurant() }
         ) {
             // peak ui code
             // the chevron will stay after the text,
             // but text will ellipses and chevron will still be visible
             AsyncImageOrMonogram(
                 model = shopImageUrl,
-                name = shopName,
+                name = restaurantName,
                 contentDescription = "Shop avatar"
             )
             Spacer(Modifier.width(10.dp))
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    shopName, style = typography.titleLarge,
+                    restaurantName, style = typography.titleLarge,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
                 )
@@ -108,9 +110,9 @@ fun OrderCard(
             for (it in orderItems) {
                 totalPrice += it.price
                 OrderItemCard(
-                    imageModel = it.imageUrl,
-                    title = it.name,
-                    notes = it.note,
+                    imageModel = it.foodItemPhotoUrl,
+                    title = it.foodName,
+                    notes = it.variations,
                     price = it.price,
                     quantity = it.quantity
                 )
@@ -132,16 +134,21 @@ fun OrderCard(
 private fun OrderPreview() {
     ComponentPreview {
         OrderCard(
-            id = "5ea765ds",
-            date = LocalDate.of(1969, 2, 28),
-            shopName = "Phúc Long",
-            shopId = "fuck u",
+            id = "5ea765ds-123123-asdasd12edqda-123edsa",
+            createdAt = Clock.System.now() - 20.days,
+            restaurantName = "Phúc Long",
             shopImageUrl = "",
-            orderItems = listOf(
-                OrderItem("Trà sữa Phô mai tươi", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
-                OrderItem("Trà sữa Phô mai tươi 2", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
-                OrderItem("Trà sữa Phô mai tươi nhưng mà nó siêu dài cmnl lmao", "Size S - không đá", 2, 54_000,  "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"),
-            ),
+            orderItems = List(3) { OrderItem(
+                id = "5ea765ds",
+                foodName = "Trà sữa Phô mai tươi",
+                foodDescription = null,
+                price = 54_000,
+                quantity = 2,
+                foodItemPhotoUrl = "",
+                originalFoodItemId = "",
+                variations = "Size S - không đá"
+            ) },
+            onNavigateToRestaurant = {},
             modifier = Modifier.width(368.dp)
         )
     }

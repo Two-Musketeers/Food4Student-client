@@ -2,11 +2,8 @@ package com.ilikeincest.food4student.screen.restaurant_owner
 
 import android.annotation.SuppressLint
 import android.os.Build
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,11 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.screen.main_page.RequestNotificationPermissionDialog
@@ -67,27 +61,12 @@ fun RestaurantOwnerScreen(
                 )
             }
         } },
-        // show top bar if route is notification and orders (why the heck don't we give these 2 screen a freaking topAppBar you ADHD piece of *
         topBar = {
-            if (currentRoute == RestaurantOwnerRoutes.Home) return@Scaffold
-            val topBarAlpha by animateFloatAsState(
-                targetValue = if (currentRoute == RestaurantOwnerRoutes.Notifications || currentRoute == RestaurantOwnerRoutes.Orders) 1f else 0f,
-                label = "Top bar alpha"
-            )
-            val topBarHeight by animateDpAsState(
-                targetValue = if (currentRoute == RestaurantOwnerRoutes.Notifications || currentRoute == RestaurantOwnerRoutes.Orders)
-                    TopAppBarDefaults.TopAppBarExpandedHeight else 0.dp,
-                label = "Top bar height"
-            )
+            if (currentRoute == RestaurantOwnerRoutes.Account || currentRoute == RestaurantOwnerRoutes.Home) return@Scaffold
             TopAppBar(
                 title = {
-                    if (currentRoute == RestaurantOwnerRoutes.Orders) {
-                        Text("Orders")
-                    } else {
-                        Text("Notification")
-                    }
+                    Text(currentRoute.topBarTitle)
                 },
-                modifier = Modifier.alpha(topBarAlpha),
                 actions = {
                     if (currentRoute == RestaurantOwnerRoutes.Notifications) {
                         val notiVm: NotificationScreenViewModel = hiltViewModel()
@@ -97,15 +76,12 @@ fun RestaurantOwnerScreen(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                expandedHeight = topBarHeight,
             )
         },
+        contentWindowInsets =
+            if (currentRoute == RestaurantOwnerRoutes.Account) WindowInsets.navigationBars
+            else ScaffoldDefaults.contentWindowInsets
     ) { innerPadding ->
-//        val finalPadding = if (currentRoute == RestaurantOwnerRoutes.Notifications) {
-//            Modifier.padding(innerPadding)
-//        } else {
-//            Modifier.fillMaxSize()
-//        }
         RestaurantOwnerPageNavGraph(
             innerPadding = innerPadding,
             currentRoute = currentRoute,

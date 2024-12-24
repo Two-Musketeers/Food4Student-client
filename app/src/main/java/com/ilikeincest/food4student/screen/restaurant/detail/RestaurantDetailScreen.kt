@@ -1,6 +1,7 @@
 package com.ilikeincest.food4student.screen.restaurant.detail
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -13,19 +14,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,7 +40,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,14 +51,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -78,7 +75,7 @@ import com.ilikeincest.food4student.screen.restaurant.detail.component.AddToCart
 import com.ilikeincest.food4student.screen.restaurant.detail.component.CartBottomSheet
 import com.ilikeincest.food4student.screen.restaurant.detail.component.FoodItemCard
 import com.ilikeincest.food4student.screen.restaurant.detail.component.RestaurantHeader
-import com.ilikeincest.food4student.util.formatPrice
+import com.ilikeincest.food4student.screen.restaurant.detail.component.ShoppingCartBottomBar
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -86,6 +83,7 @@ import kotlin.random.Random
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToRating: (id: String) -> Unit,
     viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val restaurantDetail by viewModel.restaurantDetail.collectAsState()
@@ -117,6 +115,7 @@ fun RestaurantScreen(
             timeAway = timeAway,
             description = detail.description,
             onNavigateUp = onNavigateUp,
+            onNavigateToRating = onNavigateToRating,
             viewModel = viewModel
         )
     }
@@ -132,6 +131,7 @@ private fun RestaurantScreenContent(
     timeAway: String,
     description: String?,
     onNavigateUp: () -> Unit,
+    onNavigateToRating: (id: String) -> Unit,
     viewModel: RestaurantDetailViewModel
 ) {
     val restaurantDetail = viewModel.restaurantDetail.collectAsState().value
@@ -151,10 +151,7 @@ private fun RestaurantScreenContent(
         )
     }
 
-
-    // TODO handle the status bar
     // view states
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val lazyListState = rememberLazyListState()
 
@@ -186,6 +183,10 @@ private fun RestaurantScreenContent(
         }
     }
 
+    val topBarBg by animateColorAsState(
+        if (showTitle) colorScheme.surfaceContainer else Color.Transparent
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -197,7 +198,7 @@ private fun RestaurantScreenContent(
                     ) { Text(name) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = topBarBg
                 ),
                 navigationIcon = {
                     Row {
@@ -212,9 +213,9 @@ private fun RestaurantScreenContent(
                         }
                     }
                 },
-                scrollBehavior = scrollBehavior
             )
         },
+        contentWindowInsets = WindowInsets.statusBars,
         bottomBar = {
             if (cartItems.isNotEmpty()) {
                 ShoppingCartBottomBar(
@@ -252,7 +253,6 @@ private fun RestaurantScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
                 item(contentType = "spacing box") {
                     // calculate spaced height to ensure picture is shown with 1:2 ratio
@@ -270,7 +270,10 @@ private fun RestaurantScreenContent(
                         description = description,
                         isFavorite = restaurantDetail!!.isFavorited,
                         onFavoriteToggle = {
-                            viewModel.toggleLike(restaurantDetail!!.id)
+                            viewModel.toggleLike(restaurantDetail.id)
+                        },
+                        onNavigateToRating = {
+                            onNavigateToRating(restaurantDetail.id)
                         },
                         modifier = bgModifier
                     )
@@ -349,6 +352,8 @@ private fun RestaurantScreenContent(
                         )
                     }
                 }
+
+                item { Spacer(Modifier.height(32.dp)) } // some space to breath
             }
         }
     }
@@ -364,60 +369,6 @@ private fun RestaurantScreenContent(
 }
 
 @Composable
-fun ShoppingCartBottomBar(
-    viewModel: RestaurantDetailViewModel,
-    onCartClick: () -> Unit
-) {
-    val totalPrice by viewModel.totalPrice.collectAsState()
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(colorScheme.primaryContainer)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .fillMaxWidth()
-    ) {
-        IconButton(
-            onClick = onCartClick,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = "View Cart",
-                tint = colorScheme.onPrimaryContainer
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = "Total: ${formatPrice(totalPrice)}",
-            style = typography.titleLarge.copy(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            color = colorScheme.onPrimaryContainer
-        )
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun Prev() {
-    ScreenPreview {
-        RestaurantScreenContent(
-            R.drawable.ic_launcher_background,
-            "Hồng Trà Ngô Gia",
-            "4.3",
-            "2.0km",
-            "25 phút",
-            "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
-                    " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
-            onNavigateUp = {},
-            viewModel = hiltViewModel()
-        )
-    }
-}
-
-@Composable
 private fun calculateRemainingBannerHeight(innerPadding: PaddingValues): Dp {
     val configuration = LocalConfiguration.current
     val screenWidth = remember { configuration.screenWidthDp.dp }
@@ -425,60 +376,4 @@ private fun calculateRemainingBannerHeight(innerPadding: PaddingValues): Dp {
     val heightBehindSystemUi = remember { innerPadding.calculateTopPadding() }
     val remainingHeight = remember { targetHeight - heightBehindSystemUi }
     return remainingHeight
-}
-
-private fun seedFood(seed: Int): List<FoodItem> {
-    val r = Random(seed)
-    return List(5) {
-        val id = r.nextInt()
-        FoodItem(
-            id = id.toString(),
-            name = "Hồng Trà Kem Tươi",
-            description =
-            if (id.mod(2) == 0)
-                "Est sed takimata consetetur enim ipsum eos quis diam gubergren. Clita placerat nobis invidunt dolore et dolor amet erat accusam ea accusam sed justo erat autem praesent. Qui rebum sit velit vel dolore stet et nulla placerat dolore gubergren stet laoreet option lorem autem invidunt invidunt. Kasd elit enim consectetuer dolor tempor diam takimata ea elitr esse eros odio esse velit ut stet. Sanctus nonumy eos et et sanctus possim feugiat. Takimata at vero hendrerit sadipscing nulla doming ea nonumy duis ipsum. Dolore consequat magna justo dolore dolor justo doming sit tempor et invidunt aliquyam magna sit. Amet takimata accumsan dolor dignissim te dolor et dolor erat imperdiet duo kasd et eleifend dolore. Diam mazim eirmod et feugiat labore ipsum et invidunt magna et ut. Diam clita exerci clita. Dolore at est soluta aliquam ipsum nulla feugiat dolores at sit ut at suscipit duo consetetur. Tation tincidunt lorem ea aliquip et te wisi ad dolore sed clita. Sit at dolore sit duo nulla tempor at. Labore feugait lorem lobortis consequat. Ut aliquyam ea eos wisi vero ut et stet sanctus duis est sit. No labore eu duo."
-            else "Kem có tan chảy",
-            foodItemPhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR58QY4pAtehHlOZtYU0gDSbTABNIsxy2z_gQ&s",
-            basePrice = 23000,
-            variations = listOf(
-                Variation(
-                    id = "lmao",
-                    name = "Size",
-                    minSelect = 1,
-                    maxSelect = 1,
-                    variationOptions = listOf(
-                        VariationOption(
-                            id = Random.nextInt().toString(),
-                            name = "S",
-                            priceAdjustment = 0
-                        ),
-                        VariationOption(
-                            id = Random.nextInt().toString(),
-                            name = "M",
-                            priceAdjustment = 3000
-                        ),
-                        VariationOption(
-                            id = Random.nextInt().toString(),
-                            name = "L",
-                            priceAdjustment = 6000
-                        )
-                    )
-                )
-            )
-        )
-    }
-}
-
-private fun seedList(): List<FoodCategory> {
-    val r = Random(21)
-    val cats =
-        listOf("THỨC UỐNG HOT", "TRÀ TRÁI CÂY", "THUẦN TRÀ", "TRÀ LATTE", "TRÀ SỮA", "TRÀ CHANH")
-    return List(cats.size) {
-        FoodCategory(
-            id = r.nextInt().toString(),
-            name = cats[it],
-            foodItems = seedFood(r.nextInt()),
-            restaurantId = "wtf"
-        )
-    }
 }

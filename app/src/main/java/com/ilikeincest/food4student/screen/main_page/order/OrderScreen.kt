@@ -19,10 +19,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,51 +31,67 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
+import com.ilikeincest.food4student.component.LoadingDialog
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
-import com.ilikeincest.food4student.model.OrderItem
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
+import com.ilikeincest.food4student.model.OrderStatus
 import com.ilikeincest.food4student.screen.main_page.order.component.OrderCard
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
-// TODO: Move to model/map to model
-private enum class OrderState(@StringRes val tabTitleRes: Int) {
-    Pending(R.string.order_state_pending),
-    Delivering(R.string.order_state_delivering),
-    Delivered(R.string.order_state_delivered),
+@StringRes
+private fun getTabTitle(status: OrderStatus): Int = when (status) {
+    OrderStatus.Pending -> R.string.order_state_pending
+    OrderStatus.Approved -> R.string.order_state_delivering
+    OrderStatus.Delivered -> R.string.order_state_delivered
+    OrderStatus.Cancelled -> R.string.order_state_cancelled
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(
-    modifier: Modifier = Modifier,
+    onNavigateToRestaurant: ((NoNeedToFetchAgainBuddy) -> Unit)?,
+    vm: OrderViewModel = hiltViewModel()
 ) {
-    val pagerState = rememberPagerState(pageCount = { OrderState.entries.size })
+    val context = LocalContext.current
+    val pagerState = rememberPagerState(pageCount = { OrderStatus.entries.size })
     val coroutineScope = rememberCoroutineScope()
+    val orderList = vm.orderList
 
-    val orderStateBadges = remember { listOf(3, 2, 0) }
-    assert(orderStateBadges.size == OrderState.entries.size)
+    val isLoading by vm.isLoading
+    LoadingDialog(
+        label = "Đang tải",
+        isVisible = isLoading
+    )
+    LaunchedEffect(Unit) {
+        vm.initData()
+        vm.refreshOrders {} // silently fetch data again
+    }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(Modifier.height(10.dp))
-        PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
-            OrderState.entries.forEachIndexed { i, orderState ->
+        PrimaryScrollableTabRow(selectedTabIndex = pagerState.currentPage) {
+            OrderStatus.entries.forEachIndexed { i, status ->
                 Tab(
                     selected = pagerState.currentPage == i,
                     onClick = { coroutineScope.launch {
                         pagerState.animateScrollToPage(i)
                     } },
                     text = { Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(orderState.tabTitleRes))
-                        if (orderStateBadges[i] != 0) {
+                        Text(stringResource(getTabTitle(status)))
+                        val currentList = orderList[status] ?: listOf()
+                        if (status !in listOf(OrderStatus.Pending, OrderStatus.Approved))
+                            return@Row
+                        if (currentList.isNotEmpty()) {
                             Spacer(Modifier.width(4.dp))
                             Badge {
-                                Text(orderStateBadges[i].toString())
+                                Text(currentList.size.toString())
                             }
                         }
                     } },
@@ -95,56 +112,38 @@ fun OrderScreen(
                 onRefresh = {
                     isRefreshing = true
                     coroutineScope.launch {
-                        // fake load
-                        // TODO: replace with actual data
-                        delay(2000)
-                        isRefreshing = false
+                        vm.refreshOrders {
+                            isRefreshing = false
+                        }
                     }
                 },
                 isRefreshing = isRefreshing,
+                modifier = Modifier.fillMaxSize()
             ) {
-                val list = remember { List(20) { "5ea765ds$it" } }
                 LazyColumn(
                     state = state,
                     contentPadding = PaddingValues(0.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     item { Spacer(Modifier.height(0.dp)) }
-                    // TODO: replace with actual data
-                    itemsIndexed(list) { i, id ->
+                    val currentList = orderList[OrderStatus.entries[page]] ?: listOf()
+                    itemsIndexed(currentList) { i, order ->
                         OrderCard(
-                            id = id,
-                            date = LocalDate.of(2024, 2, 28),
-                            shopName = "Phúc Long - Trần Hưng Đạo",
-                            shopId = "nuh uh",
-                            shopImageUrl = "",
-                            orderItems = listOf(
-                                OrderItem(
-                                    "Trà sữa Phô mai tươi",
-                                    "Size S - không đá",
-                                    2,
-                                    54_000,
-                                    "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"
-                                ),
-                                OrderItem(
-                                    "Trà sữa Phô mai tươi 2",
-                                    "Size S - không đá",
-                                    2,
-                                    54_000,
-                                    "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"
-                                ),
-                                OrderItem(
-                                    "Trà sữa Phô mai tươi 3",
-                                    "Size S - không đá",
-                                    2,
-                                    54_000,
-                                    "https://unsplash.com/photos/IaPlDU14Oig/download?ixid=M3wxMjA3fDB8MXxhbGx8OXx8fHx8fDJ8fDE3MjY1NTQ2MDN8&force=true&w=640"
-                                ),
-                            ),
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                            id = order.id,
+                            createdAt = order.createdAt,
+                            restaurantName = order.restaurantName,
+                            shopImageUrl = "", // TODO
+                            orderItems = order.orderItems,
+                            onNavigateToRestaurant = {
+                                if (onNavigateToRestaurant == null) return@OrderCard
+                                vm.fetchRestaurant(order.restaurantId, context, onSuccess = onNavigateToRestaurant)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
                         )
-                        if (i != list.size - 1) {
+                        if (i != orderList.size - 1) {
                             HorizontalDivider()
                         }
                     }
@@ -157,5 +156,5 @@ fun OrderScreen(
 @Preview
 @Composable
 private fun OrderPrev() {
-    ScreenPreview { OrderScreen() }
+    ScreenPreview { OrderScreen({}) }
 }

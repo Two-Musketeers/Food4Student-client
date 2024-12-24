@@ -1,12 +1,15 @@
 package com.ilikeincest.food4student.model
 
-import com.google.gson.annotations.SerializedName
-import java.time.LocalDateTime
+import kotlinx.datetime.Instant
 
 data class Order(
-    val id: String, // To be configured with db apis
-    val shopName: String,
-    val shopId: String, // For extra lookup
-    val createdAt: LocalDateTime,
-    val items: List<OrderItem>,
+    val id: String,
+    val restaurantName: String,
+    val restaurantId: String,
+    val orderItems: List<OrderItem>,
+    val shippingAddress: String,
+    val createdAt: Instant,
+    val totalPrice: Int,
+    val note: String?,
+    val status: OrderStatus
 )

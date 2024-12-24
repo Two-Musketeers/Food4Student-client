@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.screen.restaurant.detail.component
+package com.ilikeincest.food4student.screen.restaurant_owner.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -17,17 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ilikeincest.food4student.screen.restaurant.detail.component.CollapsableDescriptionCard
+import com.ilikeincest.food4student.screen.restaurant.detail.component.RatingChip
+import com.ilikeincest.food4student.screen.restaurant.detail.component.TonalFavoriteButton
 
 @Composable
-fun RestaurantHeader(
+fun RestaurantOwnerHeader(
     name: String,
     starRating: String,
-    distance: String,
-    timeAway: String,
     description: String?,
-    isFavorite: Boolean,
-    onFavoriteToggle: () -> Unit,
-    onNavigateToRating: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -42,28 +40,9 @@ fun RestaurantHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            RatingChip(starRating, onClick = onNavigateToRating)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(IntrinsicSize.Min)
-            ) {
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    distance,
-                    style = typography.bodyLarge,
-                    color = colorScheme.onSurfaceVariant
-                )
-                VerticalDivider(Modifier.padding(horizontal = 16.dp))
-                Text(
-                    timeAway,
-                    style = typography.bodyLarge,
-                    color = colorScheme.onSurfaceVariant
-                )
-            }
+            RatingChip(starRating, onClick = {}) // TODO
 
             Spacer(Modifier.weight(1f))
-
-            TonalFavoriteButton(isFavorite, onClick = onFavoriteToggle)
         }
 
         // Desc

@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.dto
+package com.ilikeincest.food4student.dto.order
 
 data class CreateRatingDto(
     val stars: Int,

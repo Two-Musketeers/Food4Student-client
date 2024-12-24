@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -74,6 +76,7 @@ fun AddToCartSheet(
         sheetState = state,
         dragHandle = null,
         onDismissRequest = onDismiss,
+        contentWindowInsets = { WindowInsets(0.dp) },
         modifier = modifier,
     ) {
         // visible area the sheet occupies on screen
@@ -139,6 +142,7 @@ fun AddToCartSheet(
                     .background(colorScheme.surfaceContainer)
                     .padding(16.dp)
                     .fillMaxWidth()
+                    .navigationBarsPadding()
             ) {
                 // calculate total price
                 val variationExtra = item.variations.sumOf { variation ->
