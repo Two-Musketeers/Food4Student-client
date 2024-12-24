@@ -33,7 +33,7 @@ import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationT
 @Composable
 fun SavedLocationCard(
     locationType: LocationType,
-    location: String,
+    location: String?,
     address: String,
     receiverName: String?,
     receiverPhone: String?,
@@ -50,7 +50,9 @@ fun SavedLocationCard(
         LocationType.Other -> Pair(otherTypeTitle, R.drawable.bookmark)
     }
     val note = if (buildingNote == null) "" else "[$buildingNote] "
-    val locationTitle = "$note$location"
+    val locationTitle =
+        if (!location.isNullOrBlank() || location == address) "$note$location"
+        else "$note$address"
     val contactInfo = "$receiverName, $receiverPhone"
 
     OutlinedCard(
@@ -86,11 +88,13 @@ fun SavedLocationCard(
                 )
                 Column {
                     Text(locationTitle, style = typography.bodyMedium)
-                    Text(
-                        address,
-                        style = typography.bodyMedium,
-                        color = colorScheme.onSurfaceVariant
-                    )
+                    if (!location.isNullOrBlank() || location == address) {
+                        Text(
+                            address,
+                            style = typography.bodyMedium,
+                            color = colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
                 Text(contactInfo, style = typography.bodySmall)
             }
@@ -113,7 +117,7 @@ private fun Prev(@PreviewParameter(LocationTypePreview::class) locationType: Loc
     SavedLocationCard(
         locationType = locationType,
         buildingNote = "Cổng trước", // this can be null
-        location = "KTX Đại học Quốc gia TPHCM - Khu B",
+        location = if (locationType != LocationType.Other) "KTX Đại học Quốc gia TPHCM - Khu B" else null,
         address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
         receiverName = "Hồ Nguyên Minh",
         receiverPhone = "01234567879",

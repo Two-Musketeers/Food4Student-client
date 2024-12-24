@@ -39,56 +39,46 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapSearchBar
 import com.ilikeincest.food4student.screen.shipping.shipping_location.component.AddLocationCard
 import com.ilikeincest.food4student.screen.shipping.shipping_location.component.CurrentLocationCard
 import com.ilikeincest.food4student.screen.shipping.shipping_location.component.SavedLocationCard
-import com.ilikeincest.food4student.model.SavedShippingLocation as Location
+import com.ilikeincest.food4student.model.SavedShippingLocation as ShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType as LocationType
 
 @Composable
 fun ShippingLocationScreen(
+    pickedLocation: Location?,
     onNavigateUp: () -> Unit,
     onPickFromMap: () -> Unit,
     onAddLocation: (type: LocationType) -> Unit,
     onEditLocation: (id: String) -> Unit,
     vm: ShippingLocationViewModel = hiltViewModel()
 ) {
-//    val locationList = vm.locationList.collectAsState()
+    val locationList = vm.locationList
     val context = LocalContext.current
+    LaunchedEffect(pickedLocation) {
+        if (pickedLocation == null) return@LaunchedEffect
+        vm.pickLocation(pickedLocation, context)
+    }
     LaunchedEffect(Unit) {
         vm.fetchCurrentFromDStore(context)
+        vm.reloadLocationList()
+    }
+    var error by vm.error
+    if (error.isNotBlank()) {
+        ErrorDialog(
+            message = error,
+            onDismiss = { error = "" },
+        )
     }
     val location by vm.currentLocation.collectAsState()
     ShippingLocationScreenContent(
-        locationList = listOf(
-            SavedShippingLocation(
-                locationType = LocationType.Home,
-                buildingNote = "Cổng trước",
-                location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                receiverName = "Hồ Nguyên Minh",
-                receiverPhone = "01234567879",
-            ),
-            SavedShippingLocation(
-                locationType = LocationType.Work,
-                buildingNote = "Cổng trước",
-                location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                receiverName = "Hồ Nguyên Minh",
-                receiverPhone = "01234567879",
-            ),
-            SavedShippingLocation(
-                locationType = LocationType.Other,
-                otherLocationTypeTitle = "Dating location",
-                location = "Trường mẫu giáo Tư thục Sao Mai",
-                address = "Lmao u believe me fr?",
-                receiverName = "Hứa Văn Lý",
-                receiverPhone = "0123456789",
-            )
-        ), // TODO
+        locationList = locationList,
         onNavigateUp = onNavigateUp,
         onAddLocation = onAddLocation,
         onPickFromMap = onPickFromMap,
@@ -104,7 +94,7 @@ fun ShippingLocationScreen(
 private fun ShippingLocationScreenContent(
     currentLocation: String,
     currentAddress: String,
-    locationList: List<Location>,
+    locationList: List<ShippingLocation>,
     onNavigateUp: () -> Unit,
     onAddLocation: (type: LocationType) -> Unit,
     onPickFromMap: () -> Unit,
@@ -199,10 +189,10 @@ private fun ShippingLocationScreenContent(
                         locationType = location.locationType,
                         location = location.location,
                         address = location.address,
-                        receiverName = location.receiverName,
-                        receiverPhone = location.receiverPhone,
+                        receiverName = location.name,
+                        receiverPhone = location.phoneNumber,
                         onSelected = { onPickLocation(location) },
-                        onEditLocation = { onEditLocation(location.location) }, // TODO: pass in actual card ID
+                        onEditLocation = { onEditLocation(location.id) },
                         buildingNote = location.buildingNote,
                         otherLocationTypeTitle = location.otherLocationTypeTitle
                     )
@@ -240,29 +230,35 @@ private fun Prev() { ScreenPreview {
         currentLocation = "KTX Đại học Quốc gia TPHCM - Khu B",
         currentAddress = "15/12/564/23 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
         listOf(
-            Location(
+            ShippingLocation(
+                "",
                 locationType = LocationType.Home,
                 buildingNote = "Cổng trước",
                 location = "KTX Đại học Quốc gia TPHCM - Khu B",
                 address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                receiverName = "Hồ Nguyên Minh",
-                receiverPhone = "01234567879",
+                name = "Hồ Nguyên Minh",
+                phoneNumber = "01234567879",
+                latitude = 0.0, longitude = 0.0,
             ),
-            Location(
+            ShippingLocation(
+                "",
                 locationType = LocationType.Work,
                 buildingNote = "Cổng trước",
                 location = "KTX Đại học Quốc gia TPHCM - Khu B",
                 address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                receiverName = "Hồ Nguyên Minh",
-                receiverPhone = "01234567879",
+                name = "Hồ Nguyên Minh",
+                phoneNumber = "01234567879",
+                latitude = 0.0, longitude = 0.0,
             ),
-            Location(
+            ShippingLocation(
+                "",
                 locationType = LocationType.Other,
                 otherLocationTypeTitle = "Dating location",
                 location = "Trường mẫu giáo Tư thục Sao Mai",
                 address = "Lmao u believe me fr?",
-                receiverName = "Hứa Văn Lý",
-                receiverPhone = "0123456789",
+                name = "Hứa Văn Lý",
+                phoneNumber = "0123456789",
+                latitude = 0.0, longitude = 0.0,
             )
         ),
         {}, {}, {}, {}, {}
@@ -285,13 +281,15 @@ private fun PrevPartial() { ScreenPreview {
     ShippingLocationScreenContent(
         currentLocation = "KTX Đại học Quốc gia TPHCM - Khu B",
         currentAddress = "15/12/564/23 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-        listOf(Location(
+        listOf(ShippingLocation(
+            "",
             locationType = LocationType.Work,
             buildingNote = "Cổng trước",
             location = "KTX Đại học Quốc gia TPHCM - Khu B",
             address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-            receiverName = "Hồ Nguyên Minh",
-            receiverPhone = "01234567879",
+            name = "Hồ Nguyên Minh",
+            phoneNumber = "01234567879",
+            latitude = 0.0, longitude = 0.0,
         ),),
         {}, {}, {}, {}, {}
     )

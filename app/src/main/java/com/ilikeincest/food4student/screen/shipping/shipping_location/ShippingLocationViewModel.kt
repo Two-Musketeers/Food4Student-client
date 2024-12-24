@@ -1,6 +1,8 @@
 package com.ilikeincest.food4student.screen.shipping.shipping_location
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -8,8 +10,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
+import com.ilikeincest.food4student.service.api.AccountApiService
+import com.ilikeincest.food4student.service.api.UserApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,16 +30,37 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "cu
 
 // address, lat lang,
 @HiltViewModel
-class ShippingLocationViewModel @Inject constructor(): ViewModel() {
+class ShippingLocationViewModel @Inject constructor(
+    private val userApiService: UserApiService
+): ViewModel() {
+    // TODO: swap to non id model
     private val _currentLocation = MutableStateFlow(SavedShippingLocation(
+        id = "",
         locationType = SavedShippingLocationType.Home,
         location = "",
         address = "",
+        latitude = 0.0, longitude = 0.0,
     ))
     val currentLocation = _currentLocation.asStateFlow()
 
-    private val LOCATION = stringPreferencesKey("location")
+    val locationList = mutableStateListOf<SavedShippingLocation>()
 
+    val error = mutableStateOf("")
+
+    fun reloadLocationList() {
+        viewModelScope.launch {
+            val res = userApiService.getShippingAddresses()
+            if (!res.isSuccessful) {
+                error.value = "${res.code()} ${res.message()} - ${res.errorBody()}"
+                return@launch
+            }
+            val body = res.body() ?: listOf()
+            locationList.clear()
+            locationList.addAll(body)
+        }
+    }
+
+    private val LOCATION = stringPreferencesKey("location")
     fun fetchCurrentFromDStore(context: Context) {
         viewModelScope.launch {
             context.dataStore.data.map {
@@ -55,5 +81,16 @@ class ShippingLocationViewModel @Inject constructor(): ViewModel() {
                 it[LOCATION] = Json.encodeToString(location)
             }
         }
+    }
+
+    fun pickLocation(it: Location, context: Context) {
+        setCurrent(SavedShippingLocation(
+            id = "",
+            locationType = SavedShippingLocationType.Home,
+            location = it.location,
+            address = it.address,
+            latitude = it.latitude,
+            longitude = it.longitude
+        ), context)
     }
 }

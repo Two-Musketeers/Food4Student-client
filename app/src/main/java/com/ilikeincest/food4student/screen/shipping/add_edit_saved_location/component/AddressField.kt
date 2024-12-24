@@ -3,7 +3,10 @@ package com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.com
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,12 +37,11 @@ fun AddressField(
             width = 1.dp
         ),
         onClick = onClick,
-        modifier = modifier.height(56.dp)
+        modifier = modifier.defaultMinSize(minHeight = 56.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.defaultMinSize(minHeight = 56.dp)
         ) {
             val showPlaceholder = text.isEmpty()
             val textColor =
@@ -51,7 +53,10 @@ fun AddressField(
             Text(textToShow,
                 style = typography.bodyLarge,
                 color = textColor,
-                modifier = Modifier.padding(start = 16.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(vertical = 16.dp)
+                    .weight(1f)
             )
             Icon(
                 Icons.Default.ChevronRight, null,

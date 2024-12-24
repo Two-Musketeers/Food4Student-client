@@ -128,7 +128,8 @@ fun MapScreen(
                             Location(
                                 latitude = coord.latitude,
                                 longitude = coord.longitude,
-                                address = nearbyPlaces[0].address.addressText
+                                address = nearbyPlaces[0].address.addressText,
+                                location = nearbyPlaces[0].title
                             )
                         )
                     }

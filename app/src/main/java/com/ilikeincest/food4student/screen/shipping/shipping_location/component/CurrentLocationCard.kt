@@ -62,7 +62,9 @@ fun CurrentLocationCard(
             ) {
                 Text("Địa chỉ giao hàng hiện tại:", style = typography.titleSmall)
                 Text(currentLocation, style = typography.titleMedium)
-                Text(locationAddress, style = typography.bodySmall)
+                if (currentLocation != locationAddress) {
+                    Text(locationAddress, style = typography.bodySmall)
+                }
             }
         }
     }

@@ -4,13 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SavedShippingLocation(
+    val id: String,
     val locationType: SavedShippingLocationType,
-    val location: String,
     val address: String,
-    val receiverName: String? = null,
-    val receiverPhone: String? = null,
-    val buildingNote: String? = null,
+    val location: String = address,
+    val name: String? = null,
+    val phoneNumber: String? = null,
+    val buildingNote: String? = null, // consider this note
     val otherLocationTypeTitle: String? = null,
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
+    val latitude: Double,
+    val longitude: Double
 )
