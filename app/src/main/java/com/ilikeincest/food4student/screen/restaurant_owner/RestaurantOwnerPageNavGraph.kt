@@ -22,6 +22,8 @@ import kotlin.random.Random
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -32,6 +34,7 @@ import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content.RestaurantOwnerScreenContent
@@ -40,26 +43,31 @@ internal val defaultRoute = RestaurantOwnerRoutes.Home
 
 internal enum class RestaurantOwnerRoutes(
     @StringRes val labelResId: Int,
+    val topBarTitle: String,
     val unselectedIcon: ImageVector,
     val selectedIcon: ImageVector
 ) {
     Home(
         R.string.home_screen_label,
+        "Danh sách món ăn",
         Icons.Outlined.Fastfood,
         Icons.Filled.Fastfood
     ),
     Orders(
         R.string.order_screen_label,
+        "Đơn hàng",
         Icons.AutoMirrored.Outlined.ReceiptLong,
         Icons.AutoMirrored.Filled.ReceiptLong
     ),
     Notifications(
         R.string.notification_screen_label,
+        "Thông báo",
         Icons.Outlined.Notifications,
         Icons.Filled.Notifications
     ),
     Account(
         R.string.account_center_label,
+        "",
         Icons.Outlined.Person,
         Icons.Filled.Person
     ),
@@ -98,7 +106,7 @@ internal fun RestaurantOwnerPageNavGraph(
     val outTransition = fadeOut(tween(durationMillis = 250))
     AnimatedContent(
         targetState = currentRoute,
-        modifier = modifier,
+        modifier = modifier.padding(innerPadding),
         transitionSpec = {
             inTransition togetherWith outTransition using SizeTransform()
         },
@@ -107,7 +115,6 @@ internal fun RestaurantOwnerPageNavGraph(
         when (it) {
             RestaurantOwnerRoutes.Home ->
                 RestaurantOwnerScreenContent(
-                    innerPadding = innerPadding,
                     onNavigateToAddEditFoodItem = {
                         onNavigateToAddEditFoodItem()
                     },
@@ -116,7 +123,10 @@ internal fun RestaurantOwnerPageNavGraph(
             RestaurantOwnerRoutes.Orders ->
                 OrderScreen(onNavigateToRestaurant = null)
             RestaurantOwnerRoutes.Account ->
-                AccountCenterScreen(navController = navController)
+                AccountCenterScreen(
+                    navController = navController,
+                    contentWindowInsets = WindowInsets(0.dp)
+                )
             RestaurantOwnerRoutes.Notifications ->
                 NotificationScreen(scrollConnection)
         }

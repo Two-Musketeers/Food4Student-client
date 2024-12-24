@@ -1,12 +1,9 @@
 package com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,7 +14,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,7 +27,6 @@ import com.ilikeincest.food4student.screen.restaurant_owner.component.FoodItemOw
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantOwnerScreenContent(
-    innerPadding: PaddingValues,
     onNavigateToAddEditFoodItem: () -> Unit,
     viewModel: RestaurantOwnerViewModel
 ) {
@@ -44,16 +39,7 @@ fun RestaurantOwnerScreenContent(
             onDismiss = { viewModel.dismissErrorDialog() }
         )
     }
-    val realPadding = PaddingValues(
-        top = innerPadding.calculateTopPadding() - WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-        bottom = innerPadding.calculateBottomPadding()
-    )
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Danh sách món ăn") }
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 viewModel.setSelectedFoodItem(null)
@@ -62,7 +48,7 @@ fun RestaurantOwnerScreenContent(
                 Icon(Icons.Default.Add, contentDescription = "Thêm món ăn")
             }
         },
-        modifier = Modifier.padding(realPadding)
+        contentWindowInsets = WindowInsets(0.dp),
     ) { innerPadding ->
         restaurant?.let { restaurant ->
             val foodItems = restaurant.foodCategories.flatMap { it.foodItems }
