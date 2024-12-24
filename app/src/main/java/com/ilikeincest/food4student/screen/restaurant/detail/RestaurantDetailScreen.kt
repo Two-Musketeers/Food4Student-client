@@ -83,6 +83,7 @@ import kotlin.random.Random
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToRating: (String) -> Unit,
     viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val restaurantDetail by viewModel.restaurantDetail.collectAsState()
@@ -107,6 +108,7 @@ fun RestaurantScreen(
         val distance = "${String.format("%.2f", detail.distanceInKm)} km"
         val timeAway = "${detail.estimatedTimeInMinutes} phút"
         RestaurantScreenContent(
+            id = detail.id,
             bannerModel = detail.bannerUrl,
             name = detail.name,
             starRating = detail.averageRating.toString(),
@@ -114,7 +116,8 @@ fun RestaurantScreen(
             timeAway = timeAway,
             description = detail.description,
             onNavigateUp = onNavigateUp,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onNavigateToRating = { onNavigateToRating(detail.id) }
         )
     }
 }
@@ -122,6 +125,7 @@ fun RestaurantScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun RestaurantScreenContent(
+    id: String,
     bannerModel: Any?,
     name: String,
     starRating: String,
@@ -129,6 +133,7 @@ private fun RestaurantScreenContent(
     timeAway: String,
     description: String?,
     onNavigateUp: () -> Unit,
+    onNavigateToRating: () -> Unit,
     viewModel: RestaurantDetailViewModel
 ) {
     val restaurantDetail = viewModel.restaurantDetail.collectAsState().value
@@ -267,9 +272,10 @@ private fun RestaurantScreenContent(
                         description = description,
                         isFavorite = restaurantDetail!!.isFavorited,
                         onFavoriteToggle = {
-                            viewModel.toggleLike(restaurantDetail!!.id)
+                            viewModel.toggleLike(id)
                         },
-                        modifier = bgModifier
+                        modifier = bgModifier,
+                        onNavigateToRating = { onNavigateToRating() }
                     )
                 }
 
@@ -367,6 +373,7 @@ private fun RestaurantScreenContent(
 private fun Prev() {
     ScreenPreview {
         RestaurantScreenContent(
+            "",
             R.drawable.ic_launcher_background,
             "Hồng Trà Ngô Gia",
             "4.3",
@@ -375,6 +382,7 @@ private fun Prev() {
             "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
                     " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
             onNavigateUp = {},
+            onNavigateToRating = {},
             viewModel = hiltViewModel()
         )
     }

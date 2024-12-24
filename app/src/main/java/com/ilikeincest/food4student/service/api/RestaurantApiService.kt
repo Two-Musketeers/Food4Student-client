@@ -5,6 +5,7 @@ import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.dto.RestaurantDetailDto
 import com.ilikeincest.food4student.dto.RegisterRestaurantOwnerDto
 import com.ilikeincest.food4student.model.Restaurant
+import com.ilikeincest.food4student.model.RestaurantRatingsSummaryDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -38,4 +39,8 @@ interface RestaurantApiService {
     ) : Response<List<RatingDto>>
     @GET("restaurants/owned")
     suspend fun getOwnedRestaurants() : Response<Restaurant>
+    @GET("api/restaurants/{id}/ratings-summary")
+    suspend fun getRestaurantRatingsSummary(
+        @Path("id") restaurantId: String
+    ): Response<RestaurantRatingsSummaryDto>
 }
