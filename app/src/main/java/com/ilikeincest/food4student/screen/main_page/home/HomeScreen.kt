@@ -140,7 +140,7 @@ fun HomeScreen(
                         )
                         ShopListingCard(
                             shopName = restaurant.name,
-                            starRating = restaurant.averageRating.toString(),
+                            starRating = "${String.format("%.1f", restaurant.averageRating)}",
                             distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
                             timeAway = "${restaurant.estimatedTimeInMinutes} phút",
                             shopImageModel = restaurant.logoUrl, // TODO

@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.screen.main_page.component.GlobalSearchBar
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
@@ -134,6 +135,12 @@ fun MainScreen(
         currentRoute = defaultRoute
     }
 
+    val errorMessage by vm.errorMessage
+
+    if (errorMessage != "") {
+        ErrorDialog(message = errorMessage, onDismiss = {vm.dismissError()})
+    }
+
     Scaffold(
         bottomBar = { NavigationBar {
             for (route in MainRoutes.entries) {
@@ -216,7 +223,9 @@ fun MainScreen(
                 .offset { animatedSearchBarOffset }
                 .alpha(animatedSearchBarAlpha),
             onExpandedChange = { expanded = it },
-            isVisible = animatedSearchBarOffset != IntOffset(0, -100)
+            isVisible = animatedSearchBarOffset != IntOffset(0, -100),
+            onRestaurantSelected = onNavigateToRestaurant,
+            vm = vm
         )
 
         // Main screen content

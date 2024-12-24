@@ -5,44 +5,39 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ilikeincest.food4student.DEBOUNCE_DELAY
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.AsyncImageOrMonogram
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
-import kotlinx.coroutines.delay
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
+import com.ilikeincest.food4student.screen.main_page.MainScreenViewModel
 
 /**
  * A global search bar to be used in main screens
@@ -60,6 +55,8 @@ fun GlobalSearchBar(
     onAvatarClicked: () -> Unit = {},
     onExpandedChange: (Boolean) -> Unit = {},
     isVisible: Boolean = true,
+    vm: MainScreenViewModel,
+    onRestaurantSelected: (noNeedToFetchAgainBuddy: NoNeedToFetchAgainBuddy) -> Unit
 ) {
     if (!isVisible) return
     var query by rememberSaveable { mutableStateOf("") }
@@ -71,9 +68,9 @@ fun GlobalSearchBar(
 
     // query search debounce
     LaunchedEffect(query) {
-        if (query.isBlank()) return@LaunchedEffect
-        delay(DEBOUNCE_DELAY)
-        onSearch(query)
+        vm.searchRestaurants(
+            query = query
+        )
     }
 
     LaunchedEffect(expanded) {
@@ -81,7 +78,7 @@ fun GlobalSearchBar(
     }
 
     val searchBarPadding by animateDpAsState(
-        targetValue = if(expanded) 0.dp else 16.dp,
+        targetValue = if (expanded) 0.dp else 16.dp,
         label = "Global search bar padding"
     )
 
@@ -93,52 +90,53 @@ fun GlobalSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = searchBarPadding),
-        inputField = { SearchBarDefaults.InputField(
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = { onSearch(query) },
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = it
-                // Clear query text when search bar expands
-                query = ""
-                // Hide keyboard when search bar closes
-                if (!it) keyboardController?.hide()
-            },
-            placeholder = { Text("Trà đào, Phúc Long") },
-            leadingIcon = {
-                if (expanded) Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier.clickable {
-                        expanded = false // Collapse search bar
-                        keyboardController?.hide() // Hide keyboard
-                    }
-                )
-                else Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                )
-            },
-            trailingIcon = {
-                if (expanded) {
-                    if (query.isNotEmpty()) Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear",
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = query,
+                onQueryChange = { query = it },
+                onSearch = { vm.searchRestaurants(query = query) },
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = it
+                    // Clear query text when search bar expands
+                    query = ""
+                    // Hide keyboard when search bar closes
+                    if (!it) keyboardController?.hide()
+                },
+                placeholder = { Text("Trà đào, Phúc Long") },
+                leadingIcon = {
+                    if (expanded) Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
                         modifier = Modifier.clickable {
-                            query = "" // Clear query text
+                            expanded = false // Collapse search bar
+                            keyboardController?.hide() // Hide keyboard
                         }
                     )
-                }
-                else AsyncImageOrMonogram(
-                    model = userAvatarModel,
-                    name = userName,
-                    contentDescription = "User avatar",
-                    size = 38.dp,
-                    onClick = onAvatarClicked
-                )
-            },
-        ) },
+                    else Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                    )
+                },
+                trailingIcon = {
+                    if (expanded) {
+                        if (query.isNotEmpty()) Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear",
+                            modifier = Modifier.clickable {
+                                query = "" // Clear query text
+                            }
+                        )
+                    } else AsyncImageOrMonogram(
+                        model = userAvatarModel,
+                        name = userName,
+                        contentDescription = "User avatar",
+                        size = 38.dp,
+                        onClick = onAvatarClicked
+                    )
+                },
+            )
+        },
         expanded = expanded,
         onExpandedChange = {
             expanded = it
@@ -146,22 +144,43 @@ fun GlobalSearchBar(
             if (!it) keyboardController?.hide()
         },
     ) {
-        Column(Modifier.verticalScroll(rememberScrollState())) {
-            repeat(4) { idx ->
-                val resultText = "Suggestion $idx"
-                ListItem(
-                    headlineContent = { Text(resultText) },
-                    supportingContent = { Text("Additional info") },
-                    leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        if (expanded && query.isNotEmpty()) {
+            val results by vm.searchResults.collectAsState()
+            if (results.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(results) { restaurant ->
+                        val noNeedToFetchAgainBuddy = NoNeedToFetchAgainBuddy(
+                            Id = restaurant.id,
+                            TimeAway = restaurant.estimatedTimeInMinutes,
+                            Distance = restaurant.distanceInKm,
+                            IsFavorited = restaurant.isFavorited
+                        )
+                        ListItem(
+                            headlineContent = { Text(restaurant.name) },
+                            supportingContent = { Text(restaurant.address) },
+                            modifier = Modifier
+                                .clickable {
+                                    onRestaurantSelected(noNeedToFetchAgainBuddy)
+                                    query = restaurant.name
+                                    expanded = false
+                                    keyboardController?.hide()
+                                }
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            } else {
+                Box(
                     modifier = Modifier
-                        .clickable {
-                            query = resultText
-                            expanded = false
-                        }
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                )
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No results found")
+                }
             }
         }
     }
@@ -175,10 +194,17 @@ private fun SearchPrev() {
             GlobalSearchBar(
                 userName = "Ho Nguyen",
                 userAvatarModel = "",
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
+                vm = hiltViewModel(),
+                onRestaurantSelected = {}
             )
             LazyColumn(
-                contentPadding = PaddingValues(start = 16.dp, top = 68.dp, end = 16.dp, bottom = 16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = 68.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 val list = List(100) { "Text $it" }

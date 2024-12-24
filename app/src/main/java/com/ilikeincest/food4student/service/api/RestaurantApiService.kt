@@ -39,8 +39,14 @@ interface RestaurantApiService {
     ) : Response<List<RatingDto>>
     @GET("restaurants/owned")
     suspend fun getOwnedRestaurants() : Response<Restaurant>
-    @GET("api/restaurants/{id}/ratings-summary")
+    @GET("restaurants/{id}/ratings-summary")
     suspend fun getRestaurantRatingsSummary(
         @Path("id") restaurantId: String
     ): Response<RestaurantRatingsSummaryDto>
+    @GET("restaurants/search")
+    suspend fun searchRestaurants(
+        @Query("query") query: String,
+        @Query("pageNumber") pageNumber: Int = 1,
+        @Query("pageSize") pageSize: Int = 20
+    ): Response<List<Restaurant>>
 }

@@ -56,21 +56,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.LoadingDialog
-import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
-import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
-import com.ilikeincest.food4student.model.Variation
-import com.ilikeincest.food4student.model.VariationOption
 import com.ilikeincest.food4student.screen.restaurant.detail.component.AddToCartSheet
 import com.ilikeincest.food4student.screen.restaurant.detail.component.CartBottomSheet
 import com.ilikeincest.food4student.screen.restaurant.detail.component.FoodItemCard
@@ -78,7 +72,6 @@ import com.ilikeincest.food4student.screen.restaurant.detail.component.Restauran
 import com.ilikeincest.food4student.screen.restaurant.detail.component.ShoppingCartBottomBar
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import kotlin.random.Random
 
 @Composable
 fun RestaurantScreen(
@@ -107,10 +100,11 @@ fun RestaurantScreen(
     restaurantDetail?.let { detail ->
         val distance = "${String.format("%.2f", detail.distanceInKm)} km"
         val timeAway = "${detail.estimatedTimeInMinutes} phút"
+        val starRating = "${String.format("%.2f", detail.averageRating)}"
         RestaurantScreenContent(
             bannerModel = detail.bannerUrl,
             name = detail.name,
-            starRating = detail.averageRating.toString(),
+            starRating = starRating,
             distance = distance,
             timeAway = timeAway,
             description = detail.description,

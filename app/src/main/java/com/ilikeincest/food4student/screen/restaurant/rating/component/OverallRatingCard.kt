@@ -50,7 +50,7 @@ fun OverallRatingCard(
             modifier = Modifier.padding(horizontal =  24.dp)
                 .padding(top = 24.dp, bottom = 16.dp)
         ) {
-            Text(averageRating.toString(),
+            Text("${String.format("%.2f", averageRating)}",
                 style = typography.titleLarge.copy(
                     fontWeight = FontWeight.W700,
                     fontSize = 24.sp
