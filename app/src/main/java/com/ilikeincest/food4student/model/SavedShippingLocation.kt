@@ -1,13 +1,17 @@
 package com.ilikeincest.food4student.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SavedShippingLocation(
+    val id: String,
     val locationType: SavedShippingLocationType,
-    val location: String,
     val address: String,
-    val receiverName: String,
-    val receiverPhone: String,
-    val buildingNote: String? = null,
+    val location: String = address,
+    val name: String? = null,
+    val phoneNumber: String? = null,
+    val buildingNote: String? = null, // consider this note
     val otherLocationTypeTitle: String? = null,
-    val latitude: Double = 0.0, // TODO
-    val longitude: Double = 0.0,
+    val latitude: Double,
+    val longitude: Double
 )

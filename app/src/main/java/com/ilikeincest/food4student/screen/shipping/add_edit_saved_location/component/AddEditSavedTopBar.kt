@@ -25,6 +25,7 @@ import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditSavedTopBar(
+    enableSave: Boolean,
     isEdit: Boolean,
     onNavigateUp: () -> Unit,
     onDelete: () -> Unit,
@@ -48,7 +49,8 @@ fun AddEditSavedTopBar(
             }
             FilledTonalButton(
                 contentPadding = PaddingValues(start = 16.dp, top = 10.dp, end = 24.dp, bottom = 10.dp),
-                onClick = onSave
+                onClick = onSave,
+                enabled = enableSave
             ) {
                 Icon(Icons.Default.Check, null, Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
@@ -65,12 +67,12 @@ fun AddEditSavedTopBar(
 @Preview
 @Composable
 private fun Edit() { ComponentPreview {
-    AddEditSavedTopBar(true, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
+    AddEditSavedTopBar(true, true, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
 } }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun Add() { ComponentPreview {
-    AddEditSavedTopBar(false, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
+    AddEditSavedTopBar(false, false, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
 } }

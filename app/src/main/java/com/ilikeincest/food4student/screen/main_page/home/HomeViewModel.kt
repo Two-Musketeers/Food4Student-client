@@ -1,27 +1,60 @@
 package com.ilikeincest.food4student.screen.main_page.home
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.model.Restaurant
+import com.ilikeincest.food4student.model.SavedShippingLocation
+import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.api.RestaurantApiService
 import com.ilikeincest.food4student.service.api.UserApiService
 import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 private const val pageSize = 10
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "current_shipping")
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val restaurantApi: RestaurantApiService,
     private val userApiService: UserApiService
 ) : ViewModel() {
+    private val _shippingLocation = MutableStateFlow("")
+    val shippingLocation = _shippingLocation.asStateFlow()
+
+    private val LOCATION = stringPreferencesKey("location")
+    fun fetchCurrentFromDStore(context: Context) {
+        viewModelScope.launch {
+            context.dataStore.data.map {
+                val str = it[LOCATION] ?: return@map
+                try {
+                    val res = Json.decodeFromString<SavedShippingLocation>(str)
+                    _shippingLocation.value = res.location
+                } catch (e: SerializationException) {
+                    context.dataStore.edit { it[LOCATION] = "" }
+                }
+            }.stateIn(viewModelScope)
+        }
+    }
+
     // the list that's shown on screen
     val restaurantList = mutableStateListOf<Restaurant>()
 
@@ -48,7 +81,7 @@ class HomeViewModel @Inject constructor(
     fun updateCurrentLocation(location: GeoCoordinates) {
         _currentLocation.value = location
         viewModelScope.launch {
-            refreshRestaurantList()
+//            refreshRestaurantList()
         }
     }
 
@@ -99,7 +132,8 @@ class HomeViewModel @Inject constructor(
                     isLiked = dto.isLiked,
                     foodCategories = emptyList(), // Populate as needed
                     distanceInKm = distance,
-                    estimatedTimeInMinutes = estimatedTime
+                    estimatedTimeInMinutes = estimatedTime,
+                    perStarRating = listOf() // TODO
                 )
             )
         }
@@ -107,10 +141,14 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.value = false
     }
 
-    fun loadMoreRestaurants(currentLocation: GeoCoordinates) {
+    fun loadMoreRestaurants() {
         _isLoadingMore.value = true
         _currentPage++
         viewModelScope.launch {
+            while (_currentLocation.value == null) {
+                delay(1000)
+            }
+            val currentLocation = _currentLocation.value!!
             val res = restaurantApi.getRestaurants(currentLocation.latitude, currentLocation.longitude, _currentPage, pageSize)
 
             if (!res.isSuccessful) {
@@ -146,7 +184,8 @@ class HomeViewModel @Inject constructor(
                     isLiked = dto.isLiked,
                     foodCategories = emptyList(), // Populate as needed
                     distanceInKm = distance,
-                    estimatedTimeInMinutes = estimatedTime
+                    estimatedTimeInMinutes = estimatedTime,
+                    perStarRating = listOf()
                 )
             } ?: listOf()
 

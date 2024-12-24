@@ -7,6 +7,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.dto.RatingDto
@@ -64,9 +67,12 @@ fun RatingCard(
         Box(Modifier.fillMaxWidth()) {
             Icon(painterResource(R.drawable.quarter_circle), null,
                 tint = colorScheme.secondaryContainer.copy(alpha = 0.4f),
-                modifier = Modifier.align(Alignment.BottomEnd).size(120.dp)
+                modifier = Modifier.align(Alignment.BottomEnd).size(100.dp)
             )
-            Column(Modifier.padding(16.dp)) {
+            Column(Modifier.padding(16.dp)
+                .requiredHeightIn(min = 80.dp)
+                .height(IntrinsicSize.Min)
+            ) {
                 AnimatedContent(showMore,
                     transitionSpec = {
                         fadeIn() togetherWith fadeOut()
@@ -79,6 +85,7 @@ fun RatingCard(
                     )
                 }
                 Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.offset(x = (-4).dp)
                 ) {
