@@ -144,14 +144,10 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.value = false
     }
 
-    fun loadMoreRestaurants() {
+    fun loadMoreRestaurants(currentLocation: GeoCoordinates) {
         _isLoadingMore.value = true
         _currentPage++
         viewModelScope.launch {
-            while (_currentLocation.value == null) {
-                delay(1000)
-            }
-            val currentLocation = _currentLocation.value!!
             val res = restaurantApi.getRestaurants(currentLocation.latitude, currentLocation.longitude, _currentPage, pageSize)
 
             if (!res.isSuccessful) {

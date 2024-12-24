@@ -1,8 +1,5 @@
 package com.ilikeincest.food4student.screen.main_page.home
 
-import android.Manifest
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,14 +18,10 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,7 +35,7 @@ import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.screen.main_page.component.ShopListingCard
 import com.ilikeincest.food4student.screen.main_page.home.component.AdsBanner
 import com.ilikeincest.food4student.screen.main_page.home.component.CurrentShippingLocationCard
-import com.ilikeincest.food4student.util.LocationUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class HomeTabTypes(val tabTitle: String) {
@@ -125,8 +118,9 @@ fun HomeScreen(
                                     coroutineScope.launch {
                                         if (state.firstVisibleItemIndex > 0)
                                             state.animateScrollToItem(1)
+                                        if (currentLocation == null) return@launch
                                         coroutineScope.launch {
-                                            vm.refreshRestaurantList()
+                                            vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
                                         }
                                     }
                                 },
@@ -164,7 +158,10 @@ fun HomeScreen(
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect
-                        vm.loadMoreRestaurants()
+                        while (currentLocation == null) {
+                            delay(1000)
+                        }
+                        vm.loadMoreRestaurants(currentLocation)
                     }
                     if (noMoreRestaurant) {
                         Text(
