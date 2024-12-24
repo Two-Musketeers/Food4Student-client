@@ -97,6 +97,11 @@ class HomeViewModel @Inject constructor(
 
     fun selectTab(i: HomeTabTypes) { _selectedTab.value = i }
 
+    val currentLocation = MutableStateFlow<GeoCoordinates?>(null)
+    fun setCurrentLocation(it: GeoCoordinates?) {
+        currentLocation.value = it
+    }
+
     suspend fun refreshRestaurantList(latitude: Double, longitude: Double) {
         _isRefreshing.value = true
         _isLoadingMore.value = false
@@ -144,11 +149,15 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.value = false
     }
 
-    fun loadMoreRestaurants(currentLocation: GeoCoordinates) {
+    fun loadMoreRestaurants() {
         _isLoadingMore.value = true
         _currentPage++
         viewModelScope.launch {
-            val res = restaurantApi.getRestaurants(currentLocation.latitude, currentLocation.longitude, _currentPage, pageSize)
+            while (currentLocation.value == null) {
+                delay(1000)
+            }
+            val location = currentLocation.value!!
+            val res = restaurantApi.getRestaurants(location.latitude, location.longitude, _currentPage, pageSize)
 
             if (!res.isSuccessful) {
                 _errorMessage.value = "Không thể load danh sách nhà hàng.\n" +
@@ -159,8 +168,8 @@ class HomeViewModel @Inject constructor(
 
             val newList = res.body()?.map { dto ->
                 val distance = haversineDistance(
-                    lat1 = currentLocation.latitude,
-                    lon1 = currentLocation.longitude,
+                    lat1 = location.latitude,
+                    lon1 = location.longitude,
                     lat2 = dto.latitude,
                     lon2 = dto.longitude
                 )

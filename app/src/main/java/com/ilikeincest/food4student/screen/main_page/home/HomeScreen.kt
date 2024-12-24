@@ -155,13 +155,13 @@ fun HomeScreen(
                     }
                 }
                 item {
+                    LaunchedEffect(currentLocation) {
+                        vm.setCurrentLocation(currentLocation)
+                    }
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect
-                        while (currentLocation == null) {
-                            delay(1000)
-                        }
-                        vm.loadMoreRestaurants(currentLocation)
+                        vm.loadMoreRestaurants()
                     }
                     if (noMoreRestaurant) {
                         Text(

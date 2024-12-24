@@ -110,9 +110,7 @@ fun FavoriteScreen(
                         isFavorite = restaurant.isFavorited, // disable favorite on home page
                         onFavoriteChange = { vm.toggleLike(restaurant.id) },
                         onClick = { onNavigateToRestaurant(noNeedToFetchAgainBuddy) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
                     )
                 }
                 item {
