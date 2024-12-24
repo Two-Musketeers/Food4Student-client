@@ -34,7 +34,6 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "cu
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val restaurantApi: RestaurantApiService,
-    private val userApiService: UserApiService,
     private val repository: RestaurantRepository
 ) : ViewModel() {
     private val _shippingLocation = MutableStateFlow("")

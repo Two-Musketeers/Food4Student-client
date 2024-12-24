@@ -101,12 +101,18 @@ internal fun RestaurantOwnerPageNavGraph(
         )
         notificationViewModel.addNewNotification(newNoti)
     }
+    val homeOnlyBottomPadding = PaddingValues(
+        bottom = innerPadding.calculateBottomPadding()
+    )
 
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
     val outTransition = fadeOut(tween(durationMillis = 250))
     AnimatedContent(
         targetState = currentRoute,
-        modifier = modifier.padding(innerPadding),
+        modifier = when (currentRoute) {
+            RestaurantOwnerRoutes.Home -> modifier.padding(homeOnlyBottomPadding)
+            else -> modifier.padding(innerPadding)
+        },
         transitionSpec = {
             inTransition togetherWith outTransition using SizeTransform()
         },

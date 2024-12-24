@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.restaurant_owner
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
@@ -61,7 +62,7 @@ fun RestaurantOwnerScreen(
             }
         } },
         topBar = {
-            if (currentRoute == RestaurantOwnerRoutes.Account) return@Scaffold
+            if (currentRoute == RestaurantOwnerRoutes.Account || currentRoute == RestaurantOwnerRoutes.Home) return@Scaffold
             TopAppBar(
                 title = {
                     Text(currentRoute.topBarTitle)
