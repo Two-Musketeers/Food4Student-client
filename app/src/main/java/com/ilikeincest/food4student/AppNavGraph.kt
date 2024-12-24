@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
@@ -54,7 +55,12 @@ object AppRoutes {
     object SignUpAsRestaurant
 
     @Serializable
-    data class RestaurantDetail(val id: String)
+    data class RestaurantDetail(
+        val id: String,
+        val distance: Double,
+        val timeAway: Int,
+        val isFavorited: Boolean
+    )
     @Serializable
     data class RestaurantRating(val id: String)
 
@@ -113,7 +119,14 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onNavigateToShippingLocation = {
                     navController.navigate(AppRoutes.ShippingLocation)
                 },
-                onNavigateToRestaurant = { navController.navigate(AppRoutes.RestaurantDetail(it)) }
+                onNavigateToRestaurant = { buddy ->
+                    navController.navigate(AppRoutes.RestaurantDetail(
+                        id = buddy.Id,
+                        distance = buddy.Distance,
+                        timeAway = buddy.TimeAway,
+                        isFavorited = buddy.IsFavorited
+                    ))
+                }
             )
         }
         composable<AppRoutes.Admin> {
@@ -194,7 +207,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             NavigateWithResult(it) { location: Location? ->
                 SelectRoleRestaurantScreen(
                     selectedLocation = location,
-                    onNavigateToLocationPicker = { navController.navigate(AppRoutes.PickLocation) }
+                    onNavigateToLocationPicker = { navController.navigate(AppRoutes.PickLocation) },
+                    onSetRootSplashScreen = { navController.navigateAsRootRoute(AppRoutes.SplashScreen) }
                 )
             }
         }
@@ -256,11 +270,11 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         // restaurant routes
         composable<AppRoutes.RestaurantDetail> {
             RestaurantScreen(
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUp() },
             )
         }
         composable<AppRoutes.RestaurantRating> {
-            
+
         }
     }
 }

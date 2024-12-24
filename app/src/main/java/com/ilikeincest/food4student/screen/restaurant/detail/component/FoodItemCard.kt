@@ -118,65 +118,65 @@ fun FoodItemCard(
     }
 }
 
-@Preview
-@Composable
-private fun Prev() {
-    ComponentPreview {
-        FoodItemCard(
-            FoodItem(
-                id = "",
-                name = "Hồng Trà Kem Tươi",
-                description = "Kem có tan chảy",
-                foodItemPhotoUrl = "https://cc",
-                basePrice = 28000,
-                variations = listOf()
-            ), {},
-            Modifier
-                .padding(16.dp)
-                .width(400.dp)
-        )
-    }
-}
+//@Preview
+//@Composable
+//private fun Prev() {
+//    ComponentPreview {
+//        FoodItemCard(
+//            FoodItem(
+//                id = "",
+//                name = "Hồng Trà Kem Tươi",
+//                description = "Kem có tan chảy",
+//                foodItemPhotoUrl = "https://cc",
+//                basePrice = 28000,
+//                variations = listOf()
+//            ), {},
+//            Modifier
+//                .padding(16.dp)
+//                .width(400.dp)
+//        )
+//    }
+//}
 
-@Preview
-@Composable
-private fun PrevLong() {
-    ComponentPreview {
-        FoodItemCard(
-            FoodItem(
-                id = "",
-                name = "Hồng Trà Kem Tươi",
-                description = "Kem có tan chảy No feugait ullamcorper elit diam justo. Elitr vel in invidunt in esse tincidunt et dolore nulla lorem vero laoreet vero kasd aliquyam gubergren sanctus feugiat. Est amet et aliquip aliquyam lobortis dolore esse dolor duo lorem rebum. Dolor sed magna magna sit erat erat et. No voluptua diam aliquyam dolor dolores lorem sed labore. Sit eros lorem dolor cum ut takimata est accusam diam dolore labore. Aliquyam et tempor dolor erat blandit at eos invidunt. Est et sanctus justo sit blandit labore consequat et duo. Rebum amet vulputate magna dolor et in feugait tation diam tempor ullamcorper. Diam in rebum tempor odio sed sea eos ipsum dolore vero diam consequat. Sanctus ipsum ullamcorper accusam stet et et at sed aliquam et ea. Dolore et at dolore labore te et kasd consetetur. Rebum magna et facilisis. Et stet et lorem amet ut tempor takimata dolor vero sea vel dolores sit. No accusam est ad elitr erat accusam eirmod vero dolores velit sed adipiscing.",
-                foodItemPhotoUrl = "https://cc",
-                basePrice = 28000,
-                variations = listOf()
-            ), {},
-            Modifier
-                .padding(16.dp)
-                .width(400.dp),
-            onDecreaseInCart = {},
-            inCartCount = 3
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun PrevLong2() {
-    ComponentPreview {
-        FoodItemCard(
-            FoodItem(
-                id = "",
-                name = "Hồng Trà Kem Tươi",
-                description = "Kem có tan chảy No feugait ullamcorper elit diam justo. Elitr vel in invidunt in esse tincidunt et dolore nulla lorem vero laoreet vero kasd aliquyam gubergren sanctus feugiat. Est amet et aliquip aliquyam lobortis dolore esse dolor duo lorem rebum. Dolor sed magna magna sit erat erat et. No voluptua diam aliquyam dolor dolores lorem sed labore. Sit eros lorem dolor cum ut takimata est accusam diam dolore labore. Aliquyam et tempor dolor erat blandit at eos invidunt. Est et sanctus justo sit blandit labore consequat et duo. Rebum amet vulputate magna dolor et in feugait tation diam tempor ullamcorper. Diam in rebum tempor odio sed sea eos ipsum dolore vero diam consequat. Sanctus ipsum ullamcorper accusam stet et et at sed aliquam et ea. Dolore et at dolore labore te et kasd consetetur. Rebum magna et facilisis. Et stet et lorem amet ut tempor takimata dolor vero sea vel dolores sit. No accusam est ad elitr erat accusam eirmod vero dolores velit sed adipiscing.",
-                foodItemPhotoUrl = "https://cc",
-                basePrice = 28000,
-                variations = listOf()
-            ), {},
-            Modifier
-                .padding(16.dp)
-                .width(400.dp),
-            inCartCount = 3
-        )
-    }
-}
+//@Preview
+//@Composable
+//private fun PrevLong() {
+//    ComponentPreview {
+//        FoodItemCard(
+//            FoodItem(
+//                id = "",
+//                name = "Hồng Trà Kem Tươi",
+//                description = "Kem có tan chảy No feugait ullamcorper elit diam justo. Elitr vel in invidunt in esse tincidunt et dolore nulla lorem vero laoreet vero kasd aliquyam gubergren sanctus feugiat. Est amet et aliquip aliquyam lobortis dolore esse dolor duo lorem rebum. Dolor sed magna magna sit erat erat et. No voluptua diam aliquyam dolor dolores lorem sed labore. Sit eros lorem dolor cum ut takimata est accusam diam dolore labore. Aliquyam et tempor dolor erat blandit at eos invidunt. Est et sanctus justo sit blandit labore consequat et duo. Rebum amet vulputate magna dolor et in feugait tation diam tempor ullamcorper. Diam in rebum tempor odio sed sea eos ipsum dolore vero diam consequat. Sanctus ipsum ullamcorper accusam stet et et at sed aliquam et ea. Dolore et at dolore labore te et kasd consetetur. Rebum magna et facilisis. Et stet et lorem amet ut tempor takimata dolor vero sea vel dolores sit. No accusam est ad elitr erat accusam eirmod vero dolores velit sed adipiscing.",
+//                foodItemPhotoUrl = "https://cc",
+//                basePrice = 28000,
+//                variations = listOf()
+//            ), {},
+//            Modifier
+//                .padding(16.dp)
+//                .width(400.dp),
+//            onDecreaseInCart = {},
+//            inCartCount = 3
+//        )
+//    }
+//}
+//
+//@Preview
+//@Composable
+//private fun PrevLong2() {
+//    ComponentPreview {
+//        FoodItemCard(
+//            FoodItem(
+//                id = "",
+//                name = "Hồng Trà Kem Tươi",
+//                description = "Kem có tan chảy No feugait ullamcorper elit diam justo. Elitr vel in invidunt in esse tincidunt et dolore nulla lorem vero laoreet vero kasd aliquyam gubergren sanctus feugiat. Est amet et aliquip aliquyam lobortis dolore esse dolor duo lorem rebum. Dolor sed magna magna sit erat erat et. No voluptua diam aliquyam dolor dolores lorem sed labore. Sit eros lorem dolor cum ut takimata est accusam diam dolore labore. Aliquyam et tempor dolor erat blandit at eos invidunt. Est et sanctus justo sit blandit labore consequat et duo. Rebum amet vulputate magna dolor et in feugait tation diam tempor ullamcorper. Diam in rebum tempor odio sed sea eos ipsum dolore vero diam consequat. Sanctus ipsum ullamcorper accusam stet et et at sed aliquam et ea. Dolore et at dolore labore te et kasd consetetur. Rebum magna et facilisis. Et stet et lorem amet ut tempor takimata dolor vero sea vel dolores sit. No accusam est ad elitr erat accusam eirmod vero dolores velit sed adipiscing.",
+//                foodItemPhotoUrl = "https://cc",
+//                basePrice = 28000,
+//                variations = listOf()
+//            ), {},
+//            Modifier
+//                .padding(16.dp)
+//                .width(400.dp),
+//            inCartCount = 3
+//        )
+//    }
+//}

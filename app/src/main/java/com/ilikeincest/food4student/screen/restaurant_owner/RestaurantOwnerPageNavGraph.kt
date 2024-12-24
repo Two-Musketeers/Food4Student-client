@@ -21,6 +21,7 @@ import kotlinx.datetime.Clock
 import kotlin.random.Random
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -66,6 +67,7 @@ internal enum class RestaurantOwnerRoutes(
 
 @Composable
 internal fun RestaurantOwnerPageNavGraph(
+    innerPadding: PaddingValues,
     currentRoute: RestaurantOwnerRoutes,
     scrollConnection: NestedScrollConnection,
     onNavigateToAddEditFoodItem: () -> Unit,
@@ -105,6 +107,7 @@ internal fun RestaurantOwnerPageNavGraph(
         when (it) {
             RestaurantOwnerRoutes.Home ->
                 RestaurantOwnerScreenContent(
+                    innerPadding = innerPadding,
                     onNavigateToAddEditFoodItem = {
                         onNavigateToAddEditFoodItem()
                     },

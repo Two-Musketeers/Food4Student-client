@@ -24,8 +24,7 @@ interface RestaurantApiService {
     @GET("restaurants/{id}")
     suspend fun getRestaurantById(
         @Path("id") id: String
-    ) : Response<RestaurantDetailDto>
-    @Deprecated("TODO: update this shit")
+    ) : Response<Restaurant>
     @PUT("restaurants")
     suspend fun updateRestaurant(
         @Body restaurant : RegisterRestaurantOwnerDto

@@ -8,6 +8,7 @@ import com.ilikeincest.food4student.admin.service.ModeratorApiService
 import com.ilikeincest.food4student.platform.retrofit.NetworkErrorInterceptor
 import com.ilikeincest.food4student.service.api.*
 import com.ilikeincest.food4student.util.InstantDeserializer
+import com.ilikeincest.food4student.util.RestaurantRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -103,4 +104,10 @@ object RetrofitModule {
     @Singleton
     fun provideFoodItemApiService(retrofit: Retrofit): FoodItemApiService
         = retrofit.create(FoodItemApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideRestaurantRepository(userApiService: UserApiService): RestaurantRepository {
+        return RestaurantRepository(userApiService)
+    }
 }

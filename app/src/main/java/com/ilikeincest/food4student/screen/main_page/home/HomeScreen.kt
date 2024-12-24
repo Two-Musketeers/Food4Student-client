@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,8 +35,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 import com.ilikeincest.food4student.component.ErrorDialog
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.screen.main_page.component.ShopListingCard
 import com.ilikeincest.food4student.screen.main_page.home.component.AdsBanner
 import com.ilikeincest.food4student.screen.main_page.home.component.CurrentShippingLocationCard
@@ -54,7 +55,8 @@ enum class HomeTabTypes(val tabTitle: String) {
 @Composable
 fun HomeScreen(
     onNavigateToShippingLocation: () -> Unit,
-    onNavigateToRestaurant: (id: String) -> Unit,
+    onNavigateToRestaurant: (noNeedToFetchAgainBuddy: NoNeedToFetchAgainBuddy) -> Unit,
+    currentLocation: GeoCoordinates?,
     vm: HomeViewModel = hiltViewModel()
 ) {
     val errorMessage by vm.errorMessage.collectAsState()
@@ -80,47 +82,13 @@ fun HomeScreen(
         val selectedTab by vm.selectedTab.collectAsState()
         val noMoreRestaurant by vm.noMoreRestaurant.collectAsState()
         val state = rememberLazyListState()
-        val currentLocation by vm.currentLocation.collectAsState()
-        val localContext = LocalContext.current
-
-        val locationUtils = remember { LocationUtils(localContext) }
-
-        var hasLocationPermission by remember { mutableStateOf(false) }
-        val requestPermissionLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestMultiplePermissions(),
-            onResult = { permissions ->
-                if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
-                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                ) {
-                    hasLocationPermission = true
-                    locationUtils.requestLocationForLatLong { location ->
-                        vm.updateCurrentLocation(location)
-                    }
-                }
-                locationUtils.handlePermissionResult(permissions)
-            }
-        )
-
-        DisposableEffect(Unit) {
-            if (!locationUtils.hasLocationPermission(localContext)) {
-                locationUtils.requestLocationPermissions(requestPermissionLauncher)
-            } else {
-                hasLocationPermission = true
-                locationUtils.requestLocationForLatLong { location ->
-                    vm.updateCurrentLocation(location)
-                }
-            }
-            onDispose {
-                locationUtils.stopLocationUpdates()
-            }
-        }
 
         // on select another tab
         LaunchedEffect(selectedTab, currentLocation) {
             if (state.firstVisibleItemIndex > 0)
                 state.animateScrollToItem(1)
             if (currentLocation != null)
-                vm.refreshRestaurantList()
+                vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
         }
 
         val coroutineScope = rememberCoroutineScope()
@@ -130,7 +98,7 @@ fun HomeScreen(
             onRefresh = {
                 if (currentLocation != null) {
                     coroutineScope.launch {
-                        vm.refreshRestaurantList()
+                        vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
                     }
                 }
             },
@@ -162,15 +130,21 @@ fun HomeScreen(
 
                 items(restaurantList, key = { it.id }) { restaurant ->
                     Column {
+                        val noNeedToFetchAgainBuddy = NoNeedToFetchAgainBuddy(
+                            Id = restaurant.id,
+                            TimeAway = restaurant.estimatedTimeInMinutes,
+                            Distance = restaurant.distanceInKm,
+                            IsFavorited = restaurant.isFavorited
+                        )
                         ShopListingCard(
                             shopName = restaurant.name,
                             starRating = restaurant.averageRating.toString(),
                             distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
                             timeAway = "${restaurant.estimatedTimeInMinutes} phút",
                             shopImageModel = restaurant.logoUrl, // TODO
-                            isFavorite = restaurant.isLiked, // disable favorite on home page
+                            isFavorite = restaurant.isFavorited, // disable favorite on home page
                             onFavoriteChange = { vm.toggleLike(restaurant.id) },
-                            onClick = { onNavigateToRestaurant(restaurant.id) }, // TODO
+                            onClick = { onNavigateToRestaurant(noNeedToFetchAgainBuddy) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)

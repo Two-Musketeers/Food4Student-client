@@ -3,6 +3,8 @@ package com.ilikeincest.food4student.screen.main_page
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -34,6 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -41,8 +45,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.screen.main_page.component.GlobalSearchBar
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
+import com.ilikeincest.food4student.util.LocationUtils
 
 @OptIn(ExperimentalPermissionsApi::class)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -63,7 +69,7 @@ fun RequestNotificationPermissionDialog() {
 fun MainScreen(
     onNavigateToShippingLocation: () -> Unit,
     onNavigateToAccountCenter: () -> Unit,
-    onNavigateToRestaurant: (id: String) -> Unit,
+    onNavigateToRestaurant: (noNeedToFetchAgainBuddy: NoNeedToFetchAgainBuddy) -> Unit,
     vm: MainScreenViewModel = hiltViewModel()
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -75,6 +81,39 @@ fun MainScreen(
     // (i.e. after avatar change and navigated back)
     LaunchedEffect(Unit) {
         vm.refreshUserProfile()
+    }
+    val localContext = LocalContext.current
+    val currentLocation by vm.currentLocation.collectAsState()
+    val locationUtils = remember { LocationUtils(localContext) }
+
+    var hasLocationPermission by remember { mutableStateOf(false) }
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            ) {
+                hasLocationPermission = true
+                locationUtils.requestLocationForLatLong { location ->
+                    vm.updateCurrentLocation(location)
+                }
+            }
+            locationUtils.handlePermissionResult(permissions)
+        }
+    )
+
+    DisposableEffect(Unit) {
+        if (!locationUtils.hasLocationPermission(localContext)) {
+            locationUtils.requestLocationPermissions(requestPermissionLauncher)
+        } else {
+            hasLocationPermission = true
+            locationUtils.requestLocationForLatLong { location ->
+                vm.updateCurrentLocation(location)
+            }
+        }
+        onDispose {
+            locationUtils.stopLocationUpdates()
+        }
     }
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
 
@@ -186,6 +225,7 @@ fun MainScreen(
             onNavigateToShippingLocation = onNavigateToShippingLocation,
             scrollConnection = scrollBehavior.nestedScrollConnection,
             onNavigateToRestaurant = onNavigateToRestaurant,
+            currentLocation = currentLocation,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(top = animatedContentPaddingSearchBar)

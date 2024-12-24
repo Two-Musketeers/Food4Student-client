@@ -1,25 +1,23 @@
-package com.ilikeincest.food4student.screen.main_page.home
+package com.ilikeincest.food4student.screen.main_page.favorite
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.model.Restaurant
-import com.ilikeincest.food4student.service.api.RestaurantApiService
 import com.ilikeincest.food4student.service.api.UserApiService
-import com.ilikeincest.food4student.util.RestaurantRepository
-import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import com.here.sdk.core.GeoCoordinates
+import com.ilikeincest.food4student.util.RestaurantRepository
+import com.ilikeincest.food4student.util.haversineDistance
 
 private const val pageSize = 10
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val restaurantApi: RestaurantApiService,
+class FavoriteViewModel @Inject constructor(
     private val userApiService: UserApiService,
     private val repository: RestaurantRepository
 ) : ViewModel() {
@@ -38,19 +36,19 @@ class HomeViewModel @Inject constructor(
     private val _noMoreRestaurant = MutableStateFlow(false)
     val noMoreRestaurant = _noMoreRestaurant.asStateFlow()
 
-    private val _selectedTab = MutableStateFlow(HomeTabTypes.Nearby)
-    val selectedTab = _selectedTab.asStateFlow()
-
     private var _currentPage = 1
 
     init {
         viewModelScope.launch {
             repository.initializeLikedRestaurants()
+            refreshFavorites(latitude = 0.0, longitude = 0.0) // Replace with actual location
         }
 
         // Observe liked restaurants and update the list accordingly
         viewModelScope.launch {
             repository.likedRestaurantIds.collect { likedIds ->
+                // This removal is appropriate for FavoriteViewModel
+                restaurantList.removeAll { !likedIds.contains(it.id) }
 
                 // Update existing restaurants by replacing them with updated copies
                 restaurantList.forEachIndexed { index, restaurant ->
@@ -63,29 +61,21 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun selectTab(i: HomeTabTypes) { _selectedTab.value = i }
-
-    suspend fun refreshRestaurantList(latitude: Double, longitude: Double) {
+    suspend fun refreshFavorites(latitude: Double, longitude: Double) {
         _isRefreshing.value = true
         _isLoadingMore.value = false
         _currentPage = 1
-        val res = restaurantApi.getRestaurants(latitude, longitude, 1, pageSize)
+        val res = userApiService.getLikes(1, pageSize)
         if (!res.isSuccessful) {
-            _errorMessage.value = "Không thể load danh sách nhà hàng.\n" +
-                    "Mã lỗi: ${res.code()}${res.message()}"
+            _errorMessage.value = "Không thể load danh sách nhà hàng.\nMã lỗi: ${res.code()}${res.message()}"
             _isRefreshing.value = false
             return
         }
 
         restaurantList.clear()
         res.body()?.forEach { dto ->
-            val distance = haversineDistance(
-                lat1 = latitude,
-                lon1 = longitude,
-                lat2 = dto.latitude,
-                lon2 = dto.longitude
-            )
-            val estimatedTime = (distance / 40.0 * 60).toInt() // 40 km/h => time in minutes
+            val distance = haversineDistance(lat1 = latitude, lon1 = longitude, lat2 = dto.latitude, lon2 = dto.longitude)
+            val estimatedTime = (distance / 40.0 * 60).toInt()
 
             restaurantList.add(
                 Restaurant(
@@ -112,27 +102,20 @@ class HomeViewModel @Inject constructor(
         _isRefreshing.value = false
     }
 
-    fun loadMoreRestaurants(currentLocation: GeoCoordinates) {
+    fun loadMoreFavorites(currentLocation: GeoCoordinates) {
         _isLoadingMore.value = true
         _currentPage++
         viewModelScope.launch {
-            val res = restaurantApi.getRestaurants(currentLocation.latitude, currentLocation.longitude, _currentPage, pageSize)
-
+            val res = userApiService.getLikes(_currentPage, pageSize)
             if (!res.isSuccessful) {
-                _errorMessage.value = "Không thể load danh sách nhà hàng.\n" +
-                        "Mã lỗi: ${res.code()} ${res.message()}"
+                _errorMessage.value = "Không thể load danh sách nhà hàng.\nMã lỗi: ${res.code()} ${res.message()}"
                 _isLoadingMore.value = false
                 return@launch
             }
 
             val newList = res.body()?.map { dto ->
-                val distance = haversineDistance(
-                    lat1 = currentLocation.latitude,
-                    lon1 = currentLocation.longitude,
-                    lat2 = dto.latitude,
-                    lon2 = dto.longitude
-                )
-                val estimatedTime = (distance / 40.0 * 60).toInt() // 40 km/h => time in minutes
+                val distance = haversineDistance(lat1 = currentLocation.latitude, lon1 = currentLocation.longitude, lat2 = dto.latitude, lon2 = dto.longitude)
+                val estimatedTime = (distance / 40.0 * 60).toInt()
 
                 Restaurant(
                     id = dto.id,
