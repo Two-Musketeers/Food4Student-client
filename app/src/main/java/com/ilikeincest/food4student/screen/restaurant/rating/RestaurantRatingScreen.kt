@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,6 +82,7 @@ private fun RestaurantRatingScreenContent(
                     modifier = Modifier
                         .fillParentMaxWidth()
                         .padding(16.dp)
+                        .padding(bottom = 8.dp)
                 )
             }
             item {
@@ -90,18 +91,25 @@ private fun RestaurantRatingScreenContent(
                         fontSize = 20.sp
                     ),
                     modifier = Modifier
+//                        .clip(RoundedCornerShape(topStart = 16.dp))
+//                        .clip(RoundedCornerShape(topEndPercent = 100))
                         .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                         .fillParentMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 24.dp)
                 )
             }
-            items(ratings) {
+            itemsIndexed(ratings) { i, it ->
                 RatingCard(it, Modifier
                     .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 26.dp)
                 )
+                if (i != ratings.size - 1) {
+                    Spacer(Modifier
+                        .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
+                        .height(26.dp).fillParentMaxWidth()
+                    )
+                }
             }
             item {
                 if (ratings.isNotEmpty()) return@item
@@ -112,14 +120,14 @@ private fun RestaurantRatingScreenContent(
                 ) {
                     Text("Chưa có ai đánh giá cả... \uD83D\uDE2D")
                     Text("Nhanh tay đặt món phá tem nào!")
-                    Spacer(Modifier.height(12.dp))
                 }
             }
             item {
                 Spacer(Modifier
+//                    .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                     .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                     .fillParentMaxWidth()
-                    .height(8.dp)
+                    .height(26.dp)
                 )
             }
         }
