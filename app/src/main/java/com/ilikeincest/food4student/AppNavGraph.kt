@@ -89,6 +89,12 @@ object AppRoutes {
     object AddEditVariation
     @Serializable
     object SplashScreen
+
+    // checkout
+    @Serializable
+    object CheckoutConfirm
+    @Serializable
+    object CheckoutSuccess
 }
 
 @Composable
@@ -268,6 +274,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             RestaurantScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
+                onNavigateToCheckout = { navController.navigate(AppRoutes.CheckoutConfirm) },
             )
         }
         composable<AppRoutes.RestaurantRating> {

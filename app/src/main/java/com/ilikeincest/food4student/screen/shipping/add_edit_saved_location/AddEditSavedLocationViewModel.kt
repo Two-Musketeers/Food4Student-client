@@ -1,16 +1,26 @@
 package com.ilikeincest.food4student.screen.shipping.add_edit_saved_location
 
+import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
+import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.service.api.UserApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -41,7 +51,7 @@ class AddEditSavedLocationViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
 
     private var isInitialized = false
-    fun getInitialData(id: String?, defaultType: SavedShippingLocationType) {
+    fun getInitialData(id: String?, context: Context, defaultType: SavedShippingLocationType) {
         if (isInitialized) return
         isLoading.value = true
         viewModelScope.launch {
@@ -52,18 +62,17 @@ class AddEditSavedLocationViewModel @Inject constructor(
             if (handleError(res))
                 initialPhone = res.body()!!.string() // shouldnt be null but eh
             if (id != null) {
-                val res = userApiService.getShippingAddress(id)
-                if (handleError(res)) {
-                    val body = res.body()!!
-                    with(body) {
-                        this.name?.let { initialName = it }
-                        this.phoneNumber?.let { initialPhone = it }
-                        initialPhone = phoneNumber ?: ""
-                        initialLocation = this.location.takeIf { it != this.address } ?: ""
-                        initialAddress = this.address
-                        initialNote = this.buildingNote ?: ""
-                        initialType = this.locationType.ordinal
-                        initialOtherLabel = this.otherLocationTypeTitle ?: ""
+                if (id.isEmpty()) {
+                    // working with selected
+                    val location = getCurrentLocation(context)
+                    if (location != null) seedInitialFromModel(location)
+                }
+                else {
+                    // working with saved (online)
+                    val res = userApiService.getShippingAddress(id)
+                    if (handleError(res)) {
+                        val body = res.body()!!
+                        seedInitialFromModel(body)
                     }
                 }
             }
@@ -75,6 +84,40 @@ class AddEditSavedLocationViewModel @Inject constructor(
             selectedLocationType.intValue = initialType
             isInitialized = true
             isLoading.value = false
+        }
+    }
+
+    private val LOCATION = stringPreferencesKey("location")
+    private suspend fun getCurrentLocation(context: Context): SavedShippingLocation? {
+        val data = context.dataStore.data.first()
+        val str = data[LOCATION] ?: return null
+        try {
+            val location = Json.decodeFromString<SavedShippingLocation>(str)
+            return location
+        } catch (e: SerializationException) {
+            context.dataStore.edit { it[LOCATION] = "" }
+        }
+        return null
+    }
+    private fun setCurrentLocation(location: SavedShippingLocation, context: Context) {
+        viewModelScope.launch {
+            context.dataStore.edit {
+                it[LOCATION] = Json.encodeToString(location)
+            }
+        }
+    }
+
+    private fun seedInitialFromModel(body: SavedShippingLocation) {
+        with(body) {
+            this.name?.let { initialName = it }
+            if (!this.phoneNumber.isNullOrBlank()) {
+                initialPhone = this.phoneNumber
+            }
+            initialLocation = this.location.takeIf { it != this.address } ?: ""
+            initialAddress = this.address
+            initialNote = this.buildingNote ?: ""
+            initialType = this.locationType.ordinal
+            initialOtherLabel = this.otherLocationTypeTitle ?: ""
         }
     }
 
@@ -90,11 +133,16 @@ class AddEditSavedLocationViewModel @Inject constructor(
         }
     }
 
-    fun saveEdited(id: String, onSuccess: () -> Unit) {
+    fun saveEdited(id: String, context: Context, onSuccess: () -> Unit) {
         isLoading.value = true
         viewModelScope.launch {
-            val res = userApiService.updateShippingAddress(id, buildRequestBody(id))
+            if (id.isEmpty()) {
+                setCurrentLocation(buildRequestBody(id), context)
+                isLoading.value = false
+                onSuccess()
+            }
 
+            val res = userApiService.updateShippingAddress(id, buildRequestBody(id))
             isLoading.value = false
             if (handleError(res)) {
                 onSuccess()

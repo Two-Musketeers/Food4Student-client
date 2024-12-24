@@ -71,13 +71,14 @@ fun OrderItemCard(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.align(Alignment.End)
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("x$quantity", style = typography.bodySmall)
                 val priceFormatted = formatPrice(price)
                 Text(priceFormatted, style = typography.titleMedium)
+                Text("x$quantity", style = typography.bodySmall)
             }
         }
     }

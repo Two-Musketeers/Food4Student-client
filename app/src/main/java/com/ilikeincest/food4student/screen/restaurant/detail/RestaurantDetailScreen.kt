@@ -77,6 +77,7 @@ import kotlin.math.roundToInt
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
     onNavigateToRating: (id: String) -> Unit,
+    onNavigateToCheckout: () -> Unit,
     viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val restaurantDetail by viewModel.restaurantDetail.collectAsState()

@@ -28,8 +28,6 @@ fun CurrentShippingLocationCard(
 ) {
     Card(
         onClick = onClick,
-//        colors = CardDefaults.cardColors()
-//            .copy(containerColor = colorScheme.surfaceContainerHigh),
         modifier = modifier
     ) {
         Row(

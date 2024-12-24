@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,9 +57,10 @@ fun AddEditSavedLocationScreen(
 ) {
     val isEditScreen = id != null
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val context = LocalContext.current
 
     LaunchedEffect(id, defaultType) {
-        vm.getInitialData(id, defaultType)
+        vm.getInitialData(id, context, defaultType)
     }
 
     // TODO: disable save button if missing any required field
@@ -111,12 +113,13 @@ fun AddEditSavedLocationScreen(
             enableSave = isInputValid,
             isEdit = isEditScreen,
             onNavigateUp = onNavUp,
+            showDeleteButton = id?.isNotEmpty() ?: false,
             onDelete = { id?.let { vm.delete(it, onNavigateUp) } }, // TODO: add confirm
             onSave = {
                 if (id == null) {
                     vm.saveNew(onNavigateUp)
                 } else {
-                    vm.saveEdited(id, onNavigateUp)
+                    vm.saveEdited(id, context, onNavigateUp)
                 }
             },
             scrollBehavior = scrollBehavior,
