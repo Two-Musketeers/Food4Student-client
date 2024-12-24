@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +33,6 @@ import androidx.navigation.NavController
 import com.ilikeincest.food4student.screen.main_page.RequestNotificationPermissionDialog
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantOwnerScreen(
@@ -69,6 +69,7 @@ fun RestaurantOwnerScreen(
         } },
         // show top bar if route is notification and orders (why the heck don't we give these 2 screen a freaking topAppBar you ADHD piece of *
         topBar = {
+            if (currentRoute == RestaurantOwnerRoutes.Home) return@Scaffold
             val topBarAlpha by animateFloatAsState(
                 targetValue = if (currentRoute == RestaurantOwnerRoutes.Notifications || currentRoute == RestaurantOwnerRoutes.Orders) 1f else 0f,
                 label = "Top bar alpha"
@@ -100,19 +101,18 @@ fun RestaurantOwnerScreen(
             )
         },
     ) { innerPadding ->
-        val finalPadding = if (currentRoute == RestaurantOwnerRoutes.Notifications) {
-            Modifier.padding(innerPadding)
-        } else {
-            Modifier.fillMaxSize()
-        }
-        Box (modifier = finalPadding) {
-            RestaurantOwnerPageNavGraph(
-                currentRoute = currentRoute,
-                scrollConnection = scrollBehavior.nestedScrollConnection,
-                onNavigateToAddEditFoodItem = { onNavigateToAddEditFoodItem() },
-                navController = navController,
-                viewModel = viewModel
-            )
-        }
+//        val finalPadding = if (currentRoute == RestaurantOwnerRoutes.Notifications) {
+//            Modifier.padding(innerPadding)
+//        } else {
+//            Modifier.fillMaxSize()
+//        }
+        RestaurantOwnerPageNavGraph(
+            innerPadding = innerPadding,
+            currentRoute = currentRoute,
+            scrollConnection = scrollBehavior.nestedScrollConnection,
+            onNavigateToAddEditFoodItem = { onNavigateToAddEditFoodItem() },
+            navController = navController,
+            viewModel = viewModel
+        )
     }
 }

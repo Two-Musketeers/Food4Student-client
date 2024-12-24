@@ -12,7 +12,7 @@ data class Restaurant(
     val bannerUrl: String?,
     val totalRatings: Int,
     val averageRating: Double,
-    val isLiked: Boolean,
+    val isFavorited: Boolean,
     val foodCategories: List<FoodCategory>,
     var distanceInKm: Double = 0.0,
     var estimatedTimeInMinutes: Int = 0,

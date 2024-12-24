@@ -20,10 +20,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CollapsableDescriptionCard(
-    description: String,
+    description: String?,
     modifier: Modifier = Modifier,
     minimizedMaxLines: Int = 3,
 ) {
+    if (description == null) return
     var viewMore by rememberSaveable { mutableStateOf(false) }
     Card(onClick = { viewMore = !viewMore }, modifier = modifier.fillMaxWidth()) {
         AnimatedContent(viewMore,
@@ -32,7 +33,9 @@ fun CollapsableDescriptionCard(
             },
             label = "view more desc"
         ) { showMore ->
-            Text(description, style = typography.bodyLarge,
+            Text(
+                text = description,
+                style = typography.bodyLarge,
                 maxLines = if (showMore) Int.MAX_VALUE else minimizedMaxLines,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(16.dp)

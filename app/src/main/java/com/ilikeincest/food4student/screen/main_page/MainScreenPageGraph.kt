@@ -22,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.BroadcastReceiver
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.screen.main_page.favorite.FavoriteScreen
 import com.ilikeincest.food4student.screen.main_page.home.HomeScreen
@@ -69,8 +71,9 @@ internal enum class MainRoutes(
 internal fun MainScreenPageGraph(
     currentRoute: MainRoutes,
     onNavigateToShippingLocation: () -> Unit,
-    onNavigateToRestaurant: (id: String) -> Unit,
+    onNavigateToRestaurant: (noNeedToFetchAgainBuddy: NoNeedToFetchAgainBuddy) -> Unit,
     scrollConnection: NestedScrollConnection,
+    currentLocation: GeoCoordinates?,
     modifier: Modifier = Modifier
 ) {
     // Allow receiving new notifications and appending it to list
@@ -108,12 +111,13 @@ internal fun MainScreenPageGraph(
             MainRoutes.HOME ->
                 HomeScreen(
                     onNavigateToShippingLocation,
-                    onNavigateToRestaurant
+                    onNavigateToRestaurant,
+                    currentLocation
                 )
             MainRoutes.ORDER ->
                 OrderScreen()
             MainRoutes.FAVORITE ->
-                FavoriteScreen()
+                FavoriteScreen(onNavigateToRestaurant = onNavigateToRestaurant, currentLocation = currentLocation)
             MainRoutes.NOTIFICATION ->
                 NotificationScreen(scrollConnection)
         }

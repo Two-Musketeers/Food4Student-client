@@ -44,6 +44,7 @@ import com.ilikeincest.food4student.model.Location
 fun SelectRoleRestaurantScreen(
     selectedLocation: Location?,
     onNavigateToLocationPicker: () -> Unit,
+    onSetRootSplashScreen: () -> Unit,
     vm: SelectRoleRestaurantViewModel = hiltViewModel()
 ) {
     var name by vm.name
@@ -184,8 +185,7 @@ fun SelectRoleRestaurantScreen(
             Button(
                 onClick = {
                     vm.registerRestaurant(onSuccess = {
-                        // TODO
-
+                        onSetRootSplashScreen()
                     })
                 },
                 enabled = latitude != Double.POSITIVE_INFINITY,
@@ -204,5 +204,5 @@ fun SelectRoleRestaurantScreen(
 @Preview
 @Composable
 private fun Prev() { ScreenPreview {
-    SelectRoleRestaurantScreen(null, {})
+    SelectRoleRestaurantScreen(null, {}, {})
 } }

@@ -1,8 +1,5 @@
 package com.ilikeincest.food4student.screen.main_page.home
 
-import android.Manifest
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,26 +18,24 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
 import com.ilikeincest.food4student.component.ErrorDialog
+import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.screen.main_page.component.ShopListingCard
 import com.ilikeincest.food4student.screen.main_page.home.component.AdsBanner
 import com.ilikeincest.food4student.screen.main_page.home.component.CurrentShippingLocationCard
-import com.ilikeincest.food4student.util.LocationUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class HomeTabTypes(val tabTitle: String) {
@@ -53,7 +48,8 @@ enum class HomeTabTypes(val tabTitle: String) {
 @Composable
 fun HomeScreen(
     onNavigateToShippingLocation: () -> Unit,
-    onNavigateToRestaurant: (id: String) -> Unit,
+    onNavigateToRestaurant: (noNeedToFetchAgainBuddy: NoNeedToFetchAgainBuddy) -> Unit,
+    currentLocation: GeoCoordinates?,
     vm: HomeViewModel = hiltViewModel()
 ) {
     val errorMessage by vm.errorMessage.collectAsState()
@@ -86,39 +82,6 @@ fun HomeScreen(
         val selectedTab by vm.selectedTab.collectAsState()
         val noMoreRestaurant by vm.noMoreRestaurant.collectAsState()
         val state = rememberLazyListState()
-        val currentLocation by vm.currentLocation.collectAsState()
-
-        val locationUtils = remember { LocationUtils(context) }
-
-        var hasLocationPermission by remember { mutableStateOf(false) }
-        val requestPermissionLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestMultiplePermissions(),
-            onResult = { permissions ->
-                if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
-                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                ) {
-                    hasLocationPermission = true
-                    locationUtils.requestLocationForLatLong { location ->
-                        vm.updateCurrentLocation(location)
-                    }
-                }
-                locationUtils.handlePermissionResult(permissions)
-            }
-        )
-
-        DisposableEffect(Unit) {
-            if (!locationUtils.hasLocationPermission(context)) {
-                locationUtils.requestLocationPermissions(requestPermissionLauncher)
-            } else {
-                hasLocationPermission = true
-                locationUtils.requestLocationForLatLong { location ->
-                    vm.updateCurrentLocation(location)
-                }
-            }
-            onDispose {
-                locationUtils.stopLocationUpdates()
-            }
-        }
 
         val coroutineScope = rememberCoroutineScope()
         BetterPullToRefreshBox(
@@ -127,7 +90,7 @@ fun HomeScreen(
             onRefresh = {
                 if (currentLocation != null) {
                     coroutineScope.launch {
-                        vm.refreshRestaurantList()
+                        vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
                     }
                 }
             },
@@ -155,8 +118,9 @@ fun HomeScreen(
                                     coroutineScope.launch {
                                         if (state.firstVisibleItemIndex > 0)
                                             state.animateScrollToItem(1)
+                                        if (currentLocation == null) return@launch
                                         coroutineScope.launch {
-                                            vm.refreshRestaurantList()
+                                            vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
                                         }
                                     }
                                 },
@@ -168,15 +132,21 @@ fun HomeScreen(
 
                 items(restaurantList, key = { it.id }) { restaurant ->
                     Column {
+                        val noNeedToFetchAgainBuddy = NoNeedToFetchAgainBuddy(
+                            Id = restaurant.id,
+                            TimeAway = restaurant.estimatedTimeInMinutes,
+                            Distance = restaurant.distanceInKm,
+                            IsFavorited = restaurant.isFavorited
+                        )
                         ShopListingCard(
                             shopName = restaurant.name,
                             starRating = restaurant.averageRating.toString(),
                             distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
                             timeAway = "${restaurant.estimatedTimeInMinutes} phút",
                             shopImageModel = restaurant.logoUrl, // TODO
-                            isFavorite = restaurant.isLiked, // disable favorite on home page
+                            isFavorite = restaurant.isFavorited, // disable favorite on home page
                             onFavoriteChange = { vm.toggleLike(restaurant.id) },
-                            onClick = { onNavigateToRestaurant(restaurant.id) }, // TODO
+                            onClick = { onNavigateToRestaurant(noNeedToFetchAgainBuddy) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
@@ -185,6 +155,9 @@ fun HomeScreen(
                     }
                 }
                 item {
+                    LaunchedEffect(currentLocation) {
+                        vm.setCurrentLocation(currentLocation)
+                    }
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect

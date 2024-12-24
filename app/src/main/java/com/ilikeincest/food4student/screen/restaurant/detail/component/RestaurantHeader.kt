@@ -24,7 +24,7 @@ fun RestaurantHeader(
     starRating: String,
     distance: String,
     timeAway: String,
-    description: String,
+    description: String?,
     isFavorite: Boolean,
     onFavoriteToggle: () -> Unit,
     modifier: Modifier = Modifier

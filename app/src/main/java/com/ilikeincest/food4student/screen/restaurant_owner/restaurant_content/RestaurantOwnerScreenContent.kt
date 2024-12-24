@@ -1,8 +1,12 @@
 package com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -19,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 import com.ilikeincest.food4student.screen.restaurant_owner.component.FoodItemOwnerCard
@@ -26,6 +31,7 @@ import com.ilikeincest.food4student.screen.restaurant_owner.component.FoodItemOw
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantOwnerScreenContent(
+    innerPadding: PaddingValues,
     onNavigateToAddEditFoodItem: () -> Unit,
     viewModel: RestaurantOwnerViewModel
 ) {
@@ -38,7 +44,10 @@ fun RestaurantOwnerScreenContent(
             onDismiss = { viewModel.dismissErrorDialog() }
         )
     }
-
+    val realPadding = PaddingValues(
+        top = innerPadding.calculateTopPadding() - WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+        bottom = innerPadding.calculateBottomPadding()
+    )
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,7 +61,8 @@ fun RestaurantOwnerScreenContent(
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Thêm món ăn")
             }
-        }
+        },
+        modifier = Modifier.padding(realPadding)
     ) { innerPadding ->
         restaurant?.let { restaurant ->
             val foodItems = restaurant.foodCategories.flatMap { it.foodItems }

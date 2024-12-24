@@ -22,6 +22,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,13 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
+import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantDetailViewModel
 import com.ilikeincest.food4student.util.formatPrice
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -50,14 +52,23 @@ import kotlin.random.Random
 fun AddToCartSheet(
     item: FoodItem,
     onDismiss: () -> Unit,
-    onAddItemToCart: () -> Unit, // TODO: pass in data of selected food item here
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RestaurantDetailViewModel
 ) {
     val state = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
     val coroutine = rememberCoroutineScope()
-    val selectedIsValid = true // TODO
+    val allSelectedVariations by viewModel.selectedVariations.collectAsState()
+    val itemSelectedVariations = allSelectedVariations[item.id] ?: emptyMap()
+
+    val canAdd by remember(itemSelectedVariations) {
+        derivedStateOf { viewModel.isSelectedVariationsValid(item.id) }
+    }
+
+    LaunchedEffect(item.id) {
+        viewModel.isSelectedVariationsValid(item.id)
+    }
     ModalBottomSheet(
         sheetGesturesEnabled = false,
         sheetState = state,
@@ -68,20 +79,28 @@ fun AddToCartSheet(
         // visible area the sheet occupies on screen
         val screenHeight = LocalConfiguration.current.screenHeightDp.dp
         val visibleHeight = screenHeight * 0.8f
-        Column(Modifier
-            .fillMaxWidth()
-            .requiredSizeIn(maxHeight = visibleHeight)
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .requiredSizeIn(maxHeight = visibleHeight)
         ) {
-            Box(Modifier.fillMaxWidth().padding(top = 4.dp)) {
-                Text("Thêm món mới",
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+            ) {
+                Text(
+                    "Thêm món mới",
                     style = typography.titleLarge,
                     modifier = Modifier.align(Alignment.Center)
                 )
                 IconButton(
-                    onClick = { coroutine.launch {
-                        state.hide()
-                        onDismiss()
-                    } },
+                    onClick = {
+                        coroutine.launch {
+                            state.hide()
+                            onDismiss()
+                        }
+                    },
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(horizontal = 8.dp)
@@ -89,14 +108,17 @@ fun AddToCartSheet(
                     Icon(Icons.Default.Close, "Close order sheet")
                 }
             }
-            HorizontalDivider(Modifier.padding(top = 4.dp).alpha(0.4f))
-            var quantity by rememberSaveable() { mutableIntStateOf(1) }
+            HorizontalDivider(
+                Modifier
+                    .padding(top = 4.dp)
+                    .alpha(0.4f)
+            )
+            var quantity by rememberSaveable { mutableStateOf(1) }
             FoodItemCard(
                 item = item,
                 modifier = Modifier.padding(16.dp),
                 onDecreaseInCart = {
-                    if (quantity == 1) return@FoodItemCard
-                    quantity--
+                    if (quantity > 1) quantity--
                 },
                 onIncreaseInCart = { quantity++ },
                 inCartCount = quantity
@@ -104,8 +126,10 @@ fun AddToCartSheet(
             LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
                 item.variations.forEach {
                     variationSection(it,
-                        checkedOptionId = listOf(), // TODO
-                        onCheckedOptionChange = {}, // TODO
+                        checkedOptionId = itemSelectedVariations[it.id] ?: emptyList(),
+                        onCheckedOptionChange = { optionId ->
+                            viewModel.selectVariation(item.id, it.id, optionId)
+                        }
                     )
                 }
             }
@@ -116,7 +140,16 @@ fun AddToCartSheet(
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                Text(formatPrice(28000),
+                // calculate total price
+                val variationExtra = item.variations.sumOf { variation ->
+                    val selectedOptionIds = itemSelectedVariations[variation.id] ?: emptyList()
+                    variation.variationOptions
+                        .filter { selectedOptionIds.contains(it.id) }
+                        .sumOf { it.priceAdjustment }
+                }
+                val totalPrice = (item.basePrice + variationExtra) * quantity
+                Text(
+                    formatPrice(totalPrice),
                     style = typography.titleLarge.copy(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.W800
@@ -125,9 +158,13 @@ fun AddToCartSheet(
                 )
                 Spacer(Modifier.weight(1f))
                 Button(
-                    enabled = selectedIsValid,
+                    enabled = canAdd,
                     onClick = {
-                        onAddItemToCart() // TODO
+                        viewModel.addToCart(item, itemSelectedVariations, quantity)
+                        coroutine.launch {
+                            state.hide()
+                            onDismiss()
+                        }
                     }
                 ) {
                     Text("Thêm vào giỏ hàng")
@@ -137,23 +174,23 @@ fun AddToCartSheet(
     }
 }
 
-@Preview
-@Composable
-private fun Prev() {
-    ScreenPreview {
-        var show by remember { mutableStateOf(true) }
-        Button(onClick = {show = true}, Modifier.padding(top = 64.dp)) {
-            Text("open sheet")
-        }
-        if (show) {
-            AddToCartSheet(
-                seedFood(),
-                {show = false},
-                {}
-            )
-        }
-    }
-}
+//@Preview
+//@Composable
+//private fun Prev() {
+//    ScreenPreview {
+//        var show by remember { mutableStateOf(true) }
+//        Button(onClick = {show = true}, Modifier.padding(top = 64.dp)) {
+//            Text("open sheet")
+//        }
+//        if (show) {
+//            AddToCartSheet(
+//                seedFood(),
+//                {show = false},
+//                {}
+//            )
+//        }
+//    }
+//}
 
 private fun seedFood(): FoodItem {
     return FoodItem(
@@ -162,28 +199,30 @@ private fun seedFood(): FoodItem {
         description = "Kem có tan chảy",
         foodItemPhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR58QY4pAtehHlOZtYU0gDSbTABNIsxy2z_gQ&s",
         basePrice = 23000,
-        variations = List(5) {Variation(
-            id = Random.nextInt().toString(),
-            name = "Size",
-            minSelect = 1,
-            maxSelect = 1,
-            variationOptions = listOf(
-                VariationOption(
-                    id = Random.nextInt().toString(),
-                    name = "Size S",
-                    priceAdjustment = 0
-                ),
-                VariationOption(
-                    id = Random.nextInt().toString(),
-                    name = "Size M",
-                    priceAdjustment = 3000
-                ),
-                VariationOption(
-                    id = Random.nextInt().toString(),
-                    name = "Size L",
-                    priceAdjustment = 6000
+        variations = List(5) {
+            Variation(
+                id = Random.nextInt().toString(),
+                name = "Size",
+                minSelect = 1,
+                maxSelect = 1,
+                variationOptions = listOf(
+                    VariationOption(
+                        id = Random.nextInt().toString(),
+                        name = "Size S",
+                        priceAdjustment = 0
+                    ),
+                    VariationOption(
+                        id = Random.nextInt().toString(),
+                        name = "Size M",
+                        priceAdjustment = 3000
+                    ),
+                    VariationOption(
+                        id = Random.nextInt().toString(),
+                        name = "Size L",
+                        priceAdjustment = 6000
+                    )
                 )
             )
-        )}
+        }
     )
 }

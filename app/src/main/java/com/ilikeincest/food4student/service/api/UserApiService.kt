@@ -5,6 +5,7 @@ import com.ilikeincest.food4student.dto.CreateShippingAddressDto
 import com.ilikeincest.food4student.dto.OrderDto
 import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.model.Notification
+import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -14,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserApiService {
     @GET("users/phone")
@@ -58,6 +60,11 @@ interface UserApiService {
     suspend fun deleteShippingAddress(
         @Path("id") id: String
     ) : Response<Unit>
+    @GET("users/likes")
+    suspend fun getLikes(
+        @Query("PageNumber") page: Int,
+        @Query("PageSize") size: Int
+    ) : Response<List<Restaurant>>
     // Like a restaurant
     @POST("users/likes/{restaurantId}")
     suspend fun toggleLikeRestaurant(

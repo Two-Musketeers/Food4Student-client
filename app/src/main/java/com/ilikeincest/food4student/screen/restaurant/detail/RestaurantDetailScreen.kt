@@ -9,19 +9,23 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,8 +39,10 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,27 +51,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.R
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
+import com.ilikeincest.food4student.component.ErrorDialog
+import com.ilikeincest.food4student.component.LoadingDialog
 import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
 import com.ilikeincest.food4student.screen.restaurant.detail.component.AddToCartSheet
+import com.ilikeincest.food4student.screen.restaurant.detail.component.CartBottomSheet
 import com.ilikeincest.food4student.screen.restaurant.detail.component.FoodItemCard
 import com.ilikeincest.food4student.screen.restaurant.detail.component.RestaurantHeader
+import com.ilikeincest.food4student.util.formatPrice
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -73,20 +86,40 @@ import kotlin.random.Random
 @Composable
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
-    // TODO: add nav to order screen
-    // TODO: add vm
+    viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
+    val restaurantDetail by viewModel.restaurantDetail.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val showLoading by viewModel.showLoading.collectAsState()
+
+    if (errorMessage.isNotEmpty()) {
+        ErrorDialog(
+            message = errorMessage,
+            onDismiss = { viewModel.dismissError() }
+        )
+    }
+    if (showLoading) {
+        LoadingDialog(
+            label = "Đang tải nhà hàng bạn chờ tí nha... ヾ(≧▽≦*)o",
+            isVisible = false
+        )
+    }
+
     // for now.
-    RestaurantScreenContent(
-        bannerModel = R.drawable.ic_launcher_background,
-        name = "Hồng Trà Ngô Gia",
-        starRating = "4.3",
-        distance = "2.0km",
-        timeAway = "25 phút",
-        description = "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
-                " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
-        onNavigateUp = onNavigateUp
-    )
+    restaurantDetail?.let { detail ->
+        val distance = "${String.format("%.2f", detail.distanceInKm)} km"
+        val timeAway = "${detail.estimatedTimeInMinutes} phút"
+        RestaurantScreenContent(
+            bannerModel = detail.bannerUrl,
+            name = detail.name,
+            starRating = detail.averageRating.toString(),
+            distance = distance,
+            timeAway = timeAway,
+            description = detail.description,
+            onNavigateUp = onNavigateUp,
+            viewModel = viewModel
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -97,14 +130,27 @@ private fun RestaurantScreenContent(
     starRating: String,
     distance: String,
     timeAway: String,
-    description: String,
+    description: String?,
     onNavigateUp: () -> Unit,
+    viewModel: RestaurantDetailViewModel
 ) {
-    // vm states
-    val foodList = remember { seedList() } // TODO: replace with vm
+    val restaurantDetail = viewModel.restaurantDetail.collectAsState().value
+    val cartItems by viewModel.cartItems.collectAsState()
+
+    val foodList = restaurantDetail?.foodCategories ?: emptyList()
     var isRefreshing by remember { mutableStateOf(false) }
     var addToCartItem by remember { mutableStateOf<FoodItem?>(null) }
-//    val cart = remember { mutableStateListOf<>() } // TODO
+    var openCart by remember { mutableStateOf(false) }
+
+    if (openCart) {
+        CartBottomSheet(
+            onDismiss = {
+                openCart = false
+            },
+            viewModel = viewModel
+        )
+    }
+
 
     // TODO handle the status bar
     // view states
@@ -120,7 +166,7 @@ private fun RestaurantScreenContent(
     if (isDragged) {
         LaunchedEffect(firstIndex) {
             var current = 2
-            if (firstIndex <= current)  {
+            if (firstIndex <= current) {
                 selectedTab = 0
                 return@LaunchedEffect
             }
@@ -141,35 +187,52 @@ private fun RestaurantScreenContent(
     }
 
     Scaffold(
-        topBar = { TopAppBar(
-            title = {
-                AnimatedVisibility(showTitle,
-                    enter = slideInVertically() + fadeIn(),
-                    exit = slideOutVertically() + fadeOut()
-                ) { Text(name) }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent
-            ),
-            navigationIcon = {
-                Row {
-                    AnimatedVisibility(!showTitle) { Spacer(Modifier.width(8.dp)) }
-                    IconButton(onClick = onNavigateUp,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = colorScheme.surfaceContainer
-                        )
-                    ) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+        topBar = {
+            TopAppBar(
+                title = {
+                    AnimatedVisibility(
+                        showTitle,
+                        enter = slideInVertically() + fadeIn(),
+                        exit = slideOutVertically() + fadeOut()
+                    ) { Text(name) }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                navigationIcon = {
+                    Row {
+                        AnimatedVisibility(!showTitle) { Spacer(Modifier.width(8.dp)) }
+                        IconButton(
+                            onClick = onNavigateUp,
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = colorScheme.surfaceContainer
+                            )
+                        ) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                        }
                     }
-                }
-            },
-            scrollBehavior = scrollBehavior
-        ) },
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        bottomBar = {
+            if (cartItems.isNotEmpty()) {
+                ShoppingCartBottomBar(
+                    viewModel = viewModel,
+                    onCartClick = {
+                        openCart = true
+                    }
+                )
+            }
+        }
     ) { innerPadding ->
         AsyncImage(
             model = bannerModel,
             contentDescription = "Restaurant banner",
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(2f)
         )
 
         val bgModifier = Modifier
@@ -199,15 +262,16 @@ private fun RestaurantScreenContent(
 
                 // header
                 item(contentType = "restaurant header") {
-                    var isFavorite by remember { mutableStateOf(false) } // TODO
                     RestaurantHeader(
                         name = name,
                         starRating = starRating,
                         distance = distance,
                         timeAway = timeAway,
                         description = description,
-                        isFavorite = isFavorite,
-                        onFavoriteToggle = { isFavorite = !isFavorite },
+                        isFavorite = restaurantDetail!!.isFavorited,
+                        onFavoriteToggle = {
+                            viewModel.toggleLike(restaurantDetail!!.id)
+                        },
                         modifier = bgModifier
                     )
                 }
@@ -217,31 +281,40 @@ private fun RestaurantScreenContent(
                 if (foodList.isNotEmpty()) {
                     stickyHeader(contentType = "category tabs") {
                         val coroutineScope = rememberCoroutineScope()
-                        SecondaryScrollableTabRow(selectedTabIndex = selectedTab) {
-                            foodList.forEachIndexed { i, category -> Tab(
-                                selected = selectedTab == i,
-                                text = { Text(category.name) },
-                                onClick = { coroutineScope.launch {
-                                    selectedTab = i
-                                    var target = categoryInitialIndex
-                                    // each category has 1 header
-                                    // and n food item
-                                    for (cate in 0..<i) {
-                                        target += foodList[cate].foodItems.size + 1
-                                    }
-                                    lazyListState.animateScrollToItem(
-                                        target,
-                                        -tabBarHeightPx.roundToInt()
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .background(colorScheme.surface)) {
+                            SecondaryScrollableTabRow(selectedTabIndex = selectedTab) {
+                                foodList.forEachIndexed { i, category ->
+                                    Tab(
+                                        selected = selectedTab == i,
+                                        text = { Text(category.name) },
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                selectedTab = i
+                                                var target = categoryInitialIndex
+                                                // each category has 1 header
+                                                // and n food item
+                                                for (cate in 0..<i) {
+                                                    target += foodList[cate].foodItems.size + 1
+                                                }
+                                                lazyListState.animateScrollToItem(
+                                                    target,
+                                                    -tabBarHeightPx.roundToInt()
+                                                )
+                                            }
+                                        },
                                     )
-                                } },
-                            ) }
+                                }
+                            }
                         }
                     }
                 }
 
                 foodList.forEach { category ->
                     item(
-                        key = category.name,
+                        key = category.id,
                         contentType = "category header"
                     ) {
                         Text(
@@ -265,7 +338,7 @@ private fun RestaurantScreenContent(
                             // TODO: add proper edit layout if have time
                             onDecreaseInCart = null, // disable the button
                             onIncreaseInCart = { addToCartItem = it },
-                            inCartCount = 0 // TODO
+                            inCartCount = 0, // TODO
                         )
                         HorizontalDivider(
                             thickness = 1.dp,
@@ -284,25 +357,65 @@ private fun RestaurantScreenContent(
         AddToCartSheet(
             item = addToCartItem!!,
             onDismiss = { addToCartItem = null },
-            onAddItemToCart = {}, // TODO
+            viewModel = viewModel
+            // TODO
+        )
+    }
+}
+
+@Composable
+fun ShoppingCartBottomBar(
+    viewModel: RestaurantDetailViewModel,
+    onCartClick: () -> Unit
+) {
+    val totalPrice by viewModel.totalPrice.collectAsState()
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(colorScheme.primaryContainer)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .fillMaxWidth()
+    ) {
+        IconButton(
+            onClick = onCartClick,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = "View Cart",
+                tint = colorScheme.onPrimaryContainer
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = "Total: ${formatPrice(totalPrice)}",
+            style = typography.titleLarge.copy(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            color = colorScheme.onPrimaryContainer
         )
     }
 }
 
 @Preview(showSystemUi = true)
 @Composable
-private fun Prev() { ScreenPreview {
-    RestaurantScreenContent(
-        R.drawable.ic_launcher_background,
-        "Hồng Trà Ngô Gia",
-        "4.3",
-        "2.0km",
-        "25 phút",
-        "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
-                " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
-        onNavigateUp = {}
-    )
-} }
+private fun Prev() {
+    ScreenPreview {
+        RestaurantScreenContent(
+            R.drawable.ic_launcher_background,
+            "Hồng Trà Ngô Gia",
+            "4.3",
+            "2.0km",
+            "25 phút",
+            "Cửa hàng hồng trà nổi danh với \"bang for your bucks\", những ly trà 1 lít!" +
+                    " Ferox boreass ducunt ad index. Sunt competitiones vitare superbus, peritus hydraes.",
+            onNavigateUp = {},
+            viewModel = hiltViewModel()
+        )
+    }
+}
 
 @Composable
 private fun calculateRemainingBannerHeight(innerPadding: PaddingValues): Dp {
@@ -322,40 +435,44 @@ private fun seedFood(seed: Int): List<FoodItem> {
             id = id.toString(),
             name = "Hồng Trà Kem Tươi",
             description =
-                if (id.mod(2) == 0)
-                    "Est sed takimata consetetur enim ipsum eos quis diam gubergren. Clita placerat nobis invidunt dolore et dolor amet erat accusam ea accusam sed justo erat autem praesent. Qui rebum sit velit vel dolore stet et nulla placerat dolore gubergren stet laoreet option lorem autem invidunt invidunt. Kasd elit enim consectetuer dolor tempor diam takimata ea elitr esse eros odio esse velit ut stet. Sanctus nonumy eos et et sanctus possim feugiat. Takimata at vero hendrerit sadipscing nulla doming ea nonumy duis ipsum. Dolore consequat magna justo dolore dolor justo doming sit tempor et invidunt aliquyam magna sit. Amet takimata accumsan dolor dignissim te dolor et dolor erat imperdiet duo kasd et eleifend dolore. Diam mazim eirmod et feugiat labore ipsum et invidunt magna et ut. Diam clita exerci clita. Dolore at est soluta aliquam ipsum nulla feugiat dolores at sit ut at suscipit duo consetetur. Tation tincidunt lorem ea aliquip et te wisi ad dolore sed clita. Sit at dolore sit duo nulla tempor at. Labore feugait lorem lobortis consequat. Ut aliquyam ea eos wisi vero ut et stet sanctus duis est sit. No labore eu duo."
-                else "Kem có tan chảy",
+            if (id.mod(2) == 0)
+                "Est sed takimata consetetur enim ipsum eos quis diam gubergren. Clita placerat nobis invidunt dolore et dolor amet erat accusam ea accusam sed justo erat autem praesent. Qui rebum sit velit vel dolore stet et nulla placerat dolore gubergren stet laoreet option lorem autem invidunt invidunt. Kasd elit enim consectetuer dolor tempor diam takimata ea elitr esse eros odio esse velit ut stet. Sanctus nonumy eos et et sanctus possim feugiat. Takimata at vero hendrerit sadipscing nulla doming ea nonumy duis ipsum. Dolore consequat magna justo dolore dolor justo doming sit tempor et invidunt aliquyam magna sit. Amet takimata accumsan dolor dignissim te dolor et dolor erat imperdiet duo kasd et eleifend dolore. Diam mazim eirmod et feugiat labore ipsum et invidunt magna et ut. Diam clita exerci clita. Dolore at est soluta aliquam ipsum nulla feugiat dolores at sit ut at suscipit duo consetetur. Tation tincidunt lorem ea aliquip et te wisi ad dolore sed clita. Sit at dolore sit duo nulla tempor at. Labore feugait lorem lobortis consequat. Ut aliquyam ea eos wisi vero ut et stet sanctus duis est sit. No labore eu duo."
+            else "Kem có tan chảy",
             foodItemPhotoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR58QY4pAtehHlOZtYU0gDSbTABNIsxy2z_gQ&s",
             basePrice = 23000,
-            variations = listOf(Variation(
-                id = "lmao",
-                name = "Size",
-                minSelect = 1,
-                maxSelect = 1,
-                variationOptions = listOf(
-                    VariationOption(
-                        id = Random.nextInt().toString(),
-                        name = "S",
-                        priceAdjustment = 0
-                    ),
-                    VariationOption(
-                        id = Random.nextInt().toString(),
-                        name = "M",
-                        priceAdjustment = 3000
-                    ),
-                    VariationOption(
-                        id = Random.nextInt().toString(),
-                        name = "L",
-                        priceAdjustment = 6000
+            variations = listOf(
+                Variation(
+                    id = "lmao",
+                    name = "Size",
+                    minSelect = 1,
+                    maxSelect = 1,
+                    variationOptions = listOf(
+                        VariationOption(
+                            id = Random.nextInt().toString(),
+                            name = "S",
+                            priceAdjustment = 0
+                        ),
+                        VariationOption(
+                            id = Random.nextInt().toString(),
+                            name = "M",
+                            priceAdjustment = 3000
+                        ),
+                        VariationOption(
+                            id = Random.nextInt().toString(),
+                            name = "L",
+                            priceAdjustment = 6000
+                        )
                     )
                 )
-            ))
+            )
         )
     }
 }
+
 private fun seedList(): List<FoodCategory> {
     val r = Random(21)
-    val cats = listOf("THỨC UỐNG HOT", "TRÀ TRÁI CÂY", "THUẦN TRÀ", "TRÀ LATTE", "TRÀ SỮA", "TRÀ CHANH")
+    val cats =
+        listOf("THỨC UỐNG HOT", "TRÀ TRÁI CÂY", "THUẦN TRÀ", "TRÀ LATTE", "TRÀ SỮA", "TRÀ CHANH")
     return List(cats.size) {
         FoodCategory(
             id = r.nextInt().toString(),
