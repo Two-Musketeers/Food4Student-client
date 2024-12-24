@@ -4,9 +4,10 @@ import com.ilikeincest.food4student.dto.CreateRatingDto
 import com.ilikeincest.food4student.dto.CreateShippingAddressDto
 import com.ilikeincest.food4student.dto.OrderDto
 import com.ilikeincest.food4student.dto.RatingDto
-import com.ilikeincest.food4student.dto.ShippingAddressDto
 import com.ilikeincest.food4student.model.Notification
 import com.ilikeincest.food4student.model.Restaurant
+import com.ilikeincest.food4student.model.SavedShippingLocation
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -17,8 +18,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserApiService {
-    @GET("lmao")
-    suspend fun getLmao() : Response<String>
+    @GET("users/phone")
+    suspend fun getPhoneNumber() : Response<ResponseBody>
     // Notifications
     @GET("users/notifications")
     suspend fun getNotifications() : Response<List<Notification>>
@@ -41,20 +42,20 @@ interface UserApiService {
     // Shipping Addresses
     @POST("users/shipping-addresses")
     suspend fun addShippingAddress(
-        @Body shippingAddress: CreateShippingAddressDto
-    ) : Response<ShippingAddressDto>
+        @Body shippingAddress: SavedShippingLocation
+    ) : Response<SavedShippingLocation>
     @PUT("users/shipping-addresses/{id}")
     suspend fun updateShippingAddress(
         @Path("id") id: String,
-        @Body shippingAddress: ShippingAddressDto
-    ) : Response<ShippingAddressDto>
+        @Body shippingAddress: SavedShippingLocation
+    ) : Response<SavedShippingLocation>
     @GET("users/shipping-addresses")
-    suspend fun getShippingAddresses() : Response<List<ShippingAddressDto>>
+    suspend fun getShippingAddresses() : Response<List<SavedShippingLocation>>
     // Don't know if this is needed
     @GET("users/shipping-addresses/{id}")
     suspend fun getShippingAddress(
         @Path("id") id: String
-    ) : Response<ShippingAddressDto>
+    ) : Response<SavedShippingLocation>
     @DELETE("users/shipping-addresses/{id}")
     suspend fun deleteShippingAddress(
         @Path("id") id: String

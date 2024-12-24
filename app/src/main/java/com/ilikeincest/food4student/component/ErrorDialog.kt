@@ -15,10 +15,11 @@ import com.ilikeincest.food4student.component.preview_helper.ScreenPreview
 fun ErrorDialog(
     message: String,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String = "Lỗi kìa bạn."
 ) {
     AlertDialog(
-        title = { Text("Lỗi kìa bạn.") },
+        title = { Text(title) },
         text = { Text(message) },
         confirmButton = {
             Button(onClick = onDismiss) {

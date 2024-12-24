@@ -17,6 +17,7 @@ import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
+import com.ilikeincest.food4student.screen.auth.forget_password.ForgetPasswordScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleRestaurantScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
@@ -29,6 +30,7 @@ import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_catego
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
 import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
+import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
@@ -45,6 +47,8 @@ object AppRoutes {
     object SignIn
     @Serializable
     object SignUp
+    @Serializable
+    object ForgetPassword
     @Serializable
     object Profile
     @Serializable
@@ -69,7 +73,7 @@ object AppRoutes {
     @Serializable
     object PickLocation
     @Serializable
-    object AddSavedLocation
+    data class AddSavedLocation(val type: SavedShippingLocationType)
     @Serializable
     data class EditSavedLocation(val id: String)
 
@@ -183,7 +187,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable<AppRoutes.SignIn> {
             SignInScreen(
                 onSetRootSplash = { navController.navigateAsRootRoute(AppRoutes.SplashScreen) },
-                onNavigateToSignUp = { navController.navigate(AppRoutes.SignUp) }
+                onNavigateToSignUp = { navController.navigate(AppRoutes.SignUp) },
+                onNavigateToForgetPassword = { navController.navigate(AppRoutes.ForgetPassword) }
             )
         }
         composable<AppRoutes.SignUp> {
@@ -191,6 +196,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                 onSetRootSplash = { navController.navigateAsRootRoute(AppRoutes.SplashScreen) },
                 onNavigateToSignIn = { navController.popBackStack(AppRoutes.SignIn, false) }
             )
+        }
+        composable<AppRoutes.ForgetPassword> {
+            ForgetPasswordScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable<AppRoutes.SelectRole> {
             SelectRoleScreen(
@@ -213,39 +221,15 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             }
         }
         composable<AppRoutes.ShippingLocation> {
-            ShippingLocationScreen(
-                locationList = listOf(
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Home,
-                        buildingNote = "Cổng trước",
-                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                        receiverName = "Hồ Nguyên Minh",
-                        receiverPhone = "01234567879",
-                    ),
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Work,
-                        buildingNote = "Cổng trước",
-                        location = "KTX Đại học Quốc gia TPHCM - Khu B",
-                        address = "15 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
-                        receiverName = "Hồ Nguyên Minh",
-                        receiverPhone = "01234567879",
-                    ),
-                    SavedShippingLocation(
-                        locationType = SavedShippingLocationType.Other,
-                        otherLocationTypeTitle = "Dating location",
-                        location = "Trường mẫu giáo Tư thục Sao Mai",
-                        address = "Lmao u believe me fr?",
-                        receiverName = "Hứa Văn Lý",
-                        receiverPhone = "0123456789",
-                    )
-                ), // TODO: move to vm
-                onNavigateUp = { navController.navigateUp() },
-                onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
-                onEditLocation = {
-                    navController.navigate(AppRoutes.EditSavedLocation("")) // TODO
-                }
-            )
+            NavigateWithResult(it) { location: Location? ->
+                ShippingLocationScreen(
+                    pickedLocation = location,
+                    onNavigateUp = { navController.navigateUp() },
+                    onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
+                    onAddLocation = { navController.navigate(AppRoutes.AddSavedLocation(it)) },
+                    onEditLocation = { navController.navigate(AppRoutes.EditSavedLocation(it)) }
+                )
+            }
         }
         composable<AppRoutes.PickLocation> {
             MapScreen(
@@ -254,14 +238,26 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable<AppRoutes.AddSavedLocation> {
-            AddEditSavedLocationScreen(onNavigateUp = {})
+            val route = it.toRoute<AppRoutes.AddSavedLocation>()
+            NavigateWithResult(it) { location: Location? ->
+                AddEditSavedLocationScreen(
+                    selectedAddress = location,
+                    onNavigateUp = { navController.navigateUp() },
+                    onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
+                    defaultType = route.type
+                )
+            }
         }
         composable<AppRoutes.EditSavedLocation> {
             val route = it.toRoute<AppRoutes.EditSavedLocation>()
-            AddEditSavedLocationScreen(
-                onNavigateUp = { navController.navigateUp() },
-                id = route.id
-            )
+            NavigateWithResult(it) { location: Location? ->
+                AddEditSavedLocationScreen(
+                    selectedAddress = location,
+                    onNavigateUp = { navController.navigateUp() },
+                    onPickFromMap = { navController.navigate(AppRoutes.PickLocation) },
+                    id = route.id
+                )
+            }
         }
         composable<AppRoutes.Profile> {
             AccountCenterScreen(navController = navController)
@@ -274,7 +270,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
         composable<AppRoutes.RestaurantRating> {
-
+            RestaurantRatingScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
     }
 }

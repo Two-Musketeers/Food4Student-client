@@ -62,6 +62,7 @@ fun HomeScreen(
     val errorMessage by vm.errorMessage.collectAsState()
     val isLoadingMore by vm.isLoadingMore.collectAsState()
     val isRefreshing by vm.isRefreshing.collectAsState()
+    val shippingLocation by vm.shippingLocation.collectAsState()
     if (errorMessage.isNotEmpty()) {
         ErrorDialog(
             message = errorMessage,
@@ -69,10 +70,16 @@ fun HomeScreen(
         )
     }
 
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        vm.fetchCurrentFromDStore(context)
+    }
+
     Column(Modifier.padding(top = 12.dp)) {
         CurrentShippingLocationCard(
             onClick = onNavigateToShippingLocation,
-            currentLocation = "24 Lý Thường Kiệt, Quận 69, Tp. Thủ Đức", // TODO
+            currentLocation = shippingLocation,
             modifier = Modifier
                 .padding(bottom = 12.dp)
                 .padding(horizontal = 16.dp)
@@ -82,14 +89,6 @@ fun HomeScreen(
         val selectedTab by vm.selectedTab.collectAsState()
         val noMoreRestaurant by vm.noMoreRestaurant.collectAsState()
         val state = rememberLazyListState()
-
-        // on select another tab
-        LaunchedEffect(selectedTab, currentLocation) {
-            if (state.firstVisibleItemIndex > 0)
-                state.animateScrollToItem(1)
-            if (currentLocation != null)
-                vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
-        }
 
         val coroutineScope = rememberCoroutineScope()
         BetterPullToRefreshBox(
@@ -121,7 +120,16 @@ fun HomeScreen(
                         HomeTabTypes.entries.forEach {
                             Tab(
                                 selected = selectedTab == it,
-                                onClick = { vm.selectTab(it) },
+                                onClick = {
+                                    vm.selectTab(it)
+                                    coroutineScope.launch {
+                                        if (state.firstVisibleItemIndex > 0)
+                                            state.animateScrollToItem(1)
+                                        coroutineScope.launch {
+                                            vm.refreshRestaurantList()
+                                        }
+                                    }
+                                },
                                 text = { Text(it.tabTitle) }
                             )
                         }
@@ -156,9 +164,7 @@ fun HomeScreen(
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect
-                        currentLocation?.let {
-                            vm.loadMoreRestaurants(currentLocation!!)
-                        }
+                        vm.loadMoreRestaurants()
                     }
                     if (noMoreRestaurant) {
                         Text(

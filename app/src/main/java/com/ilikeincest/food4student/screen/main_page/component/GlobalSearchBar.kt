@@ -180,7 +180,6 @@ private fun SearchPrev() {
             LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, top = 68.dp, end = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.semantics { traversalIndex = 1f },
             ) {
                 val list = List(100) { "Text $it" }
                 items(count = list.size) {

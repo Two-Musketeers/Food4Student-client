@@ -55,6 +55,10 @@ class AccountServiceImpl @Inject constructor() : AccountService {
         Firebase.auth.currentUser?.updateProfile(profileUpdates)?.await()
     }
 
+    override suspend fun forgetPassword(email: String) {
+        Firebase.auth.sendPasswordResetEmail(email)
+    }
+
     override suspend fun linkAccountWithGoogle(idToken: String) {
         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
         Firebase.auth.currentUser?.linkWithCredential(firebaseCredential)?.await()

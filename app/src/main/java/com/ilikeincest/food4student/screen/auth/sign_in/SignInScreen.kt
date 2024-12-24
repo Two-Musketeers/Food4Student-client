@@ -18,12 +18,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.NormalField
 import com.ilikeincest.food4student.component.PasswordField
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
@@ -33,12 +35,17 @@ import com.ilikeincest.food4student.viewmodel.SignInViewModel
 fun SignInScreen(
     onNavigateToSignUp: () -> Unit,
     onSetRootSplash: () -> Unit,
+    onNavigateToForgetPassword: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     // big ass TODO: add event callbacks
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
+    var error by viewModel.error
+    if (error != "") {
+        ErrorDialog(error, { error = "" })
+    }
 
     Surface { Column(
         verticalArrangement = Arrangement.Center,
@@ -53,8 +60,6 @@ fun SignInScreen(
             modifier = Modifier.padding(bottom = 42.dp)
         )
 
-        // TODO: add email validation
-        // TODO: add wrong creds warning
         NormalField(
             label = "email",
             value = email,
@@ -74,7 +79,7 @@ fun SignInScreen(
         )
         Spacer(Modifier.height(4.dp))
         TextButton(
-            onClick = {}, // TODO
+            onClick = onNavigateToForgetPassword,
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("quên mật khẩu?")
