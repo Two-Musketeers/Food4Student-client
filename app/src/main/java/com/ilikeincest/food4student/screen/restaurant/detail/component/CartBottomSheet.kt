@@ -15,7 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ModalBottomSheet
@@ -91,8 +90,7 @@ fun CartBottomSheet(
                     .alpha(0.4f)
             )
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                items(cartItems, key = { it.foodItem.id }) { cartItem ->
-                    // Example:
+                items(cartItems) { cartItem ->
                     FoodItemCard(
                         item = cartItem.foodItem.copy(
                             // Replace description with variation info or use a custom layout
