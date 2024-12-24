@@ -1,10 +1,9 @@
 package com.ilikeincest.food4student.service.api
 
-import com.ilikeincest.food4student.dto.CreateRatingDto
-import com.ilikeincest.food4student.dto.CreateShippingAddressDto
-import com.ilikeincest.food4student.dto.OrderDto
+import com.ilikeincest.food4student.dto.order.CreateRatingDto
 import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.model.Notification
+import com.ilikeincest.food4student.model.Order
 import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import okhttp3.ResponseBody
@@ -85,11 +84,11 @@ interface UserApiService {
     ) : Response<RatingDto>
     // Orders
     @GET("users/orders")
-    suspend fun getOrders() : Response<List<OrderDto>>
+    suspend fun getOrders() : Response<List<Order>>
     @GET("users/orders/{id}")
     suspend fun getOrder(
         @Path("id") orderId: String
-    ) : Response<OrderDto>
+    ) : Response<Order>
     @DELETE("orders/{id}")
     suspend fun deleteOrder(
         @Path("id") orderId: String

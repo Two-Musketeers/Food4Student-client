@@ -115,7 +115,7 @@ internal fun MainScreenPageGraph(
                     currentLocation
                 )
             MainRoutes.ORDER ->
-                OrderScreen()
+                OrderScreen(onNavigateToRestaurant = onNavigateToRestaurant)
             MainRoutes.FAVORITE ->
                 FavoriteScreen(onNavigateToRestaurant = onNavigateToRestaurant, currentLocation = currentLocation)
             MainRoutes.NOTIFICATION ->

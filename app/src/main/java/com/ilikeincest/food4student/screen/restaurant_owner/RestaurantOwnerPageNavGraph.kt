@@ -114,7 +114,7 @@ internal fun RestaurantOwnerPageNavGraph(
                     viewModel = viewModel
                 )
             RestaurantOwnerRoutes.Orders ->
-                OrderScreen()
+                OrderScreen(onNavigateToRestaurant = null)
             RestaurantOwnerRoutes.Account ->
                 AccountCenterScreen(navController = navController)
             RestaurantOwnerRoutes.Notifications ->

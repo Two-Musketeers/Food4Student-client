@@ -154,7 +154,7 @@ class AddEditSavedLocationViewModel @Inject constructor(
 
     private fun <T> handleError(res: Response<T>): Boolean {
         if (res.isSuccessful) return true
-        error.value = "${res.code()} ${res.message()} - ${res.errorBody()}"
+        error.value = "${res.code()} ${res.message()} - ${res.errorBody()!!.string()}"
         return false
     }
 

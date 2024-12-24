@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.SavedShippingLocation
-import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.api.RestaurantApiService
 import com.ilikeincest.food4student.service.api.UserApiService
 import com.ilikeincest.food4student.util.RestaurantRepository
