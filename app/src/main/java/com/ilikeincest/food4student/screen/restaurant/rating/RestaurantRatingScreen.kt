@@ -1,6 +1,7 @@
 package com.ilikeincest.food4student.screen.restaurant.rating
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -103,6 +104,18 @@ private fun RestaurantRatingScreenContent(
                 )
             }
             item {
+                if (ratings.isNotEmpty()) return@item
+                Column(Modifier
+                    .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
+                    .fillParentMaxWidth()
+                    .padding(horizontal = 16.dp)
+                ) {
+                    Text("Chưa có ai đánh giá cả... \uD83D\uDE2D")
+                    Text("Nhanh tay đặt món phá tem nào!")
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
+            item {
                 Spacer(Modifier
                     .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                     .fillParentMaxWidth()
@@ -124,7 +137,7 @@ private fun Prev() { ScreenPreview {
             RatingDto(
                 id = "1",
                 stars = 4,
-                comment = "go fuck yourself"
+                comment = "Lmao what"
             ),
             RatingDto(
                 id = "2",
@@ -147,5 +160,16 @@ private fun Prev() { ScreenPreview {
                 comment = "Consetetur aliquyam voluptua et tempor sit. Et in aliquyam sanctus dolores tincidunt tempor invidunt nobis vel ipsum justo kasd. Mazim "
             ),
         )
+    )
+} }
+
+@Preview
+@Composable
+private fun PrevEmpty() { ScreenPreview {
+    RestaurantRatingScreenContent({},
+        874,
+        4.3,
+        listOf(2, 12, 32, 132, 696),
+        listOf()
     )
 } }
