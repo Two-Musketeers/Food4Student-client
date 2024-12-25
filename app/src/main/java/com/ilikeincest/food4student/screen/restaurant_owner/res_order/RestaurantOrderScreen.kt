@@ -144,6 +144,8 @@ fun RestaurantOrderScreen(
                             onApprove = { vm.approveOrder(order.id) },
                             onDelivered = { vm.deliverOrder(order.id) },
                             address = order.shippingAddress,
+                            receiverPhone = order.phoneNumber,
+                            receiverName = order.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp)

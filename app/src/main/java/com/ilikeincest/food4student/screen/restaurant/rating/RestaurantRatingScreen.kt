@@ -98,7 +98,7 @@ private fun RestaurantRatingScreenContent(
                         .padding(horizontal = 16.dp, vertical = 24.dp)
                 )
             }
-            itemsIndexed(ratings) { i, it ->
+            itemsIndexed(ratings.sortedByDescending { it.stars }) { i, it ->
                 RatingCard(it, Modifier
                     .background(colorScheme.secondaryContainer.copy(alpha = 0.4f))
                     .fillMaxWidth()

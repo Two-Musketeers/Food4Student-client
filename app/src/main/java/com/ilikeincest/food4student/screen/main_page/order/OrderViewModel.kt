@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
+import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.dto.order.CreateRatingDto
 import com.ilikeincest.food4student.model.Order
 import com.ilikeincest.food4student.model.OrderStatus
@@ -33,7 +34,7 @@ class OrderViewModel @Inject constructor(
     private val restaurantApiService: RestaurantApiService
 ): ViewModel() {
     val orderList = mutableStateMapOf<OrderStatus, List<Order>>()
-    val noRatingYet = mutableStateListOf<String>()
+    val ratings = mutableStateListOf<RatingDto>()
     val error = mutableStateOf("")
     val isLoading = mutableStateOf(false)
 
@@ -46,9 +47,11 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    private suspend fun ratingExists(orderId: String): Boolean {
+    private suspend fun addRatingIfExists(orderId: String) {
         val res = userApiService.getRating(orderId)
-        return res.isSuccessful
+        if (res.isSuccessful) {
+            ratings.add(res.body()!!)
+        }
     }
 
     private var _isInitialized = false
@@ -66,15 +69,14 @@ class OrderViewModel @Inject constructor(
                 val res = getOrdersOfStatus(status)
                 if (!res.isSuccessful) {
                     error.value = "${res.code()} ${res.message()} - ${res.errorBody()!!.string()}"
-                    noRatingYet.clear()
+                    ratings.clear()
                     return@launch
                 }
                 orderList[status] = res.body()!!
             }
-            noRatingYet.clear()
+            ratings.clear()
             for (order in orderList[OrderStatus.Delivered]!!) {
-                val hasRating = ratingExists(order.id)
-                if (!hasRating) noRatingYet.add(order.id)
+                addRatingIfExists(order.id)
             }
             onSuccess()
         }

@@ -11,5 +11,7 @@ data class Order(
     val createdAt: Instant,
     val totalPrice: Int,
     val note: String?,
+    val phoneNumber: String,
+    val name: String,
     val status: OrderStatus
 )

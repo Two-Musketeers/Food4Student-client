@@ -63,7 +63,7 @@ fun OrderScreen(
     val pagerState = rememberPagerState(pageCount = { OrderStatus.entries.size })
     val coroutineScope = rememberCoroutineScope()
     val orderList = vm.orderList
-    val noRatingYet = vm.noRatingYet
+    val ratings = vm.ratings
 
     val isLoading by vm.isLoading
     LoadingDialog(
@@ -140,7 +140,8 @@ fun OrderScreen(
                                 if (onNavigateToRestaurant == null) return@OrderCard
                                 vm.fetchRestaurant(order.restaurantId, context, onSuccess = onNavigateToRestaurant)
                             },
-                            showReview = order.status == OrderStatus.Delivered && noRatingYet.contains(order.id),
+                            rating = ratings.firstOrNull { it.id == order.id },
+                            isReviewable = order.status == OrderStatus.Delivered,
                             onReview = { star, comment -> vm.addReview(order.id, star, comment) },
                             modifier = Modifier
                                 .fillMaxWidth()

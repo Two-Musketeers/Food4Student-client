@@ -9,6 +9,8 @@ interface AccountService {
     suspend fun getUserToken(): String?
     fun hasUser(): Boolean
     fun getUserProfile(): Account
+    fun isEmailVerified(): Boolean
+    fun sendVerifyEmail()
     suspend fun reloadToken()
     suspend fun createAccountWithEmail(email: String, password: String)
     suspend fun updateDisplayName(newDisplayName: String)

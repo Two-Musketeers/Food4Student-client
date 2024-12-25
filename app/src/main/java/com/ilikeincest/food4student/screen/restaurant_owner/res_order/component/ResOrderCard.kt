@@ -46,6 +46,8 @@ fun ResOrderCard(
     createdAt: Instant,
     orderItems: List<OrderItem>,
     address: String,
+    receiverName: String,
+    receiverPhone: String,
     onNavigateToRestaurant: () -> Unit,
     onCancel: () -> Unit,
     onApprove: () -> Unit,
@@ -139,7 +141,9 @@ fun ResOrderCard(
                 Column(Modifier.padding(16.dp)) {
                     Text("Địa chỉ giao", color = colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(6.dp))
-                    Text(address, fontWeight = FontWeight.W600)
+                    Text("$receiverName, $receiverPhone", fontWeight = FontWeight.W600)
+                    Spacer(Modifier.height(6.dp))
+                    Text(address)
                 }
             }
 
@@ -196,6 +200,8 @@ private fun OrderPreview() {
             onNavigateToRestaurant = {},
             onApprove = {},
             onCancel = {},
+            receiverName = "",
+            receiverPhone = "",
             onDelivered = {},
             modifier = Modifier.width(368.dp)
         )

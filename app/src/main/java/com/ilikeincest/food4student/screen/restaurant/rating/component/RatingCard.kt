@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -86,16 +88,13 @@ fun RatingCard(
                 }
                 Spacer(Modifier.height(16.dp))
                 Spacer(Modifier.weight(1f))
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.offset(x = (-4).dp)
-                ) {
-                    Icon(
-                        Icons.Rounded.Star, null, tint = starColor,
-                        modifier = Modifier.size(20.dp).padding(end = 4.dp)
-                    )
-                    Text(it.stars.toString(),
-                        color = colorScheme.onSurfaceVariant
-                    )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in 1..it.stars) {
+                        Icon(Icons.Default.Star, null, tint = starColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
