@@ -15,7 +15,7 @@ import com.here.sdk.core.Point2D
 import com.here.sdk.mapview.MapMeasure
 import com.here.sdk.mapview.MapScheme
 import com.here.sdk.mapview.MapView
-import com.ilikeincest.food4student.viewmodel.MapViewModel
+import com.ilikeincest.food4student.screen.shipping.pick_location.MapViewModel
 
 @Composable
 fun MapViewContainer(

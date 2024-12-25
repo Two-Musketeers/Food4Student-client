@@ -32,7 +32,6 @@ import com.ilikeincest.food4student.screen.account_center.component.ExitAppCard
 import com.ilikeincest.food4student.screen.account_center.component.RemoveAccountCard
 import com.ilikeincest.food4student.screen.account_center.component.card
 import com.ilikeincest.food4student.model.Account
-import com.ilikeincest.food4student.viewmodel.AccountCenterViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)

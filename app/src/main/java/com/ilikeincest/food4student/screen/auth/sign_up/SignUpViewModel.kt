@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.viewmodel
+package com.ilikeincest.food4student.screen.auth.sign_up
 
 import android.util.Log
 import androidx.credentials.Credential
@@ -61,17 +61,17 @@ class SignUpViewModel @Inject constructor(
         launchCatching {
             var hasError = false
             if (!_email.value.isValidEmail()) {
-                _emailError.value = "Invalid email format"
+                _emailError.value = "Email không hợp lệ"
                 hasError = true
             }
 
             if (!_password.value.isValidPassword()) {
-                _passwordError.value = "Password must be at least 6 characters long and contain an uppercase letter"
+                _passwordError.value = "Mật khẩu phải có từ 8 ký tự, và bao gồm cả chữ hoa, thường và số"
                 hasError = true
             }
 
             if (_password.value != _confirmPassword.value) {
-                _confirmPasswordError.value = "Passwords do not match"
+                _confirmPasswordError.value = "Mật khẩu không khớp"
                 hasError = true
             }
 

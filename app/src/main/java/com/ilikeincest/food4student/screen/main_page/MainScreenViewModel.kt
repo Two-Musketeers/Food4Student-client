@@ -75,7 +75,9 @@ class MainScreenViewModel @Inject constructor(
                                 restaurant.copy(
                                     distanceInKm = distance,
                                     estimatedTimeInMinutes = estimatedTime,
-                                    isFavorited = repository.likedRestaurantIds.value.contains(restaurant.id)
+                                    isFavorited = repository.likedRestaurantIds.value.contains(restaurant.id),
+                                    perStarRating = listOf(),
+                                    foodCategories = listOf()
                                 )
                             }
                             _searchResults.value = updatedResults

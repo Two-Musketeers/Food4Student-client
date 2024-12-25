@@ -29,7 +29,6 @@ import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.NormalField
 import com.ilikeincest.food4student.component.PasswordField
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
-import com.ilikeincest.food4student.viewmodel.SignInViewModel
 
 @Composable
 fun SignInScreen(
