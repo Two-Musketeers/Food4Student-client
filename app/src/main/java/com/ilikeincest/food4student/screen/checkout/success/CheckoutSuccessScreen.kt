@@ -12,6 +12,7 @@ import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,37 +32,41 @@ import kotlinx.coroutines.delay
 fun CheckoutSuccessScreen(
     onNavigateToMain: () -> Unit,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
-        modifier = Modifier.fillMaxHeight().padding(24.dp)
-    ) {
-        var progress by remember { mutableFloatStateOf(0f) }
-        val animatedProgress by
-        animateFloatAsState(
-            targetValue = progress,
-            animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
-        )
+    Surface {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(24.dp)
+        ) {
+            var progress by remember { mutableFloatStateOf(0f) }
+            val animatedProgress by
+            animateFloatAsState(
+                targetValue = progress,
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+            )
 
-        LaunchedEffect(Unit) {
-            while (true) {
-                progress = 0f
-                delay(2000)
-                progress = 1f
-                delay(2000)
+            LaunchedEffect(Unit) {
+                while (true) {
+                    progress = 0f
+                    delay(2000)
+                    progress = 1f
+                    delay(2000)
+                }
             }
-        }
 
-        Column {
-            Text("Đặt hàng thành công", style = typography.displaySmall)
-            Text("Bạn chờ tí, shop xác nhận đơn nha", style = typography.bodyLarge)
-        }
-        LinearWavyProgressIndicator(
-            progress = { animatedProgress },
-            color = colorScheme.tertiary,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(onClick = onNavigateToMain) {
-            Text("Về trang chủ", fontSize = 18.sp)
+            Column {
+                Text("Đặt hàng thành công", style = typography.displaySmall)
+                Text("Bạn chờ tí, shop xác nhận đơn nha", style = typography.bodyLarge)
+            }
+            LinearWavyProgressIndicator(
+                progress = { animatedProgress },
+                color = colorScheme.tertiary,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(onClick = onNavigateToMain) {
+                Text("Về trang chủ", fontSize = 18.sp)
+            }
         }
     }
 }

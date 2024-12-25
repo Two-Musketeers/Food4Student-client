@@ -5,22 +5,37 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -36,6 +51,8 @@ import kotlin.time.Duration.Companion.days
 @Composable
 fun OrderCard(
     id: String,
+    showReview: Boolean,
+    onReview: (star: Int, comment: String) -> Unit,
     restaurantName: String,
     shopImageUrl: String,
     createdAt: Instant,
@@ -125,6 +142,46 @@ fun OrderCard(
                 Text("Tổng cộng:", style = typography.titleMedium)
                 Text(formatPrice(totalPrice), style = typography.titleLarge.copy(fontWeight = FontWeight(600)))
             }
+            if (showReview) {
+                HorizontalDivider(Modifier.fillMaxWidth())
+                Text("Thêm đánh giá ngay!", style = typography.titleLarge)
+                var selectedStar by remember { mutableIntStateOf(5) }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Số sao", Modifier.padding(end = 16.dp))
+                    OutlinedIconButton(onClick = { if (selectedStar != 1) selectedStar-- },
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(Icons.Default.Remove, "Remove from cart")
+                    }
+                    Text(selectedStar.toString(),
+                        style = typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .defaultMinSize(minWidth = 38.dp)
+                            .padding(horizontal = 8.dp)
+                    )
+                    FilledIconButton(onClick = { if (selectedStar != 5) selectedStar++ },
+                        shape = RoundedCornerShape(4.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = colorScheme.tertiary,
+                            contentColor = colorScheme.onTertiary
+                        ),
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(Icons.Default.Add, "Add to cart")
+                    }
+                }
+                var comment by remember { mutableStateOf("") }
+                TextField(
+                    value = comment, onValueChange = { comment = it },
+                    label = { Text("Comment") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button({ onReview(selectedStar, comment) }) {
+                    Text("Đánh giá")
+                }
+            }
         }
     }
 }
@@ -148,6 +205,8 @@ private fun OrderPreview() {
                 originalFoodItemId = "",
                 variations = "Size S - không đá"
             ) },
+            showReview = true,
+            onReview = {_,_->},
             onNavigateToRestaurant = {},
             modifier = Modifier.width(368.dp)
         )

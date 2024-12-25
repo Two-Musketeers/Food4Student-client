@@ -163,7 +163,7 @@ fun ResOrderCard(
                     }
                 }
                 if (status == OrderStatus.Approved) {
-                    Button(onApprove) {
+                    Button(onDelivered) {
                         Text("Đã giao")
                     }
                 }

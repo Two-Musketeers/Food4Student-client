@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -256,22 +257,20 @@ fun EditableCard(
     onEditClick: (String) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var newValue by remember { mutableStateOf(value) }
 
     Card(
+        onClick = { showDialog = true },
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp),
+            .defaultMinSize(minHeight = 80.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(text = title, style = typography.titleSmall)
                 Text(text = value, style = typography.bodyMedium)
             }
