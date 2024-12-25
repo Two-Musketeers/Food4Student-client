@@ -99,8 +99,19 @@ class RestaurantOwnerViewModel @Inject constructor(
 
     private val _changes = mutableMapOf<String, String>()
 
+    private val _hasUnsavedChanges = MutableStateFlow(false)
+    val hasUnsavedChanges: StateFlow<Boolean> = _hasUnsavedChanges
+
+    private val _hasChanges = MutableStateFlow(false)
+    val hasChanges: StateFlow<Boolean> = _hasChanges
+
     fun setFoodName(value: String) {
         _foodName.value = value
+        updateHasUnsavedChanges()
+    }
+
+    private fun updateHasUnsavedChanges() {
+        _hasUnsavedChanges.value = hasComputedUnsavedChanges
     }
     fun dismissMessages() {
         _errorMessage.value = ""
@@ -109,10 +120,12 @@ class RestaurantOwnerViewModel @Inject constructor(
 
     fun setFoodDescription(value: String?) {
         _foodDescription.value = value ?: ""
+        updateHasUnsavedChanges()
     }
 
     fun setFoodBasePrice(value: String) {
         _foodBasePrice.value = value
+        updateHasUnsavedChanges()
     }
 
     private val _selectedFoodCategory = MutableStateFlow<FoodCategory?>(null)
@@ -347,7 +360,7 @@ class RestaurantOwnerViewModel @Inject constructor(
         }
     }
 
-    val hasUnsavedChanges: Boolean
+    val hasComputedUnsavedChanges: Boolean
         get() = _foodName.value != originalName ||
                 _foodDescription.value != originalDescription ||
                 _foodBasePrice.value != originalPrice ||
@@ -405,11 +418,13 @@ class RestaurantOwnerViewModel @Inject constructor(
     // Functions to manage unsaved variations
     fun addVariation(variation: Variation) {
         _unsavedVariations.value = _unsavedVariations.value + variation
+        updateHasUnsavedChanges()
     }
 
     // Functions to manage unsaved image
     fun setUnsavedImage(uri: Uri?) {
         _unsavedImageUri.value = uri
+        updateHasUnsavedChanges()
     }
 
     fun clearUnsavedData() {
@@ -469,7 +484,7 @@ class RestaurantOwnerViewModel @Inject constructor(
         foodItemCreateDto: FoodItem,
         foodCategoryId: String
     ) {
-        if (!hasUnsavedChanges) return
+        if (!hasComputedUnsavedChanges) return
         else {
             viewModelScope.launch {
                 try {
