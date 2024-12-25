@@ -124,9 +124,14 @@ class RestaurantOrderViewModel @Inject constructor(
         isLoading.value = true
         viewModelScope.launch {
             val res = work()
-            isLoading.value = false
             if (!res.isSuccessful) {
                 error.value = "${res.code()} - ${res.message()}: ${res.errorBody()!!.string()}"
+                isLoading.value = false
+            }
+            else {
+                refreshOrders {
+                    isLoading.value = false
+                }
             }
         }
     }
