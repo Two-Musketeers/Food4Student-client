@@ -32,6 +32,7 @@ import com.ilikeincest.food4student.component.AsyncImageOrMonogram
 import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 import com.ilikeincest.food4student.model.OrderItem
 import com.ilikeincest.food4student.screen.main_page.order.component.OrderItemCard
+import com.ilikeincest.food4student.screen.restaurant.detail.CartItem
 import com.ilikeincest.food4student.util.formatPrice
 import com.ilikeincest.food4student.util.timeFrom
 import kotlinx.datetime.Clock
@@ -41,12 +42,15 @@ import kotlin.time.Duration.Companion.days
 @Composable
 fun PreviewOrderCard(
     restaurantName: String,
-    shopImageUrl: String,
-    orderItems: List<OrderItem>,
+    shopImageUrl: String?,
+    orderItems: List<CartItem>,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(4.dp),
+    Card(
+        colors = CardDefaults.cardColors().copy(
+            containerColor = colorScheme.primaryContainer,
+            contentColor = colorScheme.onPrimaryContainer
+        ),
         modifier = modifier
     ) {
         Column(
@@ -61,9 +65,6 @@ fun PreviewOrderCard(
                     .height(48.dp)
                     .fillMaxWidth()
             ) {
-                // peak ui code
-                // the chevron will stay after the text,
-                // but text will ellipses and chevron will still be visible
                 AsyncImageOrMonogram(
                     model = shopImageUrl,
                     name = restaurantName,
@@ -73,15 +74,7 @@ fun PreviewOrderCard(
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         restaurantName, style = typography.titleLarge,
-                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        tint = colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -89,14 +82,27 @@ fun PreviewOrderCard(
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 var totalPrice = 0
                 for (it in orderItems) {
-                    totalPrice += it.price
+                    val price = (it.foodItem.basePrice + it.selectedVariations.entries.sumOf { (variationId, optionIds) ->
+                        optionIds.sumOf { optionId ->
+                            it.foodItem.variations.find { it.id == variationId }
+                                ?.variationOptions?.find { it.id == optionId }
+                                ?.priceAdjustment ?: 0
+                        }
+                    })
+                    val mergedVariations = it.selectedVariations.entries.joinToString("\n") { (variationId, optionIds) ->
+                        val variation = it.foodItem.variations.find { it.id == variationId }
+                        val options = variation?.variationOptions?.filter { it.id in optionIds }
+                        "${variation?.name}: ${options?.joinToString { it.name } ?: ""}"
+                    }
+
                     OrderItemCard(
-                        imageModel = it.foodItemPhotoUrl,
-                        title = it.foodName,
-                        notes = it.variations,
-                        price = it.price,
+                        imageModel = it.foodItem.foodItemPhotoUrl,
+                        title = it.foodItem.name,
+                        notes = mergedVariations,
+                        price = price,
                         quantity = it.quantity
                     )
+                    totalPrice += price
                 }
                 Row(
                     verticalAlignment = Alignment.Bottom,
@@ -111,27 +117,5 @@ fun PreviewOrderCard(
                 }
             }
         }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun OrderPreview() {
-    ComponentPreview {
-        PreviewOrderCard(
-            restaurantName = "Phúc Long",
-            shopImageUrl = "",
-            orderItems = List(3) { OrderItem(
-                id = "5ea765ds",
-                foodName = "Trà sữa Phô mai tươi",
-                foodDescription = null,
-                price = 54_000,
-                quantity = 2,
-                foodItemPhotoUrl = "",
-                originalFoodItemId = "",
-                variations = "Size S - không đá"
-            ) },
-            modifier = Modifier.width(368.dp).padding(16.dp)
-        )
     }
 }

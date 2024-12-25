@@ -1,5 +1,8 @@
 package com.ilikeincest.food4student.dto.order
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CreateOrderDto(
     val orderItems: List<CreateOrderItemDto>,
     val shippingAddress: String,

@@ -91,7 +91,7 @@ fun FavoriteScreen(
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = modifier.padding(horizontal = 16.dp)
+                modifier = modifier.padding(horizontal = 16.dp).fillMaxSize()
             ) {
                 item {} // to get the default 16dp spacing as padding
                 items(restaurantList, key = { it.id }) { restaurant ->

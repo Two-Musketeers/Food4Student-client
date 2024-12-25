@@ -13,6 +13,8 @@ import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
 import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
+import com.ilikeincest.food4student.dto.order.CreateOrderDto
+import com.ilikeincest.food4student.dto.order.CreateOrderItemDto
 import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
@@ -23,7 +25,11 @@ import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
+import com.ilikeincest.food4student.screen.checkout.confirm.CheckoutConfirmScreen
+import com.ilikeincest.food4student.screen.checkout.success.CheckoutSuccessScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant.detail.Cart
+import com.ilikeincest.food4student.screen.restaurant.detail.CartItem
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.AddCategoryScreen
@@ -37,6 +43,9 @@ import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLo
 import com.ilikeincest.food4student.screen.splash.SplashScreen
 import com.ilikeincest.food4student.util.nav.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 object AppRoutes {
     @Serializable
@@ -92,7 +101,7 @@ object AppRoutes {
 
     // checkout
     @Serializable
-    object CheckoutConfirm
+    data class CheckoutConfirm(val order: String) // is json of Cart
     @Serializable
     object CheckoutSuccess
 }
@@ -274,13 +283,36 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             RestaurantScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
-                onNavigateToCheckout = { navController.navigate(AppRoutes.CheckoutConfirm) },
+                onNavigateToCheckout = {
+                    val cart = Json.encodeToString(it)
+                    navController.navigate(AppRoutes.CheckoutConfirm(cart))
+                },
             )
         }
         composable<AppRoutes.RestaurantRating> {
             RestaurantRatingScreen(
                 onNavigateUp = { navController.navigateUp() }
             )
+        }
+
+        // checkout
+        composable<AppRoutes.CheckoutConfirm> {
+            val route = it.toRoute<AppRoutes.CheckoutConfirm>()
+            val order = remember { Json.decodeFromString<Cart>(route.order) }
+            CheckoutConfirmScreen(
+                order,
+                onSuccess = { navController.navigate(AppRoutes.CheckoutSuccess) {
+                    popUpTo<AppRoutes.RestaurantDetail> {
+                        inclusive = true
+                        saveState = false
+                    }
+                } },
+                onNavigateToShippingLocation = { navController.navigate(AppRoutes.ShippingLocation) }
+            )
+        }
+
+        composable<AppRoutes.CheckoutSuccess> {
+            CheckoutSuccessScreen { navController.popBackStack(AppRoutes.Main, false) }
         }
     }
 }

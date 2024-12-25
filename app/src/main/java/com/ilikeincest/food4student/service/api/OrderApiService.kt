@@ -12,13 +12,13 @@ import retrofit2.http.Path
 
 interface OrderApiService {
     // For restaurant owner
-    @GET("orders/pending")
+    @GET("orders/users/pending")
     suspend fun getOrdersPending() : Response<List<Order>>
-    @GET("orders/approved")
+    @GET("orders/users/approved")
     suspend fun getOrdersApproved() : Response<List<Order>>
-    @GET("orders/delivered")
+    @GET("orders/users/delivered")
     suspend fun getOrdersDelivered() : Response<List<Order>>
-    @GET("orders/cancelled")
+    @GET("orders/users/cancelled")
     suspend fun getOrdersCancelled() : Response<List<Order>>
     @GET("orders/{id}")
     suspend fun getOrder(
@@ -40,8 +40,9 @@ interface OrderApiService {
     suspend fun deliverOrder(
         @Path("id") orderId : String
     ) : Response<Unit>
-    @POST("orders")
+    @POST("orders/restaurants/{id}")
     suspend fun createOrder(
+        @Path("id") restaurantId: String,
         @Body order: CreateOrderDto
     ) : Response<Order>
 }

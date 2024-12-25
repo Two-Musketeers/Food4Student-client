@@ -1,7 +1,5 @@
 package com.ilikeincest.food4student.model
 
-import com.ilikeincest.food4student.dto.VariationSelectionDto
-
 data class OrderItem(
     val id: String,
     val foodName: String,

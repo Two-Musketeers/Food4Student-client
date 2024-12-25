@@ -2,6 +2,7 @@ package com.ilikeincest.food4student.screen.main_page.order.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,7 @@ import com.ilikeincest.food4student.util.formatPrice
 fun OrderItemCard(
     imageModel: Any?,
     title: String,
-    notes: String,
+    notes: String?,
     price: Int,
     quantity: Int,
     modifier: Modifier = Modifier
@@ -40,11 +41,11 @@ fun OrderItemCard(
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.Top,
-        modifier = modifier.height(itemHeight)
+        modifier = modifier.height(IntrinsicSize.Min)
     ) {
         AsyncImage(
             model = imageModel, contentDescription = "Food image",
-            placeholder = ColorPainter(colorScheme.primaryContainer),
+            placeholder = ColorPainter(colorScheme.secondaryContainer),
             error = ColorPainter(colorScheme.error),
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -62,14 +63,14 @@ fun OrderItemCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    notes, style = typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (!notes.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        notes, style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             Row(
                 verticalAlignment = Alignment.Bottom,
@@ -92,6 +93,21 @@ private fun OrderItemPreview() {
             imageModel = R.drawable.ic_launcher_background,
             title = "Trà sữa Phô mai tươi 123123213123213123",
             notes = "Size S - Không đá",
+            price = 56000,
+            quantity = 2,
+            modifier = Modifier.width(300.dp),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun OrderItemPreview2() {
+    ComponentPreview {
+        OrderItemCard(
+            imageModel = R.drawable.ic_launcher_background,
+            title = "Trà sữa Phô mai tươi 123123213123213123",
+            notes = "Size S - Không đá\nSize S - Không đá\nSize S - Không đá\nSize S - Không đá\nSize S - Không đá\nSize S - Không đá\n",
             price = 56000,
             quantity = 2,
             modifier = Modifier.width(300.dp),

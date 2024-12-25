@@ -31,7 +31,7 @@ import com.ilikeincest.food4student.model.SavedShippingLocationType
 @Composable
 fun CheckoutShippingLocationCard(
     onClick: () -> Unit,
-    currentLocation: SavedShippingLocation,
+    currentLocation: SavedShippingLocation?,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -43,6 +43,13 @@ fun CheckoutShippingLocationCard(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.padding(16.dp)
         ) {
+            if (currentLocation == null) {
+                Icon(Icons.Rounded.LocationOn, null)
+                Text("Vui lòng chọn địa chỉ!", style = typography.titleMedium)
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Default.ChevronRight, null)
+                return@Row
+            }
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.LocationOn, null)
@@ -58,7 +65,10 @@ fun CheckoutShippingLocationCard(
                         )
                     }
                 }
-                HorizontalDivider(Modifier.width(240.dp).padding(vertical = 8.dp))
+                HorizontalDivider(
+                    Modifier
+                        .width(240.dp)
+                        .padding(vertical = 8.dp))
                 if (currentLocation.address != currentLocation.location) {
                     Text(currentLocation.location, style = typography.bodyMedium.copy(
                         fontSize = 15.sp,
@@ -91,4 +101,10 @@ private fun P() {
         phoneNumber = "01234567879",
         latitude = 0.0, longitude = 0.0,
     ), Modifier.padding(16.dp))
+}
+
+@Preview
+@Composable
+private fun P2() {
+    CheckoutShippingLocationCard({}, null, Modifier.padding(16.dp))
 }

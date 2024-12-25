@@ -1,5 +1,6 @@
 package com.ilikeincest.food4student.screen.restaurant.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
@@ -27,6 +28,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,6 +43,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -62,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.ilikeincest.food4student.component.BetterPullToRefreshBox
+import com.ilikeincest.food4student.component.ConfirmDiscardUnsavedDialog
 import com.ilikeincest.food4student.component.ErrorDialog
 import com.ilikeincest.food4student.component.LoadingDialog
 import com.ilikeincest.food4student.model.FoodItem
@@ -77,7 +84,7 @@ import kotlin.math.roundToInt
 fun RestaurantScreen(
     onNavigateUp: () -> Unit,
     onNavigateToRating: (id: String) -> Unit,
-    onNavigateToCheckout: () -> Unit,
+    onNavigateToCheckout: (Cart) -> Unit,
     viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val restaurantDetail by viewModel.restaurantDetail.collectAsState()
@@ -99,9 +106,9 @@ fun RestaurantScreen(
 
     // for now.
     restaurantDetail?.let { detail ->
-        val distance = "${String.format("%.2f", detail.distanceInKm)} km"
+        val distance = "${String.format("%.1f", detail.distanceInKm)} km"
         val timeAway = "${detail.estimatedTimeInMinutes} phút"
-        val starRating = "${String.format("%.2f", detail.averageRating)}"
+        val starRating = "${String.format("%.1f", detail.averageRating)}"
         RestaurantScreenContent(
             bannerModel = detail.bannerUrl,
             name = detail.name,
@@ -111,6 +118,7 @@ fun RestaurantScreen(
             description = detail.description,
             onNavigateUp = onNavigateUp,
             onNavigateToRating = onNavigateToRating,
+            onNavigateToCheckout = onNavigateToCheckout,
             viewModel = viewModel
         )
     }
@@ -127,22 +135,59 @@ private fun RestaurantScreenContent(
     description: String?,
     onNavigateUp: () -> Unit,
     onNavigateToRating: (id: String) -> Unit,
+    onNavigateToCheckout: (Cart) -> Unit,
     viewModel: RestaurantDetailViewModel
 ) {
     val restaurantDetail = viewModel.restaurantDetail.collectAsState().value
     val cartItems by viewModel.cartItems.collectAsState()
 
     val foodList = restaurantDetail?.foodCategories ?: emptyList()
-    var isRefreshing by remember { mutableStateOf(false) }
+    val isRefreshing by viewModel.showRefreshing.collectAsState()
     var addToCartItem by remember { mutableStateOf<FoodItem?>(null) }
     var openCart by remember { mutableStateOf(false) }
 
     if (openCart) {
         CartBottomSheet(
-            onDismiss = {
-                openCart = false
+            onDismiss = { openCart = false },
+            onNavigateToCheckout = {
+                if (restaurantDetail == null) return@CartBottomSheet
+                onNavigateToCheckout(Cart(
+                    restaurantId = restaurantDetail.id,
+                    cartItems = cartItems,
+                    restaurantName = restaurantDetail.name,
+                    shopImageUrl = restaurantDetail.logoUrl
+                ))
             },
             viewModel = viewModel
+        )
+    }
+
+    var showConfirmBack by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = cartItems.isNotEmpty()) {
+        showConfirmBack = true
+    }
+    if (showConfirmBack) {
+        val onDismiss = { showConfirmBack = false }
+        AlertDialog(
+            title = { Text("Đơn hàng chưa đặt") },
+            text = { Text(
+                "Bạn có hàng còn trong giỏ kìa!\no(*////▽////*)q\n" +
+                "Tiếp tục đặt hàng hay hủy giỏ hàng?"
+            ) },
+            confirmButton = {
+                Button(onClick = onNavigateUp, colors = ButtonDefaults.buttonColors().copy(
+                    containerColor = colorScheme.error
+                )) {
+                    Text("Hủy giỏ hàng",
+                        color = colorScheme.onError
+                    )
+                }
+            },
+            dismissButton = { TextButton(onClick = onDismiss) {
+                Text("Tiếp tục sửa")
+            } },
+            onDismissRequest = onDismiss,
+            icon = { Icon(Icons.Default.Warning, null) },
         )
     }
 
@@ -238,8 +283,7 @@ private fun RestaurantScreenContent(
             lazyListState = lazyListState,
             isRefreshing = isRefreshing,
             onRefresh = {
-                // TODO
-                isRefreshing = false
+                viewModel.refresh()
             },
         ) {
             LazyColumn(
