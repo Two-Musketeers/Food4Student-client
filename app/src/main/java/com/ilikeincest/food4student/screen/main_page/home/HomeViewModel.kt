@@ -93,6 +93,10 @@ class HomeViewModel @Inject constructor(
     val currentLocation = MutableStateFlow<GeoCoordinates?>(null)
     fun setCurrentLocation(it: GeoCoordinates?) {
         currentLocation.value = it
+        if (it == null) return
+        viewModelScope.launch {
+            refreshRestaurantList(it.latitude, it.longitude)
+        }
     }
 
     suspend fun refreshRestaurantList(latitude: Double, longitude: Double) {
@@ -144,9 +148,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun loadMoreRestaurants() {
-        _isLoadingMore.value = true
-        _currentPage++
         viewModelScope.launch {
+            _isLoadingMore.value = true
+            _currentPage++
             while (currentLocation.value == null) {
                 delay(1000)
             }
