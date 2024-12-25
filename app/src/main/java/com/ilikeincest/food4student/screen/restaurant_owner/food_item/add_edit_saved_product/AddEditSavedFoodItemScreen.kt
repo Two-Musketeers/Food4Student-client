@@ -184,7 +184,8 @@ fun AddEditSavedFoodItemScreen(
                     imageState = ImageState(imageUri = unsavedImageUri),
                     onImageClick = { imagePickerLauncher.launch("image/*") },
                     onDeleteImage = { viewModel.setUnsavedImage(null) },
-                    modifier = Modifier.size(125.dp)
+                    modifier = Modifier.size(125.dp),
+                    title = "Thêm ảnh đồ ăn"
                 )
                 Spacer(modifier = Modifier.padding(top = 8.dp))
                 DividerWithSubhead(subhead = { Text("Thông tin đồ ăn, thức uống") })

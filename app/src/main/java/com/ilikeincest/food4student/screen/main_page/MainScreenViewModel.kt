@@ -10,6 +10,7 @@ import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.service.api.RestaurantApiService
 import com.ilikeincest.food4student.util.RestaurantRepository
+import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,26 @@ class MainScreenViewModel @Inject constructor(
                 val response = restaurantApiService.searchRestaurants(query, pageNumber, pageSize)
                 if (response.isSuccessful) {
                     response.body()?.let { results ->
-                        _searchResults.value = results
+                        val currentLoc = _currentLocation.value
+                        if (currentLoc != null) {
+                            val updatedResults = results.map { restaurant ->
+                                val distance = haversineDistance(
+                                    lat1 = currentLoc.latitude,
+                                    lon1 = currentLoc.longitude,
+                                    lat2 = restaurant.latitude,
+                                    lon2 = restaurant.longitude
+                                )
+                                val estimatedTime = (distance / 40.0 * 60).toInt()
+                                restaurant.copy(
+                                    distanceInKm = distance,
+                                    estimatedTimeInMinutes = estimatedTime,
+                                    isFavorited = repository.likedRestaurantIds.value.contains(restaurant.id)
+                                )
+                            }
+                            _searchResults.value = updatedResults
+                        } else {
+                            _searchResults.value = results
+                        }
                     } ?: run {
                         errorMessage.value = "No results found."
                     }

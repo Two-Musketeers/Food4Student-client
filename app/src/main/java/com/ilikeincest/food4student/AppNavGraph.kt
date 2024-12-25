@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,9 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
-import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.model.Location
-import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.forget_password.ForgetPasswordScreen
@@ -24,13 +23,13 @@ import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
+import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.AddCategoryScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
-import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
-import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
@@ -145,11 +144,15 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
                 val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
-                RestaurantOwnerScreen(
-                    viewModel = sharedViewModel,
-                    onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
-                    navController = navController
-                )
+                NavigateWithResult(it) { location: Location? ->
+                    RestaurantOwnerScreen(
+                        viewModel = sharedViewModel,
+                        onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
+                        onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
+                        onNavigateToLocationPicker = { navController.navigate(AppRoutes.PickLocation) },
+                        selectedLocation = location
+                    )
+                }
             }
             composable<AppRoutes.AddEditFoodItem> {
                 val parentEntry = remember(navController) {

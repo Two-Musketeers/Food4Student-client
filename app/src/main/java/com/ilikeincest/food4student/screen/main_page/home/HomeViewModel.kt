@@ -134,7 +134,8 @@ class HomeViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
-                    perStarRating = listOf() // TODO
+                    perStarRating = listOf(),
+                    phoneNumber = ""
                 )
             )
         }
@@ -166,7 +167,7 @@ class HomeViewModel @Inject constructor(
                     lat2 = dto.latitude,
                     lon2 = dto.longitude
                 )
-                val estimatedTime = (distance / 40.0 * 60).toInt() // 40 km/h => time in minutes
+                val estimatedTime = (distance / 40.0 * 60).toInt()
 
                 Restaurant(
                     id = dto.id,
@@ -184,7 +185,8 @@ class HomeViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
-                    perStarRating = listOf()
+                    perStarRating = listOf(),
+                    phoneNumber = ""
                 )
             } ?: listOf()
 

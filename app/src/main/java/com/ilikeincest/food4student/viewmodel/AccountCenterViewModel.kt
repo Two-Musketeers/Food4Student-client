@@ -5,11 +5,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.ilikeincest.food4student.MainActivity
-import com.ilikeincest.food4student.dto.DeviceTokenDto
 import com.ilikeincest.food4student.model.Account
 import com.ilikeincest.food4student.service.AccountService
 import com.ilikeincest.food4student.service.api.AccountApiService
@@ -57,7 +55,7 @@ class AccountCenterViewModel @Inject constructor(
         }
     }
 
-    fun onSignOutClick(navController: NavController, context: Context) {
+    fun onSignOutClick(context: Context) {
         launchCatching {
             val token = Firebase.messaging.token.await()
             accountApiService.deleteDeviceToken(token)
@@ -68,7 +66,8 @@ class AccountCenterViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteAccountClick(navController: NavController, context: Context) {
+
+    fun onDeleteAccountClick(context: Context) {
         launchCatching {
             accountApiService.deleteUser()
             accountService.deleteAccount()

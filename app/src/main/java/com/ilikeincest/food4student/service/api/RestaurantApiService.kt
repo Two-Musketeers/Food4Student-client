@@ -4,6 +4,7 @@ import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.dto.RatingDto
 import com.ilikeincest.food4student.dto.RestaurantDetailDto
 import com.ilikeincest.food4student.dto.RegisterRestaurantOwnerDto
+import com.ilikeincest.food4student.dto.RestaurantUpdateDto
 import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.RestaurantRatingsSummaryDto
 import retrofit2.Response
@@ -28,7 +29,7 @@ interface RestaurantApiService {
     ) : Response<Restaurant>
     @PUT("restaurants")
     suspend fun updateRestaurant(
-        @Body restaurant : RegisterRestaurantOwnerDto
+        @Body restaurant : RestaurantUpdateDto
     ) : Response<Restaurant>
     @DELETE("restaurants")
     suspend fun deleteRestaurant() : Response<Unit>
