@@ -37,7 +37,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.model.Location
+import com.ilikeincest.food4student.screen.restaurant_owner.account_center.RestaurantAccountCenterScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content.RestaurantOwnerScreenContent
+import com.ilikeincest.food4student.util.nav.NavigateWithResult
 
 internal val defaultRoute = RestaurantOwnerRoutes.Home
 
@@ -75,12 +78,14 @@ internal enum class RestaurantOwnerRoutes(
 
 @Composable
 internal fun RestaurantOwnerPageNavGraph(
+    location: Location?,
     innerPadding: PaddingValues,
     currentRoute: RestaurantOwnerRoutes,
     scrollConnection: NestedScrollConnection,
     onNavigateToAddEditFoodItem: () -> Unit,
+    onNavigateToLocationPicker: () -> Unit,
+    onNavigateToRating: () -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavController,
     viewModel: RestaurantOwnerViewModel
 ) {
     val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
@@ -124,15 +129,14 @@ internal fun RestaurantOwnerPageNavGraph(
                     onNavigateToAddEditFoodItem = {
                         onNavigateToAddEditFoodItem()
                     },
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onNavigateToRating = { onNavigateToRating() }
                 )
             RestaurantOwnerRoutes.Orders ->
                 OrderScreen(onNavigateToRestaurant = null)
-            RestaurantOwnerRoutes.Account ->
-                AccountCenterScreen(
-                    navController = navController,
-                    contentWindowInsets = WindowInsets(0.dp)
-                )
+            RestaurantOwnerRoutes.Account -> {
+                RestaurantAccountCenterScreen(selectedLocation = location, viewModel = viewModel, onNavigateToLocationPicker = onNavigateToLocationPicker)
+            }
             RestaurantOwnerRoutes.Notifications ->
                 NotificationScreen(scrollConnection)
         }

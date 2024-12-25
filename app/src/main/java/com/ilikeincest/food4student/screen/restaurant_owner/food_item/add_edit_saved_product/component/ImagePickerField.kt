@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,15 +34,17 @@ import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_s
 
 @Composable
 fun ImagePickerField(
+    title: String,
     imageState: ImageState,
     onImageClick: () -> Unit,
     onDeleteImage: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Row {
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
+                .sizeIn(minWidth = 125.dp, minHeight = 125.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(colorScheme.surfaceVariant)
                 .clickable { onImageClick() }
@@ -56,14 +60,14 @@ fun ImagePickerField(
                     placeholder = ColorPainter(colorScheme.primaryContainer),
                     error = ColorPainter(colorScheme.error),
                     contentScale = ContentScale.Crop,
-                    modifier = modifier
+                    modifier = Modifier.fillMaxSize()
                 )
             } else {
                 // Placeholder UI when no image is selected
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = modifier
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -73,7 +77,7 @@ fun ImagePickerField(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Thêm ảnh",
+                        text = title,
                         color = colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -111,6 +115,7 @@ private fun ImagePickerFieldPreview() {
         imageState = ImageState(),
         onImageClick = {},
         onDeleteImage = {},
-        modifier = Modifier.size(125.dp)
+        modifier = Modifier.size(125.dp),
+        title = "Add Image"
     )
 }

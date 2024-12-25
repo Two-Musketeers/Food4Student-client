@@ -94,6 +94,7 @@ class FavoriteViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
+                    phoneNumber = dto.phoneNumber,
                     perStarRating = listOf()
                 )
             )
@@ -133,6 +134,7 @@ class FavoriteViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
+                    phoneNumber = dto.phoneNumber,
                     perStarRating = listOf()
                 )
             } ?: listOf()

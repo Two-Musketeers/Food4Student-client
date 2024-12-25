@@ -116,11 +116,11 @@ fun AccountCenterScreen(
 
             ExitAppCard(
                 navController,
-            ) { navController -> viewModel.onSignOutClick(navController, context) }
+            ) { navController -> viewModel.onSignOutClick(context) }
             // TODO: reauth before delete (yes its needed)
             RemoveAccountCard(
                 navController,
-            ) { navController -> viewModel.onDeleteAccountClick(navController, context) }
+            ) { navController -> viewModel.onDeleteAccountClick(context) }
         }
     }
 }

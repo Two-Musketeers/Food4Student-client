@@ -1,25 +1,36 @@
 package com.ilikeincest.food4student.screen.restaurant_owner
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
+import com.ilikeincest.food4student.MainActivity
 import com.ilikeincest.food4student.dto.FoodCategoryCreateDto
+import com.ilikeincest.food4student.dto.RestaurantUpdateDto
 import com.ilikeincest.food4student.model.FoodCategory
 import com.ilikeincest.food4student.model.FoodItem
 import com.ilikeincest.food4student.model.Restaurant
 import com.ilikeincest.food4student.model.Variation
 import com.ilikeincest.food4student.model.VariationOption
+import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.model.ImageState
+import com.ilikeincest.food4student.service.AccountService
+import com.ilikeincest.food4student.service.api.AccountApiService
 import com.ilikeincest.food4student.service.api.FoodCategoryApiService
 import com.ilikeincest.food4student.service.api.FoodItemApiService
 import com.ilikeincest.food4student.service.api.PhotoApiService
 import com.ilikeincest.food4student.service.api.RestaurantApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -32,8 +43,21 @@ class RestaurantOwnerViewModel @Inject constructor(
     private val restaurantApiService: RestaurantApiService,
     private val foodItemApiService: FoodItemApiService,
     private val photoApiService: PhotoApiService,
-    private val foodCategoryApiService: FoodCategoryApiService
+    private val foodCategoryApiService: FoodCategoryApiService,
+    private val accountService: AccountService,
+    private val accountApiService: AccountApiService
 ) : ViewModel() {
+    //To get the user session token and log it out in the LogCat
+    fun logUserToken() {
+        viewModelScope.launch {
+            try {
+                val token = accountService.getUserToken()
+                Log.d("AccountCenterViewModel", "User token: $token")
+            } catch (e: Exception) {
+                Log.e("AccountCenterViewModel", "Error fetching user token", e)
+            }
+        }
+    }
 
     private val _restaurant = MutableStateFlow<Restaurant?>(null)
     val restaurant: StateFlow<Restaurant?> = _restaurant
@@ -70,8 +94,17 @@ class RestaurantOwnerViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _successMessage = MutableStateFlow("")
+    val successMessage: StateFlow<String> = _successMessage
+
+    private val _changes = mutableMapOf<String, String>()
+
     fun setFoodName(value: String) {
         _foodName.value = value
+    }
+    fun dismissMessages() {
+        _errorMessage.value = ""
+        _successMessage.value = ""
     }
 
     fun setFoodDescription(value: String?) {
@@ -92,6 +125,7 @@ class RestaurantOwnerViewModel @Inject constructor(
 
     init {
         fetchRestaurantData()
+        logUserToken()
     }
 
     private fun fetchRestaurantData() {
@@ -116,8 +150,11 @@ class RestaurantOwnerViewModel @Inject constructor(
                             distanceInKm = 0.0,
                             estimatedTimeInMinutes = 0,
                             perStarRating = emptyList(),
-                            description = it.description
+                            description = it.description,
+                            phoneNumber = it.phoneNumber
                         )
+                        _logoImageState.value = ImageState(imageUrl = it.logoUrl)
+                        _bannerImageState.value = ImageState(imageUrl = it.bannerUrl)
                         _categories.value = it.foodCategories
                     }
                 } else {
@@ -136,6 +173,55 @@ class RestaurantOwnerViewModel @Inject constructor(
     fun dismissErrorDialog() {
         _errorMessage.value = ""
     }
+
+    fun updateRestaurantProperty(property: String, newValue: String) {
+        _changes[property] = newValue
+        _restaurant.value = when (property) {
+            "name" -> _restaurant.value?.copy(name = newValue)
+            "description" -> _restaurant.value?.copy(description = newValue)
+            "address" -> _restaurant.value?.copy(address = newValue)
+            "latitude" -> _restaurant.value?.copy(latitude = newValue.toDoubleOrNull() ?: _restaurant.value!!.latitude)
+            "longitude" -> _restaurant.value?.copy(longitude = newValue.toDoubleOrNull() ?: _restaurant.value!!.longitude)
+            "phoneNumber" -> _restaurant.value?.copy(phoneNumber = newValue)
+            else -> _restaurant.value
+        }
+    }
+
+    fun saveChanges() {
+        if (_changes.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val updateDto = RestaurantUpdateDto(
+                    name = _changes["name"] ?: _restaurant.value!!.name,
+                    description = _changes["description"] ?: _restaurant.value!!.description,
+                    address = _changes["address"] ?: _restaurant.value!!.address,
+                    latitude = _changes["latitude"]?.toDoubleOrNull() ?: _restaurant.value!!.latitude,
+                    longitude = _changes["longitude"]?.toDoubleOrNull() ?: _restaurant.value!!.longitude,
+                    phoneNumber = _restaurant.value!!.phoneNumber
+                )
+                val response = restaurantApiService.updateRestaurant(updateDto)
+                if (response.isSuccessful) {
+                    _successMessage.value = "Restaurant details updated successfully."
+                    _changes.clear()
+                    fetchRestaurantData() // Refresh data
+                } else {
+                    _errorMessage.value = "Update failed: ${response.code()} ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Exception during update: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun updateAddress(address: String) {
+        _restaurant.value = _restaurant.value?.copy(address = address)
+    }
+
+    fun hasChanges(): Boolean = _changes.isNotEmpty()
 
     fun addCategory(categoryName: String) {
         viewModelScope.launch {
@@ -161,6 +247,34 @@ class RestaurantOwnerViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSignOutClick(context: Context) {
+        launchCatching {
+            val token = Firebase.messaging.token.await()
+            accountApiService.deleteDeviceToken(token)
+            accountService.signOut()
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            context.startActivity(intent, null)
+        }
+    }
+
+    fun onDeleteAccountClick(context: Context) {
+        launchCatching {
+            accountApiService.deleteUser()
+            accountService.deleteAccount()
+            val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            context.startActivity(intent, null)
+        }
+    }
+
+    private fun launchCatching(block: suspend CoroutineScope.() -> Unit) =
+        viewModelScope.launch(
+            CoroutineExceptionHandler { _, throwable ->
+                Log.d("SignInViewModel", throwable.message.orEmpty())
+            }, block = block
+        )
 
     fun updateCategory(categoryId: String, newName: String) {
         viewModelScope.launch {
@@ -511,6 +625,80 @@ class RestaurantOwnerViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             showErrorDialog(e.message.toString())
+        }
+    }
+
+    // Add Image States
+    private val _logoImageState = MutableStateFlow<ImageState>(ImageState())
+    val logoImageState: StateFlow<ImageState> = _logoImageState
+
+    private val _bannerImageState = MutableStateFlow<ImageState>(ImageState())
+    val bannerImageState: StateFlow<ImageState> = _bannerImageState
+    // Add functions to handle logo image
+    fun setLogoImage(uri: Uri) {
+        _logoImageState.value = ImageState(imageUri = uri, imageUrl = _logoImageState.value.imageUrl)
+        viewModelScope.launch {
+            try {
+                val multipart = uriToMultipartBody(uri)!!
+                val response = photoApiService.uploadLogo(multipart)
+                if (response.isSuccessful) {
+                    _logoImageState.value = _logoImageState.value.copy(imageUrl = response.body()?.url)
+                } else {
+                    showErrorDialog("Failed to upload logo: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                showErrorDialog("Failed to upload logo: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun deleteLogoImage() {
+        _logoImageState.value = ImageState()
+        viewModelScope.launch {
+            try {
+                val response = photoApiService.deleteLogo()
+                if (response.isSuccessful) {
+                    // Optionally, update the restaurant's logo URL after deletion
+                } else {
+                    showErrorDialog("Failed to delete logo: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                showErrorDialog("Failed to delete logo: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    // Add functions to handle banner image
+    fun setBannerImage(uri: Uri) {
+        _bannerImageState.value = ImageState(imageUri = uri, imageUrl = _bannerImageState.value.imageUrl)
+        viewModelScope.launch {
+            try {
+                val multipart = uriToMultipartBody(uri)!!
+                val response = photoApiService.uploadBanner(multipart)
+                if (response.isSuccessful) {
+                    _bannerImageState.value = _bannerImageState.value.copy(imageUrl = response.body()?.url)
+                } else {
+                    showErrorDialog("Failed to upload banner: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                showErrorDialog("Failed to upload banner: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun deleteBannerImage() {
+        _bannerImageState.value = ImageState()
+        viewModelScope.launch {
+            try {
+                val response = photoApiService.deleteBanner()
+                if (response.isSuccessful) {
+                    // Optionally, update the restaurant's banner URL after deletion
+                } else {
+                    showErrorDialog("Failed to delete banner: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                showErrorDialog("Failed to delete banner: ${e.localizedMessage}")
+            }
         }
     }
 

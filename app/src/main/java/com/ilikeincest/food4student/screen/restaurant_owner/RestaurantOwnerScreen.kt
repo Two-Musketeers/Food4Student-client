@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,19 +25,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ilikeincest.food4student.model.Location
 import com.ilikeincest.food4student.screen.main_page.RequestNotificationPermissionDialog
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantOwnerScreen(
+    selectedLocation: Location?,
     viewModel: RestaurantOwnerViewModel,
     onNavigateToAddEditFoodItem: () -> Unit,
-    navController: NavController,
+    onNavigateToRating: (id: String) -> Unit,
+    onNavigateToLocationPicker: () -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         RequestNotificationPermissionDialog()
     }
+
+    val restaurantState = viewModel.restaurant.collectAsState()
+    val restaurant = restaurantState.value
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -87,8 +94,10 @@ fun RestaurantOwnerScreen(
             currentRoute = currentRoute,
             scrollConnection = scrollBehavior.nestedScrollConnection,
             onNavigateToAddEditFoodItem = { onNavigateToAddEditFoodItem() },
-            navController = navController,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onNavigateToRating = {onNavigateToRating(restaurant!!.id)},
+            onNavigateToLocationPicker = onNavigateToLocationPicker,
+            location = selectedLocation
         )
     }
 }
