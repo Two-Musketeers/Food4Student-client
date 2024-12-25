@@ -141,7 +141,7 @@ fun RestaurantOwnerScreenContent(
         ) { innerPadding ->
             restaurant.let { restaurant ->
                 AsyncImage(
-                    model = restaurant.bannerUrl,
+                    model = restaurantState.value!!.bannerUrl,
                     contentDescription = "Restaurant banner",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

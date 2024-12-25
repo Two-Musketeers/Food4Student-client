@@ -691,7 +691,9 @@ class RestaurantOwnerViewModel @Inject constructor(
                 val multipart = uriToMultipartBody(uri)!!
                 val response = photoApiService.uploadBanner(multipart)
                 if (response.isSuccessful) {
-                    _bannerImageState.value = _bannerImageState.value.copy(imageUrl = response.body()?.url)
+                    val url = response.body()?.url
+                    _bannerImageState.value = _bannerImageState.value.copy(imageUrl = url)
+                    _restaurant.value = _restaurant.value?.copy(bannerUrl = url) // <---
                 } else {
                     showErrorDialog("Failed to upload banner: ${response.message()}")
                 }
