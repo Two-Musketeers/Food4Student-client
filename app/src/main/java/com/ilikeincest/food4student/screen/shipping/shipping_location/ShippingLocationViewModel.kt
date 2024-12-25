@@ -33,7 +33,6 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "cu
 class ShippingLocationViewModel @Inject constructor(
     private val userApiService: UserApiService
 ): ViewModel() {
-    // TODO: swap to non id model
     private val _currentLocation = MutableStateFlow(SavedShippingLocation(
         id = "",
         locationType = SavedShippingLocationType.Home,

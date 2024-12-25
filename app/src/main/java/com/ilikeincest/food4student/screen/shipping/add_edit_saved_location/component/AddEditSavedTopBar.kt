@@ -28,6 +28,7 @@ fun AddEditSavedTopBar(
     enableSave: Boolean,
     isEdit: Boolean,
     onNavigateUp: () -> Unit,
+    showDeleteButton: Boolean,
     onDelete: () -> Unit,
     onSave: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -42,7 +43,7 @@ fun AddEditSavedTopBar(
             Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Trở về")
         } },
         actions = {
-            if (isEdit) {
+            if (isEdit && showDeleteButton) {
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Outlined.Delete, "Xóa địa chỉ")
                 }
@@ -67,12 +68,12 @@ fun AddEditSavedTopBar(
 @Preview
 @Composable
 private fun Edit() { ComponentPreview {
-    AddEditSavedTopBar(true, true, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
+    AddEditSavedTopBar(true, true, {}, false, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
 } }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun Add() { ComponentPreview {
-    AddEditSavedTopBar(false, false, {}, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
+    AddEditSavedTopBar(false, false, {}, false, {}, {}, TopAppBarDefaults.pinnedScrollBehavior())
 } }

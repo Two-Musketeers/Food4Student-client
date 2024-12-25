@@ -66,7 +66,7 @@ fun RatingCard(
     ) {
         Box(Modifier.fillMaxWidth()) {
             Icon(painterResource(R.drawable.quarter_circle), null,
-                tint = colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                tint = colorScheme.secondaryContainer.copy(alpha = 0.3f),
                 modifier = Modifier.align(Alignment.BottomEnd).size(100.dp)
             )
             Column(Modifier.padding(16.dp)

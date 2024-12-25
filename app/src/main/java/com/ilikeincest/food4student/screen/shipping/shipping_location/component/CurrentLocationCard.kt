@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,7 @@ import com.ilikeincest.food4student.component.preview_helper.ComponentPreview
 
 @Composable
 fun CurrentLocationCard(
+    onEditCurrent: () -> Unit,
     currentLocation: String,
     locationAddress: String,
     modifier: Modifier = Modifier
@@ -37,33 +39,41 @@ fun CurrentLocationCard(
             .copy(containerColor = colorScheme.surfaceContainerLow),
         modifier = modifier.fillMaxWidth()
     ) {
-        Row(Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-        ) {
-            Box(
+        Box {
+            TextButton(onClick = onEditCurrent,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 4.dp, top = 2.dp)
+            ) { Text("Sửa") }
+            Row(
                 Modifier
-                    .background(colorScheme.primaryContainer, CircleShape)
-                    .size(40.dp)
+                    .padding(16.dp)
+                    .fillMaxWidth()
             ) {
-                Icon(
-                    painterResource(R.drawable.location_on),
-                    contentDescription = null,
-                    tint = colorScheme.onPrimaryContainer,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.Center)
-                )
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Địa chỉ giao hàng hiện tại:", style = typography.titleSmall)
-                Text(currentLocation, style = typography.titleMedium)
-                if (currentLocation != locationAddress) {
-                    Text(locationAddress, style = typography.bodySmall)
+                Box(
+                    Modifier
+                        .background(colorScheme.primaryContainer, CircleShape)
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.location_on),
+                        contentDescription = null,
+                        tint = colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Địa chỉ giao hàng hiện tại:", style = typography.titleSmall)
+                    Text(currentLocation, style = typography.titleMedium)
+                    if (currentLocation != locationAddress) {
+                        Text(locationAddress, style = typography.bodySmall)
+                    }
                 }
             }
         }
@@ -74,6 +84,7 @@ fun CurrentLocationCard(
 @Composable
 private fun Prev() { ComponentPreview {
     CurrentLocationCard(
+        {},
         "KTX Đại học Quốc gia TPHCM - Khu B",
         "15/12/564/23 Tô Vĩnh Diện, Phường Đông Hòa, Dĩ An, Bình Dương",
         Modifier
