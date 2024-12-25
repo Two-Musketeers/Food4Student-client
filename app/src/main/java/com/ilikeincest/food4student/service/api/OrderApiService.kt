@@ -11,7 +11,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface OrderApiService {
-    // For restaurant owner
+    // For user
     @GET("orders/users/pending")
     suspend fun getOrdersPending() : Response<List<Order>>
     @GET("orders/users/approved")
@@ -20,6 +20,17 @@ interface OrderApiService {
     suspend fun getOrdersDelivered() : Response<List<Order>>
     @GET("orders/users/cancelled")
     suspend fun getOrdersCancelled() : Response<List<Order>>
+
+    // For restaurant owner
+    @GET("orders/restaurants/pending")
+    suspend fun getRestaurantOrdersPending() : Response<List<Order>>
+    @GET("orders/restaurants/approved")
+    suspend fun getRestaurantOrdersApproved() : Response<List<Order>>
+    @GET("orders/restaurants/delivered")
+    suspend fun getRestaurantOrdersDelivered() : Response<List<Order>>
+    @GET("orders/restaurants/cancelled")
+    suspend fun getRestaurantOrdersCancelled() : Response<List<Order>>
+
     @GET("orders/{id}")
     suspend fun getOrder(
         @Path("id") orderId : String

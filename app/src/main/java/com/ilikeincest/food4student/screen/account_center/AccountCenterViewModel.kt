@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.viewmodel
+package com.ilikeincest.food4student.screen.account_center
 
 import android.content.Context
 import android.content.Intent

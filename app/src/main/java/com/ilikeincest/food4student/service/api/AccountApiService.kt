@@ -7,22 +7,21 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface AccountApiService {
     @POST("account/device-token")
     suspend fun registerDeviceToken(@Body token: DeviceTokenDto): Response<Unit>
-    @DELETE("account/device-token")
+    @DELETE("account/device-token/{token}")
     suspend fun deleteDeviceToken(
-        @Query("token") token: String
+        @Path("token") token: String
     ): Response<Unit>
     @POST("account/user-register")
     suspend fun registerUser(@Body userDto: RegisterAccountDto): Response<Unit>
     @POST("account/restaurantOwner-register")
-    suspend fun registerRestaurantOwner(@Body restaurantOwnerDto: RegisterRestaurantOwnerDto): Response<Unit>
+    suspend fun registerRestaurantOwner(
+        @Body restaurantOwnerDto: RegisterRestaurantOwnerDto
+    ): Response<Unit>
     @DELETE("account")
     suspend fun deleteUser(): Response<Unit>
-    @PUT("account")
-    suspend fun updateUser(@Body userDto: RegisterAccountDto): Response<Unit>
 }

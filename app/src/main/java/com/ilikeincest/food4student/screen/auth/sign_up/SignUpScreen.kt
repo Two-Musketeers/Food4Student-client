@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.PasswordField
 import com.ilikeincest.food4student.screen.auth.component.AuthenticationButton
-import com.ilikeincest.food4student.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(

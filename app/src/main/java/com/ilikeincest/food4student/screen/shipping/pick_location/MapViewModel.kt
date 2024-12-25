@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.viewmodel
+package com.ilikeincest.food4student.screen.shipping.pick_location
 
 import android.content.Context
 import android.util.Log
