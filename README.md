@@ -12,7 +12,7 @@ Yes you will need to verify your app SHA, Google will be your best friend.
 
 Make a Here SDK account, and get the keys.
 
-Copy the content of file `secret.properties.example` into a file named  `secret.properties` in the root directory.
+Copy the content of file `secret.example.properties` into a file named  `secret.properties` in the root directory.
 
 Add your needed values into each line. For example:
 
