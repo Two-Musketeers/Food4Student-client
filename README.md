@@ -4,19 +4,26 @@
 
 * Step 1: Create a Firebase project. 
 
-Add an Android app to that, download `google-services.json` file and put it inside `/app` folder
+Add an Android app to that, download `google-services.json` file and put it inside `/app` folder.
 
-* Step 2: HERE maps SDK
+Yes you will need to verify your app SHA, Google will be your best friend.
 
-Make a `secret.properties` file in the root directory and add the following line:
+* Step 2: Build variables
+
+Make a Here SDK account, and get the keys.
+
+Copy the content of file `secret.properties.example` into a file named  `secret.properties` in the root directory.
+
+Add your needed values into each line. For example:
 
 ```
-HERE_API_KEY=YOUR_HERE_SDK_KEY
-HERE_API_SECRET_KEY=YOUR_HERE_SDK_SECRET
+HERE_API_KEY=YOUR_API_KEY
+HERE_API_SECRET_KEY=YOUR_SECRET_KEY
+BACKEND_URL=https://example.com/api/
 ```
 
-And replace the `YOUR_HERE` with the keys you get from HERE maps SDK.
+**WARNING:** Make sure there is a leading `/` after the backend url. Android shennanigans...
 
-* Step 3: Build the project
+* Step 3: Build the project along with the backend
 * Step 4: Run the project
 * Step 5: Enjoy the app
