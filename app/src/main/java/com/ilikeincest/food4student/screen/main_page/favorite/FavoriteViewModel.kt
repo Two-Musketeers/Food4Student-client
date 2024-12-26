@@ -47,6 +47,9 @@ class FavoriteViewModel @Inject constructor(
         // Observe liked restaurants and update the list accordingly
         viewModelScope.launch {
             repository.likedRestaurantIds.collect { likedIds ->
+                refreshFavorites(latitude = 0.0, longitude = 0.0) // Replace with actual location
+                return@collect
+                // TODO: fix this bullshit
                 // This removal is appropriate for FavoriteViewModel
                 restaurantList.removeAll { !likedIds.contains(it.id) }
 
@@ -94,6 +97,7 @@ class FavoriteViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
+                    phoneNumber = dto.phoneNumber,
                     perStarRating = listOf()
                 )
             )
@@ -133,6 +137,7 @@ class FavoriteViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
+                    phoneNumber = dto.phoneNumber,
                     perStarRating = listOf()
                 )
             } ?: listOf()

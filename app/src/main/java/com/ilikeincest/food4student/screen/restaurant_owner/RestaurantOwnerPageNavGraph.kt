@@ -13,16 +13,14 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ilikeincest.food4student.component.BroadcastReceiver
 import com.ilikeincest.food4student.model.Notification
-import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreen
 import com.ilikeincest.food4student.screen.main_page.notification.NotificationScreenViewModel
-import com.ilikeincest.food4student.screen.main_page.order.OrderScreen
+import com.ilikeincest.food4student.screen.restaurant_owner.res_order.RestaurantOrderScreen
 import kotlinx.datetime.Clock
 import kotlin.random.Random
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
@@ -34,9 +32,9 @@ import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.ilikeincest.food4student.R
+import com.ilikeincest.food4student.model.Location
+import com.ilikeincest.food4student.screen.restaurant_owner.account_center.RestaurantAccountCenterScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.restaurant_content.RestaurantOwnerScreenContent
 
 internal val defaultRoute = RestaurantOwnerRoutes.Home
@@ -75,12 +73,14 @@ internal enum class RestaurantOwnerRoutes(
 
 @Composable
 internal fun RestaurantOwnerPageNavGraph(
+    location: Location?,
     innerPadding: PaddingValues,
     currentRoute: RestaurantOwnerRoutes,
     scrollConnection: NestedScrollConnection,
     onNavigateToAddEditFoodItem: () -> Unit,
+    onNavigateToLocationPicker: () -> Unit,
+    onNavigateToRating: () -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavController,
     viewModel: RestaurantOwnerViewModel
 ) {
     val notificationViewModel = hiltViewModel<NotificationScreenViewModel>()
@@ -124,15 +124,14 @@ internal fun RestaurantOwnerPageNavGraph(
                     onNavigateToAddEditFoodItem = {
                         onNavigateToAddEditFoodItem()
                     },
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onNavigateToRating = { onNavigateToRating() }
                 )
             RestaurantOwnerRoutes.Orders ->
-                OrderScreen(onNavigateToRestaurant = null)
-            RestaurantOwnerRoutes.Account ->
-                AccountCenterScreen(
-                    navController = navController,
-                    contentWindowInsets = WindowInsets(0.dp)
-                )
+                RestaurantOrderScreen(onNavigateToRestaurant = null)
+            RestaurantOwnerRoutes.Account -> {
+                RestaurantAccountCenterScreen(selectedLocation = location, viewModel = viewModel, onNavigateToLocationPicker = onNavigateToLocationPicker)
+            }
             RestaurantOwnerRoutes.Notifications ->
                 NotificationScreen(scrollConnection)
         }

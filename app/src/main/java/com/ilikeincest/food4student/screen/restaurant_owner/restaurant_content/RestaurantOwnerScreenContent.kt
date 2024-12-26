@@ -68,7 +68,8 @@ import kotlin.math.roundToInt
 @Composable
 fun RestaurantOwnerScreenContent(
     onNavigateToAddEditFoodItem: () -> Unit,
-    viewModel: RestaurantOwnerViewModel
+    viewModel: RestaurantOwnerViewModel,
+    onNavigateToRating: () -> Unit
 ) {
     val restaurantState = viewModel.restaurant.collectAsState()
     val restaurant = restaurantState.value
@@ -140,7 +141,7 @@ fun RestaurantOwnerScreenContent(
         ) { innerPadding ->
             restaurant.let { restaurant ->
                 AsyncImage(
-                    model = restaurant.bannerUrl,
+                    model = restaurantState.value!!.bannerUrl,
                     contentDescription = "Restaurant banner",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -168,12 +169,14 @@ fun RestaurantOwnerScreenContent(
                         }
 
                         // header
+                        val starRating = "${String.format("%.2f", restaurant.averageRating)}"
                         item(contentType = "restaurant header") {
                             RestaurantOwnerHeader(
                                 name = restaurant.name,
-                                starRating = restaurant.averageRating.toString(),
+                                starRating = starRating,
                                 description = restaurant.description,
-                                modifier = bgModifier
+                                modifier = bgModifier,
+                                onNavigateToRating = { onNavigateToRating() }
                             )
                         }
 

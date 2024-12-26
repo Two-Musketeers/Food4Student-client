@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val pageSize = 10
+const val pageSize = Int.MAX_VALUE
 
 @Singleton
 class RestaurantRepository @Inject constructor(

@@ -93,6 +93,10 @@ class HomeViewModel @Inject constructor(
     val currentLocation = MutableStateFlow<GeoCoordinates?>(null)
     fun setCurrentLocation(it: GeoCoordinates?) {
         currentLocation.value = it
+        if (it == null) return
+        viewModelScope.launch {
+            refreshRestaurantList(it.latitude, it.longitude)
+        }
     }
 
     suspend fun refreshRestaurantList(latitude: Double, longitude: Double) {
@@ -134,7 +138,8 @@ class HomeViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
-                    perStarRating = listOf() // TODO
+                    perStarRating = listOf(),
+                    phoneNumber = ""
                 )
             )
         }
@@ -143,9 +148,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun loadMoreRestaurants() {
-        _isLoadingMore.value = true
-        _currentPage++
         viewModelScope.launch {
+            _isLoadingMore.value = true
+            _currentPage++
             while (currentLocation.value == null) {
                 delay(1000)
             }
@@ -166,7 +171,7 @@ class HomeViewModel @Inject constructor(
                     lat2 = dto.latitude,
                     lon2 = dto.longitude
                 )
-                val estimatedTime = (distance / 40.0 * 60).toInt() // 40 km/h => time in minutes
+                val estimatedTime = (distance / 40.0 * 60).toInt()
 
                 Restaurant(
                     id = dto.id,
@@ -184,7 +189,8 @@ class HomeViewModel @Inject constructor(
                     foodCategories = emptyList(),
                     distanceInKm = distance,
                     estimatedTimeInMinutes = estimatedTime,
-                    perStarRating = listOf()
+                    perStarRating = listOf(),
+                    phoneNumber = ""
                 )
             } ?: listOf()
 

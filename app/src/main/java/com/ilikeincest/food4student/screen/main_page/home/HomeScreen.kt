@@ -69,6 +69,10 @@ fun HomeScreen(
         vm.fetchCurrentFromDStore(context)
     }
 
+    LaunchedEffect(currentLocation) {
+        vm.setCurrentLocation(currentLocation)
+    }
+
     Column(Modifier.padding(top = 12.dp)) {
         CurrentShippingLocationCard(
             onClick = onNavigateToShippingLocation,
@@ -90,7 +94,10 @@ fun HomeScreen(
             onRefresh = {
                 if (currentLocation != null) {
                     coroutineScope.launch {
-                        vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
+                        vm.refreshRestaurantList(
+                            currentLocation.latitude,
+                            currentLocation.longitude
+                        )
                     }
                 }
             },
@@ -119,9 +126,10 @@ fun HomeScreen(
                                         if (state.firstVisibleItemIndex > 0)
                                             state.animateScrollToItem(1)
                                         if (currentLocation == null) return@launch
-                                        coroutineScope.launch {
-                                            vm.refreshRestaurantList(currentLocation.latitude, currentLocation.longitude)
-                                        }
+                                        vm.refreshRestaurantList(
+                                            currentLocation.latitude,
+                                            currentLocation.longitude
+                                        )
                                     }
                                 },
                                 text = { Text(it.tabTitle) }
@@ -140,7 +148,7 @@ fun HomeScreen(
                         )
                         ShopListingCard(
                             shopName = restaurant.name,
-                            starRating = restaurant.averageRating.toString(),
+                            starRating = "${String.format("%.1f", restaurant.averageRating)}",
                             distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
                             timeAway = "${restaurant.estimatedTimeInMinutes} phút",
                             shopImageModel = restaurant.logoUrl, // TODO
@@ -155,9 +163,6 @@ fun HomeScreen(
                     }
                 }
                 item {
-                    LaunchedEffect(currentLocation) {
-                        vm.setCurrentLocation(currentLocation)
-                    }
                     LaunchedEffect(isLoadingMore, noMoreRestaurant, isRefreshing) {
                         if (isLoadingMore || noMoreRestaurant || isRefreshing)
                             return@LaunchedEffect

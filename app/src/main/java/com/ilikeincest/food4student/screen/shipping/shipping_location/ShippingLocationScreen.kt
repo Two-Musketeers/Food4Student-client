@@ -167,6 +167,7 @@ private fun ShippingLocationScreenContent(
                     .verticalScroll(rememberScrollState())
             ) {
                 CurrentLocationCard(
+                    onEditCurrent = { onEditLocation("") }, // empty id is current
                     currentLocation = currentLocation,
                     locationAddress = currentAddress,
                     modifier = Modifier.padding(bottom = 6.dp)

@@ -37,7 +37,7 @@ class RestaurantRatingViewModel @Inject constructor(
     private fun loadData() {
         if (_id == null) return
         viewModelScope.launch {
-            val res1 = restaurantApiService.getRestaurantById(_id)
+            val res1 = restaurantApiService.getRestaurantRatingsSummary(_id)
             if (!res1.isSuccessful) { with(res1) {
                 errorMessage.value = "${code()} - ${errorBody()?.string()}"
                 return@launch
@@ -45,7 +45,7 @@ class RestaurantRatingViewModel @Inject constructor(
             res1.body()?.let {
                 _totalRatings.value = it.totalRatings
                 _averageRating.value = it.averageRating
-                _perStarRatings.value = listOf(5,5,5,5,5) // TODO
+                _perStarRatings.value = it.perStarRatings
             }
 
             val res2 = restaurantApiService.restaurantRating(_id)

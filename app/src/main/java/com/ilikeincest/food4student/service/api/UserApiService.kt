@@ -80,7 +80,7 @@ interface UserApiService {
     // Don't know if this is needed
     @GET("users/ratings/{id}")
     suspend fun getRating(
-        @Path("id") id: String
+        @Path("id") orderId: String
     ) : Response<RatingDto>
     // Orders
     @GET("users/orders")

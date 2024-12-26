@@ -1,6 +1,7 @@
 package com.ilikeincest.food4student.screen.main_page.order
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.preferences.core.edit
@@ -8,12 +9,15 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
+import com.ilikeincest.food4student.dto.RatingDto
+import com.ilikeincest.food4student.dto.order.CreateRatingDto
 import com.ilikeincest.food4student.model.Order
 import com.ilikeincest.food4student.model.OrderStatus
 import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.screen.shipping.shipping_location.dataStore
 import com.ilikeincest.food4student.service.api.OrderApiService
 import com.ilikeincest.food4student.service.api.RestaurantApiService
+import com.ilikeincest.food4student.service.api.UserApiService
 import com.ilikeincest.food4student.util.haversineDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -26,9 +30,11 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val orderApiService: OrderApiService,
+    private val userApiService: UserApiService,
     private val restaurantApiService: RestaurantApiService
 ): ViewModel() {
     val orderList = mutableStateMapOf<OrderStatus, List<Order>>()
+    val ratings = mutableStateListOf<RatingDto>()
     val error = mutableStateOf("")
     val isLoading = mutableStateOf(false)
 
@@ -38,6 +44,13 @@ class OrderViewModel @Inject constructor(
             OrderStatus.Approved -> orderApiService.getOrdersApproved()
             OrderStatus.Delivered -> orderApiService.getOrdersDelivered()
             OrderStatus.Cancelled -> orderApiService.getOrdersCancelled()
+        }
+    }
+
+    private suspend fun addRatingIfExists(orderId: String) {
+        val res = userApiService.getRating(orderId)
+        if (res.isSuccessful) {
+            ratings.add(res.body()!!)
         }
     }
 
@@ -56,9 +69,14 @@ class OrderViewModel @Inject constructor(
                 val res = getOrdersOfStatus(status)
                 if (!res.isSuccessful) {
                     error.value = "${res.code()} ${res.message()} - ${res.errorBody()!!.string()}"
+                    ratings.clear()
                     return@launch
                 }
                 orderList[status] = res.body()!!
+            }
+            ratings.clear()
+            for (order in orderList[OrderStatus.Delivered]!!) {
+                addRatingIfExists(order.id)
             }
             onSuccess()
         }
@@ -100,5 +118,15 @@ class OrderViewModel @Inject constructor(
             context.dataStore.edit { it[LOCATION] = "" }
         }
         return null
+    }
+
+    fun addReview(orderId: String, star: Int, comment: String) {
+        isLoading.value = true
+        viewModelScope.launch {
+            userApiService.rateRestaurant(orderId,
+                CreateRatingDto(stars = star, comment = comment)
+            )
+            refreshOrders { isLoading.value = false }
+        }
     }
 }

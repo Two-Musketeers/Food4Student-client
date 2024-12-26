@@ -1,4 +1,4 @@
-package com.ilikeincest.food4student.viewmodel
+package com.ilikeincest.food4student.screen.auth.sign_in
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +50,6 @@ class SignInViewModel @Inject constructor(
 
     fun onSignIn(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            // TODO: fucking handle wrong creds, wtf
             try {
                 accountService.signInWithEmail(_email.value, _password.value)
                 onSuccess()

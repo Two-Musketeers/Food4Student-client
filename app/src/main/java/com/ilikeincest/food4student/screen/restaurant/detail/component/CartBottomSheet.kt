@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +31,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ilikeincest.food4student.dto.order.CreateOrderItemDto
+import com.ilikeincest.food4student.screen.restaurant.detail.Cart
+import com.ilikeincest.food4student.screen.restaurant.detail.CartItem
 import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantDetailViewModel
 import com.ilikeincest.food4student.util.formatPrice
 import kotlinx.coroutines.launch
@@ -38,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CartBottomSheet(
     viewModel: RestaurantDetailViewModel,
+    onNavigateToCheckout: (List<CartItem>) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val coroutine = rememberCoroutineScope()
@@ -94,7 +100,7 @@ fun CartBottomSheet(
                     FoodItemCard(
                         item = cartItem.foodItem.copy(
                             // Replace description with variation info or use a custom layout
-                            description = cartItem.selectedVariations.entries.joinToString { (variationId, optionIds) ->
+                            description = cartItem.selectedVariations.entries.joinToString(separator = "\n") { (variationId, optionIds) ->
                                 val variation = cartItem.foodItem.variations.find { it.id == variationId }
                                 val options = variation?.variationOptions?.filter { it.id in optionIds }
                                 "${variation?.name}: ${options?.joinToString { it.name } ?: ""}"
@@ -116,7 +122,7 @@ fun CartBottomSheet(
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = "Tổng tiền:",
@@ -133,12 +139,15 @@ fun CartBottomSheet(
             }
             Button(
                 onClick = {
-                    // TODO: Implement checkout functionality
+                    onNavigateToCheckout(cartItems)
                 },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                enabled = cartItems.isNotEmpty()
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(vertical = 8.dp)
+                    .height(52.dp),
+                enabled = cartItems.isNotEmpty(),
             ) {
-                Text("Đặt hàng")
+                Text("Đặt hàng", fontSize = 20.sp)
             }
         }
     }

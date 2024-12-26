@@ -50,7 +50,9 @@ fun OverallRatingCard(
             modifier = Modifier.padding(horizontal =  24.dp)
                 .padding(top = 24.dp, bottom = 16.dp)
         ) {
-            Text(averageRating.toString(),
+            val ratingToShow = if (totalRatings == 0) "---"
+                else String.format("%.2f", averageRating)
+            Text(ratingToShow,
                 style = typography.titleLarge.copy(
                     fontWeight = FontWeight.W700,
                     fontSize = 24.sp

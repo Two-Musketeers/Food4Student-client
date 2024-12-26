@@ -35,6 +35,14 @@ class AccountServiceImpl @Inject constructor() : AccountService {
         return currentUser.getIdToken(false).await().token
     }
 
+    override fun isEmailVerified(): Boolean {
+        return Firebase.auth.currentUser?.isEmailVerified ?: false
+    }
+
+    override fun sendVerifyEmail() {
+        Firebase.auth.currentUser?.sendEmailVerification()
+    }
+
     override fun hasUser(): Boolean {
         return Firebase.auth.currentUser != null
     }

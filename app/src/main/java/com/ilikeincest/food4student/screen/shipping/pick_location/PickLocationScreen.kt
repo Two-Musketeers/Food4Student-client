@@ -54,7 +54,6 @@ import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapS
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.MapViewContainer
 import com.ilikeincest.food4student.screen.shipping.pick_location.component.SuggestedAddressList
 import com.ilikeincest.food4student.util.LocationUtils
-import com.ilikeincest.food4student.viewmodel.MapViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

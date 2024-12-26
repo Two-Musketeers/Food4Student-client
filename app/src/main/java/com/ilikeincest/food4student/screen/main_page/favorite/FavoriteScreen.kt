@@ -91,7 +91,7 @@ fun FavoriteScreen(
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = modifier.padding(horizontal = 16.dp)
+                modifier = modifier.padding(horizontal = 16.dp).fillMaxSize()
             ) {
                 item {} // to get the default 16dp spacing as padding
                 items(restaurantList, key = { it.id }) { restaurant ->
@@ -101,9 +101,10 @@ fun FavoriteScreen(
                         Distance = restaurant.distanceInKm,
                         IsFavorited = restaurant.isFavorited
                     )
+                    val starRating = "${String.format("%.1f", restaurant.averageRating)}"
                     ShopListingCard(
                         shopName = restaurant.name,
-                        starRating = restaurant.averageRating.toString(),
+                        starRating = starRating,
                         distance = "${String.format("%.2f", restaurant.distanceInKm)} km",
                         timeAway = "${restaurant.estimatedTimeInMinutes} phút",
                         shopImageModel = restaurant.logoUrl, // TODO

@@ -18,7 +18,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.here.sdk.core.GeoCoordinates
 import com.ilikeincest.food4student.MainActivity
-import com.ilikeincest.food4student.viewmodel.MapViewModel
+import com.ilikeincest.food4student.screen.shipping.pick_location.MapViewModel
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.RawValue
 import kotlinx.parcelize.Parcelize
@@ -60,7 +60,11 @@ class LocationUtils(val context: @RawValue Context) : Parcelable {
 
     @SuppressLint("MissingPermission")
     fun requestLocationForLatLong(onLocationReceived: (GeoCoordinates) -> Unit) {
-        _fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        val req = CurrentLocationRequest.Builder()
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
+            .build()
+        _fusedLocationClient.getCurrentLocation(req, null).addOnSuccessListener { location ->
             location?.let {
                 val currentLocation = GeoCoordinates(it.latitude, it.longitude)
                 onLocationReceived(currentLocation)

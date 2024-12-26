@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,8 +93,19 @@ fun AddEditSavedFoodItemScreen(
     }
 
     var showConfirmDiscardDialog by remember { mutableStateOf(false) }
+    // Collect both hasUnsavedChanges and hasChanges as State
+    val hasUnsavedChanges by viewModel.hasUnsavedChanges.collectAsState()
 
-    val valueChanged = viewModel.hasUnsavedChanges
+    // Combine both flags if you still have another flag
+    // For example, if you have hasChanges as another StateFlow
+    // Here, assuming only hasUnsavedChanges is used after renaming
+    val valueChanged by derivedStateOf { hasUnsavedChanges }
+
+    // Handle back button
+    BackHandler(enabled = valueChanged) {
+        showConfirmDiscardDialog = true
+    }
+
     val onNavUp = {
         if (valueChanged) {
             showConfirmDiscardDialog = true
@@ -101,8 +113,6 @@ fun AddEditSavedFoodItemScreen(
             onNavigateUp()
         }
     }
-
-    BackHandler(enabled = valueChanged) { showConfirmDiscardDialog = true }
 
     if (showConfirmDiscardDialog) {
         ConfirmDiscardUnsavedDialog(
@@ -144,7 +154,7 @@ fun AddEditSavedFoodItemScreen(
         )
     }
 
-    Box (modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
                 AddEditSavedTopBarProduct(
@@ -184,7 +194,8 @@ fun AddEditSavedFoodItemScreen(
                     imageState = ImageState(imageUri = unsavedImageUri),
                     onImageClick = { imagePickerLauncher.launch("image/*") },
                     onDeleteImage = { viewModel.setUnsavedImage(null) },
-                    modifier = Modifier.size(125.dp)
+                    modifier = Modifier.size(125.dp),
+                    title = "Thêm ảnh đồ ăn"
                 )
                 Spacer(modifier = Modifier.padding(top = 8.dp))
                 DividerWithSubhead(subhead = { Text("Thông tin đồ ăn, thức uống") })

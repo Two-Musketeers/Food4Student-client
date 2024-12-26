@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +39,32 @@ class RestaurantDetailViewModel @Inject constructor(
 
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> = _cartItems
+
+    private val _showRefreshing = MutableStateFlow(false)
+    val showRefreshing = _showRefreshing.asStateFlow()
+    fun refresh() {
+        val restaurantId: String = handle[AppRoutes.RestaurantDetail::id.name] ?: return
+        _showRefreshing.value = true
+        viewModelScope.launch {
+            val response = restaurantApiService.getRestaurantById(restaurantId)
+            if (response.isSuccessful) {
+                val restaurant = response.body()
+                val distance: Double? = handle[AppRoutes.RestaurantDetail::distance.name]
+                val timeAway: Int? = handle[AppRoutes.RestaurantDetail::timeAway.name]
+                // Determine if the restaurant is liked based on the repository
+                val isFavorite = repository.likedRestaurantIds.value.contains(restaurantId)
+                _restaurantDetail.value = restaurant?.copy(
+                    perStarRating = listOf(),
+                    distanceInKm = distance ?: 0.0,
+                    estimatedTimeInMinutes = timeAway ?: 0,
+                    isFavorited = isFavorite
+                )
+            } else {
+                _errorMessage.value = response.message()
+            }
+            _showRefreshing.value = false
+        }
+    }
 
     init {
         val restaurantId: String? = handle[AppRoutes.RestaurantDetail::id.name]
@@ -203,8 +230,16 @@ class RestaurantDetailViewModel @Inject constructor(
     }
 }
 
+@Serializable
 data class CartItem(
     val foodItem: FoodItem,
     val selectedVariations: Map<String, List<String>>,
     val quantity: Int
+)
+@Serializable
+data class Cart(
+    val restaurantId: String,
+    val cartItems: List<CartItem>,
+    val restaurantName: String,
+    val shopImageUrl: String?
 )

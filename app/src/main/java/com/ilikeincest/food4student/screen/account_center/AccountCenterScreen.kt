@@ -32,7 +32,6 @@ import com.ilikeincest.food4student.screen.account_center.component.ExitAppCard
 import com.ilikeincest.food4student.screen.account_center.component.RemoveAccountCard
 import com.ilikeincest.food4student.screen.account_center.component.card
 import com.ilikeincest.food4student.model.Account
-import com.ilikeincest.food4student.viewmodel.AccountCenterViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,11 +115,11 @@ fun AccountCenterScreen(
 
             ExitAppCard(
                 navController,
-            ) { navController -> viewModel.onSignOutClick(navController, context) }
+            ) { navController -> viewModel.onSignOutClick(context) }
             // TODO: reauth before delete (yes its needed)
             RemoveAccountCard(
                 navController,
-            ) { navController -> viewModel.onDeleteAccountClick(navController, context) }
+            ) { navController -> viewModel.onDeleteAccountClick(context) }
         }
     }
 }

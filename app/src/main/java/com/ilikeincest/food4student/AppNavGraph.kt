@@ -12,9 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.ilikeincest.food4student.admin.screen.AdminScreen
-import com.ilikeincest.food4student.dto.NoNeedToFetchAgainBuddy
 import com.ilikeincest.food4student.model.Location
-import com.ilikeincest.food4student.model.SavedShippingLocation
 import com.ilikeincest.food4student.model.SavedShippingLocationType
 import com.ilikeincest.food4student.screen.account_center.AccountCenterScreen
 import com.ilikeincest.food4student.screen.auth.forget_password.ForgetPasswordScreen
@@ -23,20 +21,25 @@ import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleScreen
 import com.ilikeincest.food4student.screen.auth.select_role.SelectRoleUserScreen
 import com.ilikeincest.food4student.screen.auth.sign_in.SignInScreen
 import com.ilikeincest.food4student.screen.auth.sign_up.SignUpScreen
+import com.ilikeincest.food4student.screen.checkout.confirm.CheckoutConfirmScreen
+import com.ilikeincest.food4student.screen.checkout.success.CheckoutSuccessScreen
 import com.ilikeincest.food4student.screen.main_page.MainScreen
+import com.ilikeincest.food4student.screen.restaurant.detail.Cart
+import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
+import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.RestaurantOwnerViewModel
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_category.AddCategoryScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_product.AddEditSavedFoodItemScreen
 import com.ilikeincest.food4student.screen.restaurant_owner.food_item.add_edit_saved_varations.AddEditSavedVariationScreen
-import com.ilikeincest.food4student.screen.restaurant.detail.RestaurantScreen
-import com.ilikeincest.food4student.screen.restaurant.rating.RestaurantRatingScreen
 import com.ilikeincest.food4student.screen.shipping.add_edit_saved_location.AddEditSavedLocationScreen
 import com.ilikeincest.food4student.screen.shipping.pick_location.MapScreen
 import com.ilikeincest.food4student.screen.shipping.shipping_location.ShippingLocationScreen
 import com.ilikeincest.food4student.screen.splash.SplashScreen
 import com.ilikeincest.food4student.util.nav.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 object AppRoutes {
     @Serializable
@@ -89,6 +92,12 @@ object AppRoutes {
     object AddEditVariation
     @Serializable
     object SplashScreen
+
+    // checkout
+    @Serializable
+    data class CheckoutConfirm(val order: String) // is json of Cart
+    @Serializable
+    object CheckoutSuccess
 }
 
 @Composable
@@ -145,11 +154,15 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
                     navController.getBackStackEntry("RestaurantFlow")
                 }
                 val sharedViewModel = hiltViewModel<RestaurantOwnerViewModel>(parentEntry)
-                RestaurantOwnerScreen(
-                    viewModel = sharedViewModel,
-                    onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
-                    navController = navController
-                )
+                NavigateWithResult(it) { location: Location? ->
+                    RestaurantOwnerScreen(
+                        viewModel = sharedViewModel,
+                        onNavigateToAddEditFoodItem = { navController.navigate(AppRoutes.AddEditFoodItem) },
+                        onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
+                        onNavigateToLocationPicker = { navController.navigate(AppRoutes.PickLocation) },
+                        selectedLocation = location
+                    )
+                }
             }
             composable<AppRoutes.AddEditFoodItem> {
                 val parentEntry = remember(navController) {
@@ -268,12 +281,36 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             RestaurantScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNavigateToRating = { navController.navigate(AppRoutes.RestaurantRating(it)) },
+                onNavigateToCheckout = {
+                    val cart = Json.encodeToString(it)
+                    navController.navigate(AppRoutes.CheckoutConfirm(cart))
+                },
             )
         }
         composable<AppRoutes.RestaurantRating> {
             RestaurantRatingScreen(
                 onNavigateUp = { navController.navigateUp() }
             )
+        }
+
+        // checkout
+        composable<AppRoutes.CheckoutConfirm> {
+            val route = it.toRoute<AppRoutes.CheckoutConfirm>()
+            val order = remember { Json.decodeFromString<Cart>(route.order) }
+            CheckoutConfirmScreen(
+                order,
+                onSuccess = { navController.navigate(AppRoutes.CheckoutSuccess) {
+                    popUpTo<AppRoutes.RestaurantDetail> {
+                        inclusive = true
+                        saveState = false
+                    }
+                } },
+                onNavigateToShippingLocation = { navController.navigate(AppRoutes.ShippingLocation) }
+            )
+        }
+
+        composable<AppRoutes.CheckoutSuccess> {
+            CheckoutSuccessScreen { navController.popBackStack(AppRoutes.Main, false) }
         }
     }
 }
